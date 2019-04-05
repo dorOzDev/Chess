@@ -40,28 +40,28 @@ public class Queen extends Piece{
 		for( ; i < board.spots.length; i++)
 			candidateMovements.add(board.spots[i][currY].getSpot());
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		i = currX;
 		i--;
 		for(; i >= 0; i--)
 			candidateMovements.add(board.spots[i][currY].getSpot());
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		i = currY;
 		i++;
 		for(; i < board.spots.length; i++)
 			candidateMovements.add(board.spots[currX][i].getSpot());
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		i = currY;
 		i--;
 		for(; i >= 0; i--)
 			candidateMovements.add(board.spots[currX][i].getSpot());
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		int j = currY;
 		i= currX;
@@ -71,7 +71,7 @@ public class Queen extends Piece{
 			candidateMovements.add(board.spots[i][j]);
 		}
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		j = currY;
 		i= currX;
@@ -81,7 +81,7 @@ public class Queen extends Piece{
 			candidateMovements.add(board.spots[i][j]);
 		}
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		j = currY;
 		i= currX;
@@ -91,7 +91,7 @@ public class Queen extends Piece{
 			candidateMovements.add(board.spots[i][j]);
 		}
 		setValidMovements();
-		candidateMovements.clear();
+		
 		
 		j = currY;
 		i= currX;
@@ -101,17 +101,17 @@ public class Queen extends Piece{
 			candidateMovements.add(board.spots[i][j]);
 		}
 		setValidMovements();
-		candidateMovements.clear();
+		
 	}
 	
 	@Override
 	public void setValidMovements() {
-		int i = 0;
-		if(!candidateMovements.isEmpty()) {
-		while(!candidateMovements.get(i).getSpot().isOccupied()) {
-			validMovements.add(candidateMovements.get(i).getSpot());
-			i++;
+		
+		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getSpot().isOccupied()) {
+			validMovements.add(candidateMovements.pop().getSpot());
+
 			}
-		}
+		candidateMovements.clear();
+		
 	}
 }

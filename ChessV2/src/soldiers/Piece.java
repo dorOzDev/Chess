@@ -2,6 +2,10 @@ package soldiers;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 import enaum.PlayerColour;
 import game.Board;
@@ -14,12 +18,12 @@ public abstract class  Piece  {
 	protected Spot spot;
 	public PlayerColour playerCoulor;
 	protected ArrayList<Spot> validMovements;
-	protected ArrayList<Spot> candidateMovements;
+	protected LinkedList<Spot> candidateMovements;
 	
 	
 	public Piece() {
 		validMovements = new ArrayList<Spot>();
-		candidateMovements = new ArrayList<Spot>();
+		candidateMovements = new LinkedList<Spot>();
 		
 	}
 	public Piece(PlayerColour playerCoulor) {

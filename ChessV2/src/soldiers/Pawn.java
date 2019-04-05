@@ -46,12 +46,12 @@ public class Pawn extends Piece {
 	
 	@Override
 	public void setValidMovements() {
-		for(int i = 0; i < candidateMovements.size(); i++) {
-			if(candidateMovements.get(i).isOccupied()) {
-				candidateMovements.remove(i);			
+		while(!candidateMovements.isEmpty()) {
+			if(candidateMovements.peek().isOccupied()) {
+				candidateMovements.pop();			
 			}
 			else {
-				validMovements.add(candidateMovements.get(i));
+				validMovements.add(candidateMovements.pop());
 			}
 		}
 		

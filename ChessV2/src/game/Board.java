@@ -35,17 +35,20 @@ public class Board {
 					
 				}			
 		 }
+
 			
 			createPieces(piecesPlayerWhite, PlayerColour.WHITE);
 			createPieces(piecesPlayerBlack, PlayerColour.BLACK);
 			setPiecesPosition(piecesPlayerWhite, PlayerColour.WHITE);
 			setPiecesPosition(piecesPlayerBlack, PlayerColour.BLACK);
+			
+			
 			piecesPlayerWhite.get(1).movement();
 			System.out.println(piecesPlayerWhite.get(1).getMovements());
-
-	
 			
-	 }	
+
+				
+		}
 		else
 			
 			System.out.println("Attempt to create two boards avoided.");
@@ -93,14 +96,14 @@ public class Board {
 			x[1] = 1;
 		}
 		
-		piecesPlayer.get(pieceIndex).setStartPos(spots [x[0]][3]);// setting King's posistion.
+		piecesPlayer.get(pieceIndex).setStartPos(spots [x[0]][4]);// setting King's posistion.
 		spots [x[0]][3].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
 		
-		/*piecesPlayer.get(pieceIndex).setStartPos(spots [x[0]][4]);// setting Queen's position
+		piecesPlayer.get(pieceIndex).setStartPos(spots [4][4]);// setting Queen's position
 		spots [x[0]][4].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
-		*/
+		
 		// setting Y axis for Bishop's piece;
 		y[0] = 2;
 		y[1] = 5;
