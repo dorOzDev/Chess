@@ -36,10 +36,21 @@ public abstract class  Piece  {
 	public void setPlayerCoulor(PlayerColour playerCoulor) {
 		this.playerCoulor = playerCoulor;
 	}
+	
 	public abstract void setStartPos(Spot spot);
 	public abstract void movement();
 	public abstract void setCandidateMovements();
-	public abstract void setValidMovements();
+	
+	public void setValidMovements() {
+		
+		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getSpot().isOccupied()) {
+			validMovements.add(candidateMovements.pop().getSpot());
+
+			}
+		candidateMovements.clear();
+		
+	}
+
 	
 	public ArrayList<Spot> getMovements(){
 		return validMovements;

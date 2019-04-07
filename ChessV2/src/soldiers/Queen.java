@@ -104,14 +104,4 @@ public class Queen extends Piece{
 		
 	}
 	
-	@Override
-	public void setValidMovements() {
-		
-		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getSpot().isOccupied()) {
-			validMovements.add(candidateMovements.pop().getSpot());
-
-			}
-		candidateMovements.clear();
-		
-	}
 }

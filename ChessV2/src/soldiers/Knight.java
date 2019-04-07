@@ -18,19 +18,77 @@ public class Knight extends Piece  {
 
 	@Override
 	public void movement() {
-		// TODO Auto-generated method stub
+		candidateMovements.clear();
+		validMovements.clear();
+		setCandidateMovements();
 		
 	}
 	
 	@Override
 	public void setCandidateMovements() {
+		int currX = this.spot.getX();
+		int currY = this.spot.getY();
+		
+		int i = currX;
+		int j = currY;
+		
+		i += 2;
+		if(i < board.spots.length) {
+			
+			if(++j < board.spots.length)
+				candidateMovements.add(board.spots[i][j]);
+			
+			j -= 2;
+			if(j >= 0)
+				candidateMovements.add(board.spots[i][j]);
+		}
+		i = currX;
+		j = currY;
+		
+
+		if(++i < board.spots.length) {
+			if(i < board.spots.length) {
+				j += 2;
+				if(j < board.spots.length)
+					candidateMovements.add(board.spots[i][j]);
+				
+				j -= 4;
+				if(j >= 0)
+					candidateMovements.add(board.spots[i][j]);
+			}
+		}
+		i = currX;
+		j = currY;
+		
+		i -= 2;
+		if(i >= 0) {
+			
+			if(++j < board.spots.length)
+				candidateMovements.add(board.spots[i][j]);
+			
+			j -= 2;
+			if(j >= 0)
+				candidateMovements.add(board.spots[i][j]);
+		}
+		i = currX;
+		j = currY;
+		
+		if(--i >= 0 ) {
+			if(i < board.spots.length) {
+				j += 2;
+				if(j < board.spots.length)
+					candidateMovements.add(board.spots[i][j]);
+				
+				j -= 4;
+				if(j >= 0)
+					candidateMovements.add(board.spots[i][j]);
+			}
+		}
+		
+		setValidMovements();
 
 	}
 	
-	@Override
-	public void setValidMovements() {
-		
-	}
 }
 
 

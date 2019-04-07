@@ -43,23 +43,20 @@ public class Board {
 			setPiecesPosition(piecesPlayerBlack, PlayerColour.BLACK);
 			
 			
-			piecesPlayerWhite.get(1).movement();
-			System.out.println(piecesPlayerWhite.get(1).getMovements());
+			piecesPlayerWhite.get(2).movement();
+			System.out.println(piecesPlayerWhite.get(2).getMovements());
 			
 
 				
 		}
-		else
-			
+		else			
 			System.out.println("Attempt to create two boards avoided.");
-		
-		
-		
+				
 		return board;
 	
  }
 
-	private static ArrayList<Piece> createPieces(ArrayList<Piece> piecesPlayer , PlayerColour playerCoulor) {
+	private static void createPieces(ArrayList<Piece> piecesPlayer , PlayerColour playerCoulor) {
 		
 		piecesPlayer.add(new King(playerCoulor));
 		piecesPlayer.add(new Queen(playerCoulor));
@@ -76,7 +73,7 @@ public class Board {
 		for(int i = 0; i < PAWN_SIZE; i++) {
 			piecesPlayer.add(new Pawn(playerCoulor));
 		}
-		return piecesPlayer;
+		
 					
 	}
 	
@@ -87,7 +84,7 @@ public class Board {
 		int []y = new int[2];
 		int i = 0;
 		int pieceIndex = 0;
-		if(playerCoulor.equals(PlayerColour.WHITE)) {
+		if(playerCoulor.equals(PlayerColour.WHITE)) { // setting X Axi's based on the player color.
 			x[0] = 7;
 			x[1] = 6;
 		}
@@ -100,7 +97,7 @@ public class Board {
 		spots [x[0]][3].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
 		
-		piecesPlayer.get(pieceIndex).setStartPos(spots [4][4]);// setting Queen's position
+		piecesPlayer.get(pieceIndex).setStartPos(spots [x[0]][3]);// setting Queen's position
 		spots [x[0]][4].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
 		

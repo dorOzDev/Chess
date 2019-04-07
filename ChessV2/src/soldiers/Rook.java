@@ -21,19 +21,48 @@ public class Rook extends Piece {
 
 	@Override
 	public void movement() {
-		// TODO Auto-generated method stub
+		candidateMovements.clear();
+		validMovements.clear();
+		setCandidateMovements();
+
 		
 	}
 	
 	@Override
 	public void setCandidateMovements() {
+		int currX = this.spot.getX();
+		int currY = this.spot.getY();
+		
+		int i = currX;
+		i++;
+		for( ; i < board.spots.length; i++)
+			candidateMovements.add(board.spots[i][currY].getSpot());
+		setValidMovements();
+		
+		
+		i = currX;
+		i--;
+		for(; i >= 0; i--)
+			candidateMovements.add(board.spots[i][currY].getSpot());
+		setValidMovements();
+		
+		
+		i = currY;
+		i++;
+		for(; i < board.spots.length; i++)
+			candidateMovements.add(board.spots[currX][i].getSpot());
+		setValidMovements();
+		
+		
+		i = currY;
+		i--;
+		for(; i >= 0; i--)
+			candidateMovements.add(board.spots[currX][i].getSpot());
+		setValidMovements();
+		
 
 	}
 	
-	@Override
-	public void setValidMovements() {
-		
-	}
 	
 	
 
