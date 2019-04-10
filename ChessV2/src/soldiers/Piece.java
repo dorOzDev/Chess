@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import game.Spot;
@@ -14,32 +15,38 @@ import game.Spot;
 public abstract class  Piece  {
 	
 	protected Board board;
-	
+	protected  PieceType pieceType ; 
 	protected Spot spot;
 	public PlayerColour playerCoulor;
 	protected ArrayList<Spot> validMovements;
 	protected LinkedList<Spot> candidateMovements;
 	
 	
-	public Piece() {
+	public Piece(PlayerColour playerCoulor, PieceType pieceType) {
 		validMovements = new ArrayList<Spot>();
 		candidateMovements = new LinkedList<Spot>();
-		
-	}
-	public Piece(PlayerColour playerCoulor) {
 		this.playerCoulor = playerCoulor;
-		
+		this.pieceType = pieceType;
 	}
+	
 	public PlayerColour getPlayerCoulor() {
 		return playerCoulor;
 	}
+	
 	public void setPlayerCoulor(PlayerColour playerCoulor) {
 		this.playerCoulor = playerCoulor;
+	}
+	
+	public void setPieceType(PieceType pieceType) {
+		this.pieceType = pieceType;
+		
 	}
 	
 	public abstract void setStartPos(Spot spot);
 	public abstract void movement();
 	public abstract void setCandidateMovements();
+	
+	
 	
 	public void setValidMovements() {
 		
@@ -47,6 +54,11 @@ public abstract class  Piece  {
 			validMovements.add(candidateMovements.pop().getSpot());
 
 			}
+		if(candidateMovements.iterator().hasNext()) {
+			if(candidateMovements.peek().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
+				validMovements.add(candidateMovements.pop().getSpot());
+			}
+		}
 		candidateMovements.clear();
 		
 	}
@@ -55,6 +67,5 @@ public abstract class  Piece  {
 	public ArrayList<Spot> getMovements(){
 		return validMovements;
 	}
-
-
+	
 }

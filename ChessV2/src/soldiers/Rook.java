@@ -1,12 +1,13 @@
 package soldiers;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
 
 public class Rook extends Piece {
 
-	public Rook(PlayerColour playerCoulor) {
-		this.setPlayerCoulor(playerCoulor);
+	public Rook(PlayerColour playerColour, PieceType pieceType) {
+		super(playerColour, pieceType);
 		
 	}
 	

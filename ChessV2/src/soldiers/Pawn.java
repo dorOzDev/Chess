@@ -2,14 +2,15 @@ package soldiers;
 
 import java.util.ArrayList;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
 
 public class Pawn extends Piece {
 	
 	boolean isFirstMove;
-	public Pawn(PlayerColour playerColour) {
-		this.setPlayerCoulor(playerColour);
+	public Pawn(PlayerColour playerColour, PieceType pieceType) {
+		super(playerColour, pieceType);
 		isFirstMove = true;
 	}
 

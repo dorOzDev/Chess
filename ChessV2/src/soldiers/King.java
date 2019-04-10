@@ -1,13 +1,13 @@
 package soldiers;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
 
 public class King extends Piece {
 
-	public King(PlayerColour playerCoulor) {
-		this.setPlayerCoulor(playerCoulor);
-		
+	public King(PlayerColour playerColour, PieceType pieceType) {
+		super(playerColour, pieceType);
 	}
 
 	@Override
@@ -35,38 +35,44 @@ public class King extends Piece {
 		
 		if(++i < board.spots.length)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		i = currX;
 		if(--i >= 0)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		i = currX;
 		if(++j < board.spots.length)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		j = currY;
 		if(--j >= 0)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		j = currY;
 		if(++i > board.spots.length && ++j > board.spots.length)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		i = currX;
 		j = currY;
 		if(--i >= 0 && j++ < board.spots.length)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		i = currX;
 		j = currY;
 		if(++i < board.spots.length && --j >= 0)
 			candidateMovements.add(board.spots[i][j]);
+		setValidMovements();
 		
 		i = currX;
 		j = currY;
 		if(--i >= 0 && j >= 0)
 			candidateMovements.add(board.spots[i][j]);
-		
 		setValidMovements();			
 	}
 	

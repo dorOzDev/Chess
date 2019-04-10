@@ -1,12 +1,13 @@
 package soldiers;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
 
 public class Knight extends Piece  {
 
-	public Knight(PlayerColour playerCoulor) {
-		this.setPlayerCoulor(playerCoulor);
+	public Knight(PlayerColour playerColour, PieceType pieceType) {
+		super(playerColour, pieceType);
 	}
 
 	@Override
@@ -89,6 +90,25 @@ public class Knight extends Piece  {
 
 	}
 	
-}
+	@Override
+	public void setValidMovements() {
+		
+		
+		while(candidateMovements.iterator().hasNext()) {
+			if(!candidateMovements.peek().getSpot().isOccupied())
+				validMovements.add(candidateMovements.pop().getSpot());
+		
+			else { 
+				if(candidateMovements.peek().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
+					validMovements.add(candidateMovements.pop().getSpot());
+				}else
+						candidateMovements.pop();
+			}
+		}
+		
+		candidateMovements.clear();
+		}
+	}
+
 
 

@@ -1,12 +1,14 @@
 package soldiers;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
 
 public  class Bishop extends Piece {
 
-	public Bishop(PlayerColour playerCoulor) {
-		this.setPlayerCoulor(playerCoulor);
+	public Bishop(PlayerColour playerColour, PieceType pieceType) {
+		super(playerColour, pieceType);
+
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import java.util.Vector;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import soldiers.*;
 
@@ -43,8 +44,8 @@ public class Board {
 			setPiecesPosition(piecesPlayerBlack, PlayerColour.BLACK);
 			
 			
-			piecesPlayerWhite.get(2).movement();
-			System.out.println(piecesPlayerWhite.get(2).getMovements());
+			piecesPlayerWhite.get(4).movement();
+			System.out.println(piecesPlayerWhite.get(4).getMovements());
 			
 
 				
@@ -58,20 +59,20 @@ public class Board {
 
 	private static void createPieces(ArrayList<Piece> piecesPlayer , PlayerColour playerCoulor) {
 		
-		piecesPlayer.add(new King(playerCoulor));
-		piecesPlayer.add(new Queen(playerCoulor));
+		piecesPlayer.add(new King(playerCoulor,PieceType.KING));
+		piecesPlayer.add(new Queen(playerCoulor,PieceType.QUEEN));
 			
 		for(int i = 0; i < BISHOP_SIZE; i++) {
-			piecesPlayer.add(new Bishop(playerCoulor));
+			piecesPlayer.add(new Bishop(playerCoulor,PieceType.BISHOP));
 		}
 		for(int i = 0; i < KNIGHT_SIZE; i++) {
-			piecesPlayer.add(new Knight(playerCoulor));
+			piecesPlayer.add(new Knight(playerCoulor, PieceType.KNIGHT));
 		}
 		for(int i = 0; i < ROOK_SIZE; i++) {
-			piecesPlayer.add(new Rook(playerCoulor));
+			piecesPlayer.add(new Rook(playerCoulor, PieceType.ROOK));
 		}
 		for(int i = 0; i < PAWN_SIZE; i++) {
-			piecesPlayer.add(new Pawn(playerCoulor));
+			piecesPlayer.add(new Pawn(playerCoulor,PieceType.PAWN));
 		}
 		
 					

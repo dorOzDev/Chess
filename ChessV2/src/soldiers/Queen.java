@@ -3,14 +3,15 @@ package soldiers;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
 
 public class Queen extends Piece{
 
-	public Queen(PlayerColour playerCoulor) {
-		this.setPlayerCoulor(playerCoulor);
-		validMovements = new ArrayList();
+	public Queen(PlayerColour playerColour, PieceType pieceType) {
+		super(playerColour, pieceType);
+		
 	}
 
 	@Override

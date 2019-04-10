@@ -2,8 +2,8 @@ package chess;
 
 import game.Board;
 import game.GamePanel;
-import game.Player;
 import gui.GuiTable;
+import player.Player;
 
 public class Chess {
 	
