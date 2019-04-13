@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
+import movement.CandidateMove;
+import movement.NoneAttackMove;
 
 public class Pawn extends Piece {
 	
@@ -23,6 +25,9 @@ public class Pawn extends Piece {
 
 	@Override
 	public void movement() {
+		candidateMovements.clear();
+		legalMovements.clear();
+		legalAttackMovements.clear();
 		setCandidateMovements();
 		setValidMovements();
 	}
@@ -33,28 +38,33 @@ public class Pawn extends Piece {
 		int currY = this.spot.getY();
 		
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-			candidateMovements.add(board.spots[--currX][currY]);
+			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot()));
 			if(isFirstMove)
-				candidateMovements.add(board.spots[--currX][currY]);
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(),board.spots[--currX][currY].getSpot()));
 		}
 		
 		else {
-			candidateMovements.add(board.spots[++currX][currY]);
+			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot()));
 			if(isFirstMove)
-				candidateMovements.add(board.spots[++currX][currY]);
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot()));
 		}
 	}
 	
 	@Override
 	public void setValidMovements() {
 		while(!candidateMovements.isEmpty()) {
-			if(candidateMovements.peek().isOccupied()) {
+			if(!candidateMovements.peek().getDestSpot().isOccupied()) {
 				candidateMovements.pop();			
 			}
 			else {
-				validMovements.add(candidateMovements.pop());
+				legalMovements.add(new NoneAttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot()));
 			}
-		}
+		}	
+	}
+	
+	
+	//TODO add pawn attacking movements.
+	public void setPawnAttackMovements() {
 		
 	}
 }

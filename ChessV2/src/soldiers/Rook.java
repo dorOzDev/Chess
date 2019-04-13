@@ -5,9 +5,12 @@ import enaum.PlayerColour;
 import game.Spot;
 
 public class Rook extends Piece {
+	
+	private boolean isFirstMove;
 
 	public Rook(PlayerColour playerColour, PieceType pieceType) {
 		super(playerColour, pieceType);
+		isFirstMove = true;
 		
 	}
 	
@@ -23,45 +26,19 @@ public class Rook extends Piece {
 	@Override
 	public void movement() {
 		candidateMovements.clear();
-		validMovements.clear();
+		legalMovements.clear();
+		legalAttackMovements.clear();
 		setCandidateMovements();
 
 		
 	}
 	
 	@Override
-	public void setCandidateMovements() {
-		int currX = this.spot.getX();
-		int currY = this.spot.getY();
-		
-		int i = currX;
-		i++;
-		for( ; i < board.spots.length; i++)
-			candidateMovements.add(board.spots[i][currY].getSpot());
-		setValidMovements();
-		
-		
-		i = currX;
-		i--;
-		for(; i >= 0; i--)
-			candidateMovements.add(board.spots[i][currY].getSpot());
-		setValidMovements();
-		
-		
-		i = currY;
-		i++;
-		for(; i < board.spots.length; i++)
-			candidateMovements.add(board.spots[currX][i].getSpot());
-		setValidMovements();
-		
-		
-		i = currY;
-		i--;
-		for(; i >= 0; i--)
-			candidateMovements.add(board.spots[currX][i].getSpot());
-		setValidMovements();
-		
-
+	public void setCandidateMovements() {	
+		forwardMovement();
+		backwardMovement();
+		rightSideMovement();
+		leftSideMovement();
 	}
 	
 	

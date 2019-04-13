@@ -10,7 +10,8 @@ import enaum.PlayerColour;
 import soldiers.*;
 
 public class Board {
-	
+	private static final int NUM_ROWS = 8;
+	private static final int NUM_COLS = 8;
 	private static final int PAWN_SIZE = 8;
 	private static final int BISHOP_SIZE = 2;
 	private static final int KNIGHT_SIZE = 2;
@@ -24,14 +25,14 @@ public class Board {
 	private Board() {
 		piecesPlayerWhite = new ArrayList<Piece>();
 		piecesPlayerBlack = new ArrayList<Piece>();
-		spots = new Spot[8][8];
+		spots = new Spot[NUM_ROWS][NUM_COLS];
 	}
 
 	public static Board startNewBoard() {
 		if(board == null) {
 			board = new Board();
-			for(int i = 0; i < spots.length ; i++) {
-				for(int j = 0; j < spots.length; j++) {
+			for(int i = 0; i < NUM_ROWS ; i++) {
+				for(int j = 0; j < NUM_COLS; j++) {
 					spots[i][j] = new Spot(i, j);
 					
 				}			
@@ -46,6 +47,7 @@ public class Board {
 			
 			piecesPlayerWhite.get(4).movement();
 			System.out.println(piecesPlayerWhite.get(4).getMovements());
+			
 			
 
 				
@@ -140,7 +142,13 @@ public class Board {
 		
 	}
 	
-
+	public ArrayList<Piece> getPiecesWhite(){
+		return this.piecesPlayerWhite;
+	}
+	
+	public ArrayList<Piece> getPiecesBlack(){
+		return this.piecesPlayerBlack;
+	}
 	
 	
 }

@@ -3,6 +3,9 @@ package soldiers;
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Spot;
+import movement.AttackMove;
+import movement.CandidateMove;
+import movement.NoneAttackMove;
 
 public class Knight extends Piece  {
 
@@ -20,7 +23,8 @@ public class Knight extends Piece  {
 	@Override
 	public void movement() {
 		candidateMovements.clear();
-		validMovements.clear();
+		legalMovements.clear();
+		legalAttackMovements.clear();
 		setCandidateMovements();
 		
 	}
@@ -37,52 +41,51 @@ public class Knight extends Piece  {
 		if(i < board.spots.length) {
 			
 			if(++j < board.spots.length)
-				candidateMovements.add(board.spots[i][j]);
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 			
 			j -= 2;
 			if(j >= 0)
-				candidateMovements.add(board.spots[i][j]);
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 		}
+		
 		i = currX;
 		j = currY;
-		
-
 		if(++i < board.spots.length) {
 			if(i < board.spots.length) {
 				j += 2;
 				if(j < board.spots.length)
-					candidateMovements.add(board.spots[i][j]);
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 				
 				j -= 4;
 				if(j >= 0)
-					candidateMovements.add(board.spots[i][j]);
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 			}
 		}
-		i = currX;
-		j = currY;
 		
+		i = currX;
+		j = currY;		
 		i -= 2;
 		if(i >= 0) {
 			
 			if(++j < board.spots.length)
-				candidateMovements.add(board.spots[i][j]);
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 			
 			j -= 2;
 			if(j >= 0)
-				candidateMovements.add(board.spots[i][j]);
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 		}
-		i = currX;
-		j = currY;
 		
+		i = currX;
+		j = currY;	
 		if(--i >= 0 ) {
 			if(i < board.spots.length) {
 				j += 2;
 				if(j < board.spots.length)
-					candidateMovements.add(board.spots[i][j]);
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 				
 				j -= 4;
 				if(j >= 0)
-					candidateMovements.add(board.spots[i][j]);
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
 			}
 		}
 		
@@ -94,21 +97,22 @@ public class Knight extends Piece  {
 	public void setValidMovements() {
 		
 		
+		//Adding all legal none attack movements.
 		while(candidateMovements.iterator().hasNext()) {
-			if(!candidateMovements.peek().getSpot().isOccupied())
-				validMovements.add(candidateMovements.pop().getSpot());
-		
+			if(!candidateMovements.peek().getDestSpot().isOccupied())
+				legalMovements.add(new NoneAttackMove(this.spot.getSpot(),candidateMovements.pop().getDestSpot()));
+			
+		//Adding all legal attack movements.
 			else { 
-				if(candidateMovements.peek().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
-					validMovements.add(candidateMovements.pop().getSpot());
+				if(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
+					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot()));
 				}else
 						candidateMovements.pop();
 			}
-		}
-		
+		}	
 		candidateMovements.clear();
-		}
 	}
+}
 
 
 
