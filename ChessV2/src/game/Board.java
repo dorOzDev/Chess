@@ -52,7 +52,7 @@ public class Board {
 		playerBlack = new PlayerBlack(piecesPlayerBlack, this);
 		playerWhite = new PlayerWhite(piecesPlayerWhite, this);
 		
-		System.out.println(playerWhite.getInCheckStatus());
+		//System.out.println(playerWhite.isInCheckMate());
 
 	
 }
@@ -123,6 +123,10 @@ public class Board {
 					
 	}
 	
+	public Spot getSpot(int x, int y) {
+		return spots[x][y];
+	}
+	
 	//Setting start piece position. Setting them for both player black and white. Using xPos array to determine white/block position on board. 
 	private static void setPiecesPosition(ArrayList<Piece> piecesPlayer, PlayerColour playerCoulor) {
 		
@@ -140,21 +144,15 @@ public class Board {
 		}
 		
 		// setting King's posistion.
-		if(playerCoulor.equals(PlayerColour.WHITE)){
-		piecesPlayer.get(pieceIndex).setPiecePos(spots [2][2]);
-		spots [2][2].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+		
+		piecesPlayer.get(pieceIndex).setPiecePos(spots [xPos[0]][4]);
+		spots [xPos[0]][4].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
-		}
-		else 
-		{
-			piecesPlayer.get(pieceIndex).setPiecePos(spots [3][0]);
-			spots [xPos[0]][3].setPieceOnSpot(piecesPlayer.get(pieceIndex));
-			pieceIndex++;
-		}
+
 		
 		// setting Queen's position
 		piecesPlayer.get(pieceIndex).setPiecePos(spots [xPos[0]][3]);
-		spots [xPos[0]][4].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+		spots [xPos[0]][3].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
 		
 		// setting Y axis for Bishop's piece;

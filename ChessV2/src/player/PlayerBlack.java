@@ -25,8 +25,18 @@ public class PlayerBlack extends Player {
 
 	@Override
 	public boolean isInCheckMate() {
+		
+		legalMoves = board.getAllLegalBlackMoves();
+		filterInChessMoves(legalMoves);		
+		if(getInCheckStatus() && legalMoves.isEmpty()) // If king is in chess threat and no legal moves left the king is in checkmate.
+			return true;
+		return false;
+	}
 
-		if(isInCheck && legalMoves.isEmpty()) // If king is in chess threat and no legal moves left the king is in checkmate.
+	@Override
+	public boolean isInStaleMate() {
+		legalMoves = board.getAllLegalBlackMoves();
+		if(!getInCheckStatus() && legalMoves.isEmpty()) // If king is not in chess but no legal moves left 
 			return true;
 		return false;
 	}

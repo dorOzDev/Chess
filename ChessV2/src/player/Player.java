@@ -32,10 +32,10 @@ public abstract class Player {
 	protected abstract boolean  isInCheck();
 	
 	public abstract boolean  isInCheckMate();
-	//public abstract boolean isInStaleMate();
+	public abstract boolean isInStaleMate();
 	
 	
-	public  Piece getKing() {
+	protected  Piece getKing() {
 		
 		for(Piece piece: remainingPieces) {
 			if(piece.getPieceType() == PieceType.KING){
@@ -51,7 +51,7 @@ public abstract class Player {
 	}
 	
 	//While in chess only legal moves are ones that escapes the king
-	public void filterInChessMoves(ArrayList<Move> legalMoves) {
+	protected void filterInChessMoves(ArrayList<Move> legalMoves) {
 		Iterator<Move> moveIterator = legalMoves.iterator();
 		if(this.getInCheckStatus()) {
 			while(moveIterator.hasNext()) {
@@ -63,7 +63,8 @@ public abstract class Player {
 	}
 	
 	// Return true if this move escapes the king from chess.	
-	//TODO fix this shit!@#$%%^^
+	//TODO Keep checking this when GUI is installed, the king might get in chess falsely
+	//Possible solution to check only if getting out of threatening piece chess.
 	private boolean testMove(Move move, Player player) {
 		boolean checkMovement;
 		Piece tempPiece = move.getDestSpot().getPieceBySpot();
