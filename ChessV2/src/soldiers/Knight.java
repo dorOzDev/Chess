@@ -14,21 +14,12 @@ public class Knight extends Piece  {
 	}
 
 	@Override
-	public void setStartPos(Spot spot) {
+	public void setPiecePos(Spot spot) {
 		this.spot = spot;
-		spot.setOccupied(true);
+
 			
 	}
 
-	@Override
-	public void movement() {
-		candidateMovements.clear();
-		legalMovements.clear();
-		legalAttackMovements.clear();
-		setCandidateMovements();
-		
-	}
-	
 	@Override
 	public void setCandidateMovements() {
 		int currX = this.spot.getX();
@@ -41,11 +32,11 @@ public class Knight extends Piece  {
 		if(i < board.spots.length) {
 			
 			if(++j < board.spots.length)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			
 			j -= 2;
 			if(j >= 0)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 		}
 		
 		i = currX;
@@ -54,11 +45,11 @@ public class Knight extends Piece  {
 			if(i < board.spots.length) {
 				j += 2;
 				if(j < board.spots.length)
-					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 				
 				j -= 4;
 				if(j >= 0)
-					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			}
 		}
 		
@@ -68,11 +59,11 @@ public class Knight extends Piece  {
 		if(i >= 0) {
 			
 			if(++j < board.spots.length)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			
 			j -= 2;
 			if(j >= 0)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 		}
 		
 		i = currX;
@@ -81,14 +72,13 @@ public class Knight extends Piece  {
 			if(i < board.spots.length) {
 				j += 2;
 				if(j < board.spots.length)
-					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 				
 				j -= 4;
 				if(j >= 0)
-					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+					candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			}
 		}
-		
 		setValidMovements();
 
 	}
@@ -96,18 +86,24 @@ public class Knight extends Piece  {
 	@Override
 	public void setValidMovements() {
 		
-		
+		System.out.println(this);
 		//Adding all legal none attack movements.
 		while(candidateMovements.iterator().hasNext()) {
+			
 			if(!candidateMovements.peek().getDestSpot().isOccupied())
-				legalMovements.add(new NoneAttackMove(this.spot.getSpot(),candidateMovements.pop().getDestSpot()));
+				legalMovements.add(new NoneAttackMove(this.spot.getSpot(),candidateMovements.pop().getDestSpot(), this));
 			
 		//Adding all legal attack movements.
 			else { 
-				if(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
-					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot()));
-				}else
+				//System.out.println(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor());
+				
+				if(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor() != this.playerCoulor) {
+					
+					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
+				}else {
+					
 						candidateMovements.pop();
+				}
 			}
 		}	
 		candidateMovements.clear();

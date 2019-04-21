@@ -13,12 +13,13 @@ public class King extends Piece {
 	}
 
 	@Override
-	public void setStartPos(Spot spot) {
+	public void setPiecePos(Spot spot) {
 		this.spot = spot;
-		spot.setOccupied(true);
+
 			
 	}
 
+	/*
 	@Override
 	public void movement() {
 		candidateMovements.clear();
@@ -27,7 +28,7 @@ public class King extends Piece {
 		setCandidateMovements();
 		
 	}
-	
+*/	
 	@Override
 	public void setCandidateMovements() {		
 		forwardMovement();
@@ -39,5 +40,7 @@ public class King extends Piece {
 		diagonalBottomLeftMovement();
 		diagonalTopLeftMovement();
 	}
+	
+	
 	
 }

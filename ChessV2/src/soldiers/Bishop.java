@@ -12,22 +12,22 @@ public  class Bishop extends Piece {
 	}
 
 	@Override
-	public void setStartPos(Spot spot) {
+	public void setPiecePos(Spot spot) {
 		this.spot = spot;
-		spot.setOccupied(true);
 			
 	}
-
+/*
 	@Override
 	public void movement() {
 		candidateMovements.clear();
-		legalMovements.clear();
-		legalAttackMovements.clear();
+		hmLegalMoves.clear();
+		//legalMovements.clear();
+		//legalAttackMovements.clear();
 		setCandidateMovements();
 
 		
 	}
-	
+	*/
 	@Override
 	public void setCandidateMovements() {
 		diagonalBottomLeftMovement();

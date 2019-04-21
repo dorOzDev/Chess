@@ -17,9 +17,9 @@ public class Pawn extends Piece {
 	}
 
 	@Override
-	public void setStartPos(Spot spot) {
+	public void setPiecePos(Spot spot) {
 		this.spot = spot;
-		spot.setOccupied(true);
+
 			
 	}
 
@@ -38,28 +38,37 @@ public class Pawn extends Piece {
 		int currY = this.spot.getY();
 		
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot()));
+			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this));
 			if(isFirstMove)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(),board.spots[--currX][currY].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(),board.spots[--currX][currY].getSpot(), this));
+			
+		}
+
+		else {
+			
+			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this));
+			if(isFirstMove)
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this));
 		}
 		
-		else {
-			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot()));
-			if(isFirstMove)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot()));
-		}
+		
 	}
 	
 	@Override
 	public void setValidMovements() {
+		
 		while(!candidateMovements.isEmpty()) {
-			if(!candidateMovements.peek().getDestSpot().isOccupied()) {
-				candidateMovements.pop();			
+			if(candidateMovements.peek().getDestSpot().isOccupied()) {
+				candidateMovements.pop();
+				
 			}
 			else {
-				legalMovements.add(new NoneAttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot()));
+				
+				legalMovements.add(new NoneAttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
 			}
-		}	
+			
+		}
+		
 	}
 	
 	

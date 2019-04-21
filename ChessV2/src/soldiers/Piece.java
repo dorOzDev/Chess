@@ -51,27 +51,34 @@ public abstract class  Piece  {
 		
 	}
 	
-	public abstract void setStartPos(Spot spot);
-	public abstract void movement();
+	public abstract void setPiecePos(Spot spot);
+	
 	public abstract void setCandidateMovements();
 	
+	public void movement() {
+		candidateMovements.clear();
+		legalMovements.clear();
+		legalAttackMovements.clear();
+		setCandidateMovements();
+
+		
+	}
 	
 	/*
 	 In order to filter all illegal moves using the following method.
 	*/
 	public void setValidMovements() {
 		
-		
 	     //Adding all None Attacking movements.		
 		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getDestSpot().isOccupied()) {
-			legalMovements.add(new NoneAttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot()));
+			legalMovements.add(new NoneAttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
 
 			}
 		
 		//Adding all attacking movements
 		if(candidateMovements.iterator().hasNext()) {
 			if(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
-				legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot()));
+				legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
 			}
 		}
 		candidateMovements.clear();
@@ -79,8 +86,14 @@ public abstract class  Piece  {
 	}
 
 	
-	public ArrayList<Move> getMovements(){
+	public ArrayList<Move> getLegalMovements(){
+		movement();
 		return legalMovements;
+	}
+	
+	public ArrayList<Move>getAttackingMoves(){
+		movement();
+		return legalAttackMovements;
 	}
 	
 	
@@ -99,11 +112,11 @@ public abstract class  Piece  {
 		if(!(pieceType == PieceType.KING)) {
 
 			for(++i ; i < board.spots.length; i++)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY].getSpot()));		
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY].getSpot(), this));		
 		}
 		else {
 			if(++i < board.spots.length)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY]));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY], this));
 			
 		}
 		setValidMovements();		
@@ -117,12 +130,12 @@ public abstract class  Piece  {
 		
 		if(!(pieceType == PieceType.KING)) {		
 			for(--i ; i >= 0; i--)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY].getSpot(), this));
 			
 		}
 		else {
 			if(--i >= 0)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY]));			
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][currY], this));			
 		}
 		setValidMovements();	
 	}
@@ -134,12 +147,12 @@ public abstract class  Piece  {
 		int i = currY;
 		if(!(pieceType == PieceType.KING)) {		
 			for(++i; i < board.spots.length; i++)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot(), this));
 			
 		}
 		else {
 			if(++i < board.spots.length)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot()));		
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot(), this));		
 		}
 		setValidMovements();	
 	}
@@ -152,12 +165,12 @@ public abstract class  Piece  {
 		if(!(pieceType == PieceType.KING)) {		
 			
 			for(--i; i >= 0; i--)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot(), this));
 			
 		}
 		else {
 			if(--i >= 0)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot()));	
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[currX][i].getSpot(), this));	
 		}
 		setValidMovements();		
 	}
@@ -173,12 +186,12 @@ public abstract class  Piece  {
 			j++;
 			i++;
 			for(; i < board.spots.length && j < board.spots.length ; i++ , j++) {
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			}
 		}
 		else {
 			if(++i > board.spots.length && ++j > board.spots.length)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));		
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));		
 		}
 		setValidMovements();
 	}
@@ -194,12 +207,12 @@ public abstract class  Piece  {
 			j++;
 			i--;
 			for(; i >= 0 && j < board.spots.length ; i-- , j++) {
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			}
 		}
 		else {
 			if(--i >= 0 && j++ < board.spots.length)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 		}
 		setValidMovements();	
 	}
@@ -215,12 +228,12 @@ public abstract class  Piece  {
 			j--;
 			i++;
 			for(; i < board.spots.length && j >= 0 ; i++ , j--) {
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			}
 		}
 		else {
 			if(++i < board.spots.length && --j >= 0)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 		}
 		setValidMovements();	
 		
@@ -237,14 +250,28 @@ public abstract class  Piece  {
 			j--;
 			i--;
 			for(; i >= 0 && j >= 0 ; i-- , j--) {
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			}
 		}
 		else {
 			if(--i >= 0 && j >= 0)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot()));
+				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 		}
 		setValidMovements();			
 	}
+	
+	
+	public Spot getPieceSpot() {
+		return this.spot;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "Piece:" + pieceType + "Piece Color:" + playerCoulor;
+		
+	}
 		
 }
+
+

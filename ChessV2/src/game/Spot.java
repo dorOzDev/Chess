@@ -18,6 +18,7 @@ public class Spot {
 		this.x = x;
 		this.y = y;
 		this.isOccupied = false;
+		this.piece = null;
 		
 	}
 	public Spot() {
@@ -52,6 +53,7 @@ public class Spot {
 		return this;
 	}
 	public void setPieceOnSpot(Piece piece) {
+		setOccupied(true);
 		this.piece = piece;
 	}
 	

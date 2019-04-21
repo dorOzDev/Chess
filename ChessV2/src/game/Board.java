@@ -2,62 +2,105 @@ package game;
 
 import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
-
+import java.util.Iterator;
 import java.util.Vector;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import movement.Move;
+import player.Player;
+import player.PlayerBlack;
+import player.PlayerWhite;
 import soldiers.*;
 
 public class Board {
-	private static final int NUM_ROWS = 8;
-	private static final int NUM_COLS = 8;
+	public static final int NUM_ROWS = 8;
+	public static final int NUM_COLS = 8;
 	private static final int PAWN_SIZE = 8;
 	private static final int BISHOP_SIZE = 2;
 	private static final int KNIGHT_SIZE = 2;
 	private static final int ROOK_SIZE = 2;
 	public static Spot[][] spots;
 	protected static ArrayList<Piece> piecesPlayerWhite;
-	protected static ArrayList<Piece> piecesPlayerBlack;
+	protected  ArrayList<Piece> piecesPlayerBlack;
 	private static Board board = null;
+	protected ArrayList<Move> legalMovesWhite = new ArrayList<Move>();
+	protected ArrayList<Move> legalMovesBlack = new ArrayList<Move>();
+	private  PlayerBlack playerBlack;
+	private  PlayerWhite playerWhite;
+	
 
 	
+	/*Creating a Singletone board 
+	  */
 	private Board() {
 		piecesPlayerWhite = new ArrayList<Piece>();
 		piecesPlayerBlack = new ArrayList<Piece>();
 		spots = new Spot[NUM_ROWS][NUM_COLS];
-	}
-
-	public static Board startNewBoard() {
-		if(board == null) {
-			board = new Board();
-			for(int i = 0; i < NUM_ROWS ; i++) {
-				for(int j = 0; j < NUM_COLS; j++) {
-					spots[i][j] = new Spot(i, j);
-					
-				}			
-		 }
-
-			
-			createPieces(piecesPlayerWhite, PlayerColour.WHITE);
-			createPieces(piecesPlayerBlack, PlayerColour.BLACK);
-			setPiecesPosition(piecesPlayerWhite, PlayerColour.WHITE);
-			setPiecesPosition(piecesPlayerBlack, PlayerColour.BLACK);
-			
-			
-			piecesPlayerWhite.get(4).movement();
-			System.out.println(piecesPlayerWhite.get(4).getMovements());
-			
-			
-
+		
+		for(int i = 0; i < NUM_ROWS ; i++) {
+			for(int j = 0; j < NUM_COLS; j++) {
+				spots[i][j] = new Spot(i, j);
 				
-		}
+			}
+		}	
+		createPieces(piecesPlayerWhite, PlayerColour.WHITE);
+		createPieces(piecesPlayerBlack, PlayerColour.BLACK);
+		setPiecesPosition(piecesPlayerWhite, PlayerColour.WHITE);
+		setPiecesPosition(piecesPlayerBlack, PlayerColour.BLACK);
+		
+		playerBlack = new PlayerBlack(piecesPlayerBlack, this);
+		playerWhite = new PlayerWhite(piecesPlayerWhite, this);
+		
+		System.out.println(playerWhite.getInCheckStatus());
+
+	
+}
+	public static  Board startNewBoard() {
+		if(board == null) {
+			board = new Board();	
+		 }									
 		else			
 			System.out.println("Attempt to create two boards avoided.");
-				
-		return board;
-	
+		return board;	
  }
+		
+	public void calcLegalBlackMoves () {
+		//Calc legal moves when not in chess.
+		legalMovesBlack.clear();
+		for(Piece piece : piecesPlayerBlack) {			
+			legalMovesBlack.addAll(piece.getAttackingMoves());
+			legalMovesBlack.addAll(piece.getLegalMovements());
+
+			}
+		
+	}
+	public void calcLegalWhiteMoves () {
+		//Calc legal moves when not in chess.
+		legalMovesWhite.clear();
+		//System.out.print(piecesPlayerWhite);
+		System.out.println();
+		for(Piece piece : piecesPlayerWhite) {
+			legalMovesWhite.addAll(piece.getAttackingMoves());
+			legalMovesWhite.addAll(piece.getLegalMovements());		
+		}		
+	}
+	
+
+	public ArrayList<Move> getAllLegalWhiteMoves() {
+		calcLegalWhiteMoves();
+		return legalMovesWhite;
+				
+	}
+	
+	public ArrayList<Move> getAllLegalBlackMoves() {
+		calcLegalBlackMoves();
+		return legalMovesBlack;
+				
+	}
+	
+
+
 
 	private static void createPieces(ArrayList<Piece> piecesPlayer , PlayerColour playerCoulor) {
 		
@@ -80,62 +123,72 @@ public class Board {
 					
 	}
 	
-	//Setting pieces positions is depeneded on the order of pieces createing, thus setting the position is in the exact same order as creating.
+	//Setting start piece position. Setting them for both player black and white. Using xPos array to determine white/block position on board. 
 	private static void setPiecesPosition(ArrayList<Piece> piecesPlayer, PlayerColour playerCoulor) {
 		
-		int []x = new int[2];
-		int []y = new int[2];
+		int []xPos = new int[2];
+		int []yPos = new int[2];
 		int i = 0;
 		int pieceIndex = 0;
 		if(playerCoulor.equals(PlayerColour.WHITE)) { // setting X Axi's based on the player color.
-			x[0] = 7;
-			x[1] = 6;
+			xPos[0] = 7;
+			xPos[1] = 6;
 		}
 		else{
-			x[0] = 0;
-			x[1] = 1;
+			xPos[0] = 0;
+			xPos[1] = 1;
 		}
 		
-		piecesPlayer.get(pieceIndex).setStartPos(spots [x[0]][4]);// setting King's posistion.
-		spots [x[0]][3].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+		// setting King's posistion.
+		if(playerCoulor.equals(PlayerColour.WHITE)){
+		piecesPlayer.get(pieceIndex).setPiecePos(spots [2][2]);
+		spots [2][2].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
+		}
+		else 
+		{
+			piecesPlayer.get(pieceIndex).setPiecePos(spots [3][0]);
+			spots [xPos[0]][3].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+			pieceIndex++;
+		}
 		
-		piecesPlayer.get(pieceIndex).setStartPos(spots [x[0]][3]);// setting Queen's position
-		spots [x[0]][4].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+		// setting Queen's position
+		piecesPlayer.get(pieceIndex).setPiecePos(spots [xPos[0]][3]);
+		spots [xPos[0]][4].setPieceOnSpot(piecesPlayer.get(pieceIndex));
 		pieceIndex++;
 		
 		// setting Y axis for Bishop's piece;
-		y[0] = 2;
-		y[1] = 5;
+		yPos[0] = 2;
+		yPos[1] = 5;
 		for(i = 0; i < BISHOP_SIZE; i++) {
-			spots [x[0]][y[i]].setPieceOnSpot(piecesPlayer.get(pieceIndex));
-			piecesPlayer.get(pieceIndex++).setStartPos(spots [x[0]] [y[i]]);
+			spots [xPos[0]][yPos[i]].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+			piecesPlayer.get(pieceIndex++).setPiecePos(spots [xPos[0]] [yPos[i]]);
 			
 
 		}
 		// setting Y axis for Knight's piece;
-		y[0] = 1;
-		y[1] = 6;
+		yPos[0] = 1;
+		yPos[1] = 6;
 		for(i = 0; i < KNIGHT_SIZE; i++) {
-			spots [x[0]][y[i]].setPieceOnSpot(piecesPlayer.get(pieceIndex));
-			piecesPlayer.get(pieceIndex++).setStartPos(spots [x[0]] [y[i]]);
+			spots [xPos[0]][yPos[i]].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+			piecesPlayer.get(pieceIndex++).setPiecePos(spots [xPos[0]] [yPos[i]]);
 			
 
 		}
 		// setting Y axis for Rook piece;	
-		y[0] = 0;
-		y[1] = 7;
+		yPos[0] = 0;
+		yPos[1] = 7;
 		for(i = 0 ;i < ROOK_SIZE; i++) {
-			spots [x[0]][y[i]].setPieceOnSpot(piecesPlayer.get(pieceIndex));
-			piecesPlayer.get(pieceIndex++).setStartPos(spots [x[0]] [y[i]]);		
+			spots [xPos[0]][yPos[i]].setPieceOnSpot(piecesPlayer.get(pieceIndex));
+			piecesPlayer.get(pieceIndex++).setPiecePos(spots [xPos[0]] [yPos[i]]);		
 			
 
 		}
 		
 		//Setting Pawns position.
 		for(i = 0; i < PAWN_SIZE; i++) {
-			spots [x[1]][i].setPieceOnSpot(piecesPlayer.get(pieceIndex ));
-			piecesPlayer.get(pieceIndex++).setStartPos(spots [x[1]] [i]);
+			spots [xPos[1]][i].setPieceOnSpot(piecesPlayer.get(pieceIndex ));
+			piecesPlayer.get(pieceIndex++).setPiecePos(spots [xPos[1]] [i]);
 			
 
 		}
