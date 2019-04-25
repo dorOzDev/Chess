@@ -1,6 +1,8 @@
 package player;
 
 import java.util.ArrayList;
+
+import enaum.PlayerColour;
 import game.Board;
 
 import movement.Move;
@@ -9,14 +11,14 @@ import soldiers.Piece;
 public class PlayerWhite extends Player {
 	
 	public PlayerWhite(ArrayList<Piece> remainingPieces, Board board){
-		super(remainingPieces, board);
+		super(remainingPieces, board, PlayerColour.WHITE);
 	}
 	
 	@Override
 	protected boolean isInCheck() {
 		legalOpponentMoves = board.getAllLegalBlackMoves();	
 		for (Move move : legalOpponentMoves) {
-			if(king.getPieceSpot() == move.getDestSpot())
+			if(king.getSpot() == move.getDestSpot())
 				return  true;
 		}
 		return  false;

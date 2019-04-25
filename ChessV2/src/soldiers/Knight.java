@@ -2,6 +2,7 @@ package soldiers;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.Board;
 import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
@@ -9,8 +10,8 @@ import movement.NoneAttackMove;
 
 public class Knight extends Piece  {
 
-	public Knight(PlayerColour playerColour, PieceType pieceType) {
-		super(playerColour, pieceType);
+	public Knight(PlayerColour playerColour, PieceType pieceType, Board board) {
+		super(playerColour, pieceType, board, true);
 	}
 
 	@Override
@@ -97,7 +98,7 @@ public class Knight extends Piece  {
 			else { 
 				//System.out.println(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor());
 				
-				if(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor() != this.playerCoulor) {
+				if(candidateMovements.peek().getDestSpot().getPiece().getPlayerCoulor() != this.playerCoulor) {
 					
 					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
 				}else {

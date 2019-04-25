@@ -5,12 +5,13 @@ import java.util.Comparator;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.Board;
 import game.Spot;
 
 public class Queen extends Piece{
 
-	public Queen(PlayerColour playerColour, PieceType pieceType) {
-		super(playerColour, pieceType);
+	public Queen(PlayerColour playerColour, PieceType pieceType, Board board) {
+		super(playerColour, pieceType, board, true);
 		
 	}
 
@@ -20,18 +21,6 @@ public class Queen extends Piece{
 
 			
 	}
-
-
-/*
-	@Override
-	public void movement() {
-		candidateMovements.clear();
-		legalMovements.clear();
-		legalAttackMovements.clear();
-		setCandidateMovements();
-
-	}
-*/	
 	@Override
 	public void setCandidateMovements() {
 		forwardMovement();		

@@ -2,14 +2,15 @@ package soldiers;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.Board;
 import game.Spot;
 
 public class King extends Piece {
 	
-	private boolean isFirstMove;
-	public King(PlayerColour playerColour, PieceType pieceType) {
-		super(playerColour, pieceType);
-		isFirstMove = true;
+	
+	public King(PlayerColour playerColour, PieceType pieceType, Board board) {
+		super(playerColour, pieceType, board, true);
+		
 	}
 
 	@Override
@@ -19,16 +20,7 @@ public class King extends Piece {
 			
 	}
 
-	/*
-	@Override
-	public void movement() {
-		candidateMovements.clear();
-		legalMovements.clear();
-		legalAttackMovements.clear();
-		setCandidateMovements();
-		
-	}
-*/	
+
 	@Override
 	public void setCandidateMovements() {		
 		forwardMovement();

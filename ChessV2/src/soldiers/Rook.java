@@ -2,15 +2,16 @@ package soldiers;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.Board;
 import game.Spot;
 
 public class Rook extends Piece {
 	
-	private boolean isFirstMove;
+	
 
-	public Rook(PlayerColour playerColour, PieceType pieceType) {
-		super(playerColour, pieceType);
-		isFirstMove = true;
+	public Rook(PlayerColour playerColour, PieceType pieceType,Board board) {
+		super(playerColour, pieceType, board, true);
+		
 		
 	}
 	
@@ -21,17 +22,7 @@ public class Rook extends Piece {
 			
 	}
 
-/*
-	@Override
-	public void movement() {
-		candidateMovements.clear();
-		legalMovements.clear();
-		legalAttackMovements.clear();
-		setCandidateMovements();
 
-		
-	}
-*/	
 	@Override
 	public void setCandidateMovements() {	
 		forwardMovement();

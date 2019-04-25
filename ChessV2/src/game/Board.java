@@ -28,6 +28,7 @@ public class Board {
 	protected ArrayList<Move> legalMovesBlack = new ArrayList<Move>();
 	private  PlayerBlack playerBlack;
 	private  PlayerWhite playerWhite;
+	private Player currPlayer;
 	
 
 	
@@ -51,80 +52,60 @@ public class Board {
 		
 		playerBlack = new PlayerBlack(piecesPlayerBlack, this);
 		playerWhite = new PlayerWhite(piecesPlayerWhite, this);
-		
-		//System.out.println(playerWhite.isInCheckMate());
-
-	
+		setCurrPlayer();
 }
-	public static  Board startNewBoard() {
-		if(board == null) {
-			board = new Board();	
-		 }									
-		else			
-			System.out.println("Attempt to create two boards avoided.");
-		return board;	
- }
-		
-	public void calcLegalBlackMoves () {
-		//Calc legal moves when not in chess.
-		legalMovesBlack.clear();
-		for(Piece piece : piecesPlayerBlack) {			
-			legalMovesBlack.addAll(piece.getAttackingMoves());
-			legalMovesBlack.addAll(piece.getLegalMovements());
-
-			}
+	
+	//TODO  need to realize how to operate this two.
+	public Player getCurrPlayer() {
+		return currPlayer;
 		
 	}
-	public void calcLegalWhiteMoves () {
-		//Calc legal moves when not in chess.
-		legalMovesWhite.clear();
-		//System.out.print(piecesPlayerWhite);
-		System.out.println();
-		for(Piece piece : piecesPlayerWhite) {
-			legalMovesWhite.addAll(piece.getAttackingMoves());
-			legalMovesWhite.addAll(piece.getLegalMovements());		
-		}		
-	}
-	
 
-	public ArrayList<Move> getAllLegalWhiteMoves() {
-		calcLegalWhiteMoves();
-		return legalMovesWhite;
-				
-	}
-	
-	public ArrayList<Move> getAllLegalBlackMoves() {
-		calcLegalBlackMoves();
-		return legalMovesBlack;
-				
-	}
-	
-
-
-
-	private static void createPieces(ArrayList<Piece> piecesPlayer , PlayerColour playerCoulor) {
+	public void setCurrPlayer() {
+		// Letting white player play first.
+		if(currPlayer == null) {
+			currPlayer = playerWhite;
+		}
 		
-		piecesPlayer.add(new King(playerCoulor,PieceType.KING));
-		piecesPlayer.add(new Queen(playerCoulor,PieceType.QUEEN));
+		else {
+			
+			currPlayer = ((currPlayer == playerWhite) ? playerBlack : playerWhite);
+		}
+		System.out.println(currPlayer);
+	}
+	
+	public Board getUpdatedBoard() {
+		return this;
+	}
+
+
+	private  void createPieces(ArrayList<Piece> piecesPlayer , PlayerColour playerCoulor) {
+		
+		piecesPlayer.add(new King(playerCoulor,PieceType.KING, this));
+		piecesPlayer.add(new Queen(playerCoulor,PieceType.QUEEN, this));
 			
 		for(int i = 0; i < BISHOP_SIZE; i++) {
-			piecesPlayer.add(new Bishop(playerCoulor,PieceType.BISHOP));
+			piecesPlayer.add(new Bishop(playerCoulor,PieceType.BISHOP, this));
 		}
 		for(int i = 0; i < KNIGHT_SIZE; i++) {
-			piecesPlayer.add(new Knight(playerCoulor, PieceType.KNIGHT));
+			piecesPlayer.add(new Knight(playerCoulor, PieceType.KNIGHT, this));
 		}
 		for(int i = 0; i < ROOK_SIZE; i++) {
-			piecesPlayer.add(new Rook(playerCoulor, PieceType.ROOK));
+			piecesPlayer.add(new Rook(playerCoulor, PieceType.ROOK, this));
 		}
 		for(int i = 0; i < PAWN_SIZE; i++) {
-			piecesPlayer.add(new Pawn(playerCoulor,PieceType.PAWN));
+			piecesPlayer.add(new Pawn(playerCoulor,PieceType.PAWN, this));
 		}
 		
 					
 	}
 	
 	public Spot getSpot(int x, int y) {
-		return spots[x][y];
+		return spots[x][y].getSpot();
+	}
+	public Spot getSpot(Spot spot) {
+		
+		return spots[spot.getX()] [spot.getY()];
 	}
 	
 	//Setting start piece position. Setting them for both player black and white. Using xPos array to determine white/block position on board. 
@@ -201,6 +182,51 @@ public class Board {
 		return this.piecesPlayerBlack;
 	}
 	
+	public static  Board startNewBoard() {
+		if(board == null) {
+			board = new Board();	
+		 }									
+		else			
+			System.out.println("Attempt to create two boards avoided.");
+		return board;	
+ }
+		
+	public void calcLegalBlackMoves () {
+		//Calc legal moves when not in chess.
+		legalMovesBlack.clear();
+		for(Piece piece : piecesPlayerBlack) {			
+			legalMovesBlack.addAll(piece.getAttackingMoves());
+			legalMovesBlack.addAll(piece.getLegalMovements());
+
+			}
+		
+	}
+	public void calcLegalWhiteMoves () {
+		//Calc legal moves when not in chess.
+		legalMovesWhite.clear();
+		//System.out.print(piecesPlayerWhite);
+		System.out.println();
+		for(Piece piece : piecesPlayerWhite) {
+			legalMovesWhite.addAll(piece.getAttackingMoves());
+			legalMovesWhite.addAll(piece.getLegalMovements());		
+		}		
+	}
+	
+
+	public ArrayList<Move> getAllLegalWhiteMoves() {
+		calcLegalWhiteMoves();
+		return legalMovesWhite;
+				
+	}
+	
+	public ArrayList<Move> getAllLegalBlackMoves() {
+		calcLegalBlackMoves();
+		return legalMovesBlack;
+				
+	}
+	
+
+
 	
 }
 

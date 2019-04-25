@@ -21,9 +21,6 @@ public class Spot {
 		this.piece = null;
 		
 	}
-	public Spot() {
-		
-	}
 
 	public boolean isOccupied() {
 		return isOccupied;
@@ -53,17 +50,20 @@ public class Spot {
 		return this;
 	}
 	public void setPieceOnSpot(Piece piece) {
-		setOccupied(true);
+		if(piece != null)
+			setOccupied(true);
+		else
+			setOccupied(false);
 		this.piece = piece;
 	}
 	
-	public Piece getPieceBySpot() {
+	public Piece getPiece() {
 		return this.piece;
 		
 	}
 	@Override
 	public String toString() {
-		return "Spot [x=" + x + ", y=" + y + "]";
+		return "Spot = [x=" + x + ", y=" + y + "]   Piece = "  + piece;
 	}
 	
 	

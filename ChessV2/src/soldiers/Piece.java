@@ -19,18 +19,29 @@ public abstract class  Piece  {
 	protected Board board;
 	protected  PieceType pieceType ; 
 	protected Spot spot;
+	protected boolean isFirstMove;
 	public PlayerColour playerCoulor;
 	protected ArrayList<Move> legalMovements;
 	protected ArrayList<Move> legalAttackMovements;
 	protected LinkedList<Move> candidateMovements;
 	
 	
-	public Piece(PlayerColour playerCoulor, PieceType pieceType) {
+	public Piece(PlayerColour playerCoulor, PieceType pieceType, Board board, boolean isFirstMove) {
 		legalMovements = new ArrayList<Move>();
 		candidateMovements = new LinkedList<Move>();
 		legalAttackMovements= new ArrayList<Move>();
 		this.playerCoulor = playerCoulor;
 		this.pieceType = pieceType;
+		this.board = board;
+		this.isFirstMove = isFirstMove;
+		
+	}
+	public boolean isFirstMove() {
+		return isFirstMove;
+	}
+	
+	public void makeFirstMove() {
+		isFirstMove = false;
 	}
 	
 	public PlayerColour getPlayerCoulor() {
@@ -67,7 +78,7 @@ public abstract class  Piece  {
 	/*
 	 In order to filter all illegal moves using the following method.
 	*/
-	public void setValidMovements() {
+	protected void setValidMovements() {
 		
 	     //Adding all None Attacking movements.		
 		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getDestSpot().isOccupied()) {
@@ -77,7 +88,7 @@ public abstract class  Piece  {
 		
 		//Adding all attacking movements
 		if(candidateMovements.iterator().hasNext()) {
-			if(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor() != this.getPlayerCoulor()) {
+			if(candidateMovements.peek().getDestSpot().getPiece().getPlayerCoulor() != this.getPlayerCoulor()) {
 				legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
 			}
 		}
@@ -103,7 +114,7 @@ public abstract class  Piece  {
 	 The rest of the pieces has diffrent unique candidate movements hence using diffrent approach. 
 	 
 	*/
-	public void forwardMovement() {
+	protected void forwardMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -122,7 +133,7 @@ public abstract class  Piece  {
 		setValidMovements();		
 	}
 	
-	public void backwardMovement() {
+	protected void backwardMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -140,7 +151,7 @@ public abstract class  Piece  {
 		setValidMovements();	
 	}
 	
-	public void rightSideMovement() {
+	protected void rightSideMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -157,7 +168,7 @@ public abstract class  Piece  {
 		setValidMovements();	
 	}
 	
-	public void leftSideMovement() {
+	protected void leftSideMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -175,7 +186,7 @@ public abstract class  Piece  {
 		setValidMovements();		
 	}
 	
-	public void diagonalBottomRightMovement() {
+	protected void diagonalBottomRightMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -196,7 +207,7 @@ public abstract class  Piece  {
 		setValidMovements();
 	}
 	
-	public void diagonalTopRightMovement() {
+	protected void diagonalTopRightMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -217,7 +228,7 @@ public abstract class  Piece  {
 		setValidMovements();	
 	}
 	
-	public void diagonalBottomLeftMovement() {
+	protected void diagonalBottomLeftMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -239,7 +250,7 @@ public abstract class  Piece  {
 		
 	}
 	
-	public void diagonalTopLeftMovement() {
+	protected void diagonalTopLeftMovement() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -261,7 +272,7 @@ public abstract class  Piece  {
 	}
 	
 	
-	public Spot getPieceSpot() {
+	public Spot getSpot() {
 		return this.spot;
 	}
 	

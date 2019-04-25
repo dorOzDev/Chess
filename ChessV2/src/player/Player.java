@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import enaum.PieceType;
+import enaum.PlayerColour;
 import game.Board;
 import game.Spot;
 import movement.Move;
@@ -18,8 +19,9 @@ public abstract class Player {
 	protected final Piece king;
 	protected ArrayList<Move> legalOpponentMoves;
 	protected boolean isInCheck;
+	protected PlayerColour playerColour;
 	
-	public Player(ArrayList<Piece> remainingPieces, Board board){
+	public Player(ArrayList<Piece> remainingPieces, Board board, PlayerColour playerColor){
 		this.remainingPieces = new ArrayList <Piece>();		
 		this.legalMoves = new ArrayList<Move>();
 		this.legalOpponentMoves = new ArrayList<Move>();
@@ -27,6 +29,7 @@ public abstract class Player {
 		this.king = getKing();
 		this.board = board;
 		this.isInCheck = false;
+		this.playerColour = playerColor;
 	}
 	
 	protected abstract boolean  isInCheck();
@@ -34,7 +37,9 @@ public abstract class Player {
 	public abstract boolean  isInCheckMate();
 	public abstract boolean isInStaleMate();
 	
-	
+	public PlayerColour getPlayerColour() {
+		return this.playerColour;
+	}
 	protected  Piece getKing() {
 		
 		for(Piece piece: remainingPieces) {
@@ -67,12 +72,12 @@ public abstract class Player {
 	//Possible solution to check only if getting out of threatening piece chess.
 	private boolean testMove(Move move, Player player) {
 		boolean checkMovement;
-		Piece tempPiece = move.getDestSpot().getPieceBySpot();
+		Piece tempPiece = move.getDestSpot().getPiece();
 		move.getSourceSpot().setOccupied(false);	
-		move.getPieceToMove().setPiecePos(move.getDestSpot());
-		move.getDestSpot().setPieceOnSpot(move.getPieceToMove());
+		move.getPiece().setPiecePos(move.getDestSpot());
+		move.getDestSpot().setPieceOnSpot(move.getPiece());
 		checkMovement = player.getInCheckStatus();
-		move.getPieceToMove().setPiecePos(move.getSourceSpot());	
+		move.getPiece().setPiecePos(move.getSourceSpot());	
 		move.getSourceSpot().setOccupied(true);
 		
 		if(tempPiece != null) {
@@ -84,6 +89,40 @@ public abstract class Player {
 		
 		return checkMovement;
 	}
-
+	
+	
+	public boolean makeMove(Move move) {
+		legalMoves.clear();
+		legalMoves.addAll(move.getPiece().getAttackingMoves());
+		legalMoves.addAll(move.getPiece().getLegalMovements());
+		Spot sourceSpot;
+		Spot destSpot;
+		
+		if(!checkLegalMove(move)) {
+			
+			System.out.println("illegal move");
+			return false;
+		}
+		else {
+			sourceSpot = board.getSpot(move.getSourceSpot());		// setting piece on new positioin
+			destSpot = board.getSpot(move.getDestSpot());
+			move.getPiece().setPiecePos(destSpot);                 // setting piece's new position
+			destSpot.setPieceOnSpot(move.getPiece());
+			if(move.getPiece().isFirstMove()) { 				  // If this is the first move of the piece I shall mark the first move as done. Usefull for pawn movement and castling movement.
+				move.getPiece().makeFirstMove();
+			}
+			sourceSpot.setPieceOnSpot(null);
+		}
+		return true;
+	}
+	
+	protected boolean checkLegalMove(Move move) {
+		for(Move legalMove:legalMoves) {
+			if(move.getDestSpot() == legalMove.getDestSpot())
+				return true;
+		}
+		return false;
+	}
+	
 
 }

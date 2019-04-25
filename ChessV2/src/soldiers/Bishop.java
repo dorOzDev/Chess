@@ -2,12 +2,13 @@ package soldiers;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.Board;
 import game.Spot;
 
 public  class Bishop extends Piece {
 
-	public Bishop(PlayerColour playerColour, PieceType pieceType) {
-		super(playerColour, pieceType);
+	public Bishop(PlayerColour playerColour, PieceType pieceType, Board board) {
+		super(playerColour, pieceType, board, true);
 
 	}
 
