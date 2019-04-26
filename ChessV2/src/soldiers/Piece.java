@@ -89,8 +89,9 @@ public abstract class  Piece  {
 		//Adding all attacking movements
 		if(candidateMovements.iterator().hasNext()) {
 			if(candidateMovements.peek().getDestSpot().getPiece().getPlayerCoulor() != this.getPlayerCoulor()) {
-				legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
+				legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.peek().getDestSpot(), this, candidateMovements.peek().getDestSpot().getPiece()));
 			}
+			candidateMovements.pop();
 		}
 		candidateMovements.clear();
 		

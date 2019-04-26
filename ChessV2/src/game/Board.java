@@ -224,6 +224,11 @@ public class Board {
 		return legalMovesBlack;
 				
 	}
+
+	public String toAlgebricCordinate(Spot destSpot) {
+		
+		return Integer.toString(destSpot.getY()) ;
+	}
 	
 
 

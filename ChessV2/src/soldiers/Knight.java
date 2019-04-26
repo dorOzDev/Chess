@@ -100,15 +100,16 @@ public class Knight extends Piece  {
 				
 				if(candidateMovements.peek().getDestSpot().getPiece().getPlayerCoulor() != this.playerCoulor) {
 					
-					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
-				}else {
-					
-						candidateMovements.pop();
+					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.peek().getDestSpot(), this, candidateMovements.peek().getDestSpot().getPiece()));
+				
 				}
-			}
+					candidateMovements.pop();
+				
+			
 		}	
 		candidateMovements.clear();
 	}
+ }
 }
 
 

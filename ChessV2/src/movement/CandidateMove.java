@@ -10,6 +10,18 @@ public class CandidateMove extends Move {
 		super(sourceSpot, destSpot, piece);
 		
 	}
+
+	@Override
+	public boolean isAttackMove() {
+		
+		return false;
+	}
+
+	@Override
+	public Piece getAttackedPiece() {
+		
+		throw new RuntimeException("None attack move, shouldn't reach here!@#$%");
+	}
 	
 	
 

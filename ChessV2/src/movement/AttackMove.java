@@ -5,10 +5,23 @@ import game.Spot;
 import soldiers.Piece;
 
 public class AttackMove extends Move {
-
-	public AttackMove(Spot sourceSpot, Spot destSpot, final Piece piece) {
+	
+	private Piece attackedPiece;
+	public AttackMove(Spot sourceSpot, Spot destSpot, final Piece piece, final Piece attackedPiece) {
 		super(sourceSpot, destSpot, piece);
-		// TODO Auto-generated constructor stub
+		this.attackedPiece = attackedPiece;
+		
+	}
+
+	@Override
+	public boolean isAttackMove() {
+		
+		return true;
+	}
+	
+	@Override
+	public Piece getAttackedPiece() {
+		return attackedPiece;
 	}
 
 

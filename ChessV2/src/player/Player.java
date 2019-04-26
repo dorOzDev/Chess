@@ -124,5 +124,7 @@ public abstract class Player {
 		return false;
 	}
 	
+	public abstract boolean isWhite();
+	public abstract boolean isBlack();
 
 }

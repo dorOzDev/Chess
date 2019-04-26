@@ -37,17 +37,19 @@ import javax.swing.SwingUtilities;
 public class GuiTable {
 	
 	private final JFrame frame;
+	private final GameHistoryPanel gameHistoryPanel;
+	private final TakenPiecesPanel takenPiecesPanel;
 	private final JMenuBar menuBar;
 	private final BoardPanel boardPanel;
-	private boolean highLightLegalMoves;
+	private boolean highLightLegalMoves = true;
 	private Board board;
-	
+	private final MoveLog moveLog;
 	private Spot sourceSpot;
 	private Spot destSpot;
 	private Piece humanMovedPiece;
 	private Move lastMove;
 	
-	private static String defaultPieceImagePath = "art/pieces/";
+	public static String defaultPieceImagePath = "art/pieces/";
 	private static String defaultHighlightImagePath = "art/misc/green_dot.png";
 
 	private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(700, 700);
@@ -62,16 +64,19 @@ public class GuiTable {
 		this.frame.setLayout(new BorderLayout());
 		board = Board.startNewBoard();
 		menuBar = createTableMenuBar();
+		gameHistoryPanel = new GameHistoryPanel();
+		takenPiecesPanel = new TakenPiecesPanel();
 		frame.setJMenuBar(menuBar);
 		frame.setSize(OUTER_FRAME_DIMENSION);
-		
+		frame.add(takenPiecesPanel, BorderLayout.WEST);
+		frame.add(gameHistoryPanel, BorderLayout.EAST);	
+		moveLog = new MoveLog();
 		this.boardPanel = new BoardPanel();
 		this.frame.add(this.boardPanel, BorderLayout.CENTER);
 		frame.setVisible(true);
 	}
 
 	
-	// Optional
 	private JMenuBar createTableMenuBar() {
 		final JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
@@ -88,6 +93,7 @@ public class GuiTable {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					highLightLegalMoves = legalHighLighterChecBox.isSelected();
+					
 					
 				}
 			});
@@ -202,6 +208,7 @@ public class GuiTable {
 				setPreferredSize(SPOT_PANEL_DIM);
 				assignSpotColor();
 				assignPiecePanel(board);
+				highlightLegalMoves(board);
 				
 				addMouseListener(new MouseListener() {
 					
@@ -237,18 +244,20 @@ public class GuiTable {
 							if(sourceSpot == null) {
 								sourceSpot = board.getSpot(xSpotPos, ySpotPos);
 								humanMovedPiece = sourceSpot.getPiece();
-								System.out.println(humanMovedPiece);
+								//System.out.println(humanMovedPiece);
 								if(humanMovedPiece == null)
 									sourceSpot = null;
 							} else {
-								boardPanel.drawBoard(board);
 								destSpot = board.getSpot(xSpotPos, ySpotPos);
 								final Move move = new CandidateMove(sourceSpot, destSpot, humanMovedPiece); // TODO change this to make actual move.
 								 final boolean hasMoveSucceed = board.getCurrPlayer().makeMove(move); // TODO add move transition class to move.
+								 
 								 if(hasMoveSucceed){
+									 
 										board = board.getUpdatedBoard(); 
+										moveLog.addMove(move);
 										//TODO add the move that was made to the move log(Optional)
-
+									
 										 board.setCurrPlayer();
 									}
 									sourceSpot =  null;
@@ -256,16 +265,10 @@ public class GuiTable {
 									humanMovedPiece = null;		
 								 
 							}
-								SwingUtilities.invokeLater(new Runnable() {
-									
-									@Override
-									public void run() {
-										boardPanel.drawBoard(board);
-										
-									}
-								});
-		 
 						}
+
+		 
+						
 						//Right click cancel any click (in case user regrets the click)
 						else if(SwingUtilities.isRightMouseButton(event)) {
 							System.out.println("Right clicked");
@@ -274,6 +277,17 @@ public class GuiTable {
 							humanMovedPiece = null;							
 						}
 						
+						SwingUtilities.invokeLater(new Runnable() {
+							
+							@Override
+							public void run() {
+								gameHistoryPanel.redo(board, moveLog);
+								takenPiecesPanel.redo(moveLog);
+								boardPanel.drawBoard(board);
+								
+							}
+						});
+						
 					}
 				});
 				
@@ -281,11 +295,14 @@ public class GuiTable {
 			}
 			
 			private void highlightLegalMoves(Board board) {
+			
 				if(highLightLegalMoves) {
+					
 					for(final Move move : pieceLegalMoves(board)) {
+						
 						if(move.getDestSpot().getX() == xSpotPos && move.getDestSpot().getY() == ySpotPos) {
 							try {
-								System.out.println(move);
+								
 								add(new JLabel(new ImageIcon(ImageIO.read(new File(defaultHighlightImagePath)))));
 							}
 							catch(Exception e) {
@@ -298,6 +315,7 @@ public class GuiTable {
 		
 		
 			private  ArrayList<Move> pieceLegalMoves(Board board){
+				
 				ArrayList<Move> legalMoves = new ArrayList<Move>();
 				if(humanMovedPiece != null && humanMovedPiece.getPlayerCoulor() == board.getCurrPlayer().getPlayerColour()) {
 					legalMoves.addAll((Collection<? extends Move>) humanMovedPiece.getLegalMovements());
@@ -318,7 +336,8 @@ public class GuiTable {
 				this.removeAll();
 				if(board.getSpot(xSpotPos, ySpotPos).isOccupied()) {
 					try {
-						final BufferedImage image = ImageIO.read(new File(defaultPieceImagePath  + board.getSpot(xSpotPos, ySpotPos).getPiece().getPlayerCoulor().toString().substring(0, 1) + board.getSpot(xSpotPos, ySpotPos).getPiece().getPieceType().toString() + ".gif"));
+						Piece drawPiece = board.getSpot(xSpotPos, ySpotPos).getPiece();
+						final BufferedImage image = ImageIO.read(new File(defaultPieceImagePath  + drawPiece.getPlayerCoulor().toString().substring(0, 1) + drawPiece.getPieceType().toString() + ".gif"));
 						add(new JLabel(new ImageIcon(image)));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

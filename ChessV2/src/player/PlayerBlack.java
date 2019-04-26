@@ -41,6 +41,17 @@ public class PlayerBlack extends Player {
 			return true;
 		return false;
 	}
+
+	@Override
+	public boolean isWhite() {
+		return false;
+	}
+
+	@Override
+	public boolean isBlack() {
+		
+		return true;
+	}
 	
 	 
 	

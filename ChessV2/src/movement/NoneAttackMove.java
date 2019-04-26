@@ -12,4 +12,15 @@ public class NoneAttackMove extends Move {
 		
 	}
 
+	@Override
+	public boolean isAttackMove() {
+		return false;
+	}
+	
+	@Override
+	public Piece getAttackedPiece() {
+		throw new RuntimeException("None attack move, shouldn't reach here!@#$%");
+	}
+	
+
 }

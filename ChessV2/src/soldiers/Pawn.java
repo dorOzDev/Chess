@@ -78,7 +78,7 @@ public class Pawn extends Piece {
 		
 		int currX = this.getSpot().getX();
 		int currY = this.getSpot().getY();
-		Piece tempPiece;
+		Piece potentialAttackedPiece;
 		
 		// Black player pawn attack movement is in diffrent direction to White's player pawn attack move.
 		if(this.playerCoulor == PlayerColour.WHITE) {
@@ -88,10 +88,10 @@ public class Pawn extends Piece {
 			++currY;
 			if(currX >= 0 && currY < Board.NUM_COLS) {
 				
-				tempPiece = board.getSpot(currX, currY).getPiece();			
-				if(tempPiece != null) {
-					if(tempPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this));
+				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();			
+				if(potentialAttackedPiece != null) {
+					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
+						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 				}
 				
 			}
@@ -99,10 +99,10 @@ public class Pawn extends Piece {
 			//Check diagnoal left attack move
 			currY-= 2;
 			if(currX >= 0 && currY >= 0) {
-				tempPiece = board.getSpot(currX, currY).getPiece();
-				if(tempPiece != null) {
-					if(tempPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this));
+				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
+				if(potentialAttackedPiece != null) {
+					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
+						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 				}
 			}
 			
@@ -113,20 +113,20 @@ public class Pawn extends Piece {
 			++currX;
 			++currY;
 			if(currX >= 0 && currY < Board.NUM_COLS) {
-				tempPiece = board.getSpot(currX, currY).getPiece();
-				if(tempPiece != null) {
-					if(tempPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this));
+				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
+				if(potentialAttackedPiece != null) {
+					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
+						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 				}
 			}
 			
 			//Check diagnoal left attack move
 			currY-= 2;
 			if(currX >= 0 && currY >= 0) {
-				tempPiece = board.getSpot(currX, currY).getPiece();
-				if(tempPiece != null) {
-					if(tempPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this));
+				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
+				if(potentialAttackedPiece != null) {
+					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
+						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 			
 				}
 		
