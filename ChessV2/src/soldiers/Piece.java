@@ -22,14 +22,14 @@ public abstract class  Piece  {
 	protected boolean isFirstMove;
 	public PlayerColour playerCoulor;
 	protected ArrayList<Move> legalMovements;
-	protected ArrayList<Move> legalAttackMovements;
+
 	protected LinkedList<Move> candidateMovements;
 	
 	
 	public Piece(PlayerColour playerCoulor, PieceType pieceType, Board board, boolean isFirstMove) {
 		legalMovements = new ArrayList<Move>();
 		candidateMovements = new LinkedList<Move>();
-		legalAttackMovements= new ArrayList<Move>();
+
 		this.playerCoulor = playerCoulor;
 		this.pieceType = pieceType;
 		this.board = board;
@@ -66,10 +66,9 @@ public abstract class  Piece  {
 	
 	public abstract void setCandidateMovements();
 	
-	public void movement() {
+	protected void movement() {
 		candidateMovements.clear();
 		legalMovements.clear();
-		legalAttackMovements.clear();
 		setCandidateMovements();
 
 		
@@ -89,7 +88,7 @@ public abstract class  Piece  {
 		//Adding all attacking movements
 		if(candidateMovements.iterator().hasNext()) {
 			if(candidateMovements.peek().getDestSpot().getPiece().getPlayerCoulor() != this.getPlayerCoulor()) {
-				legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.peek().getDestSpot(), this, candidateMovements.peek().getDestSpot().getPiece()));
+				legalMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.peek().getDestSpot(), this, candidateMovements.peek().getDestSpot().getPiece()));
 			}
 			candidateMovements.pop();
 		}
@@ -102,18 +101,11 @@ public abstract class  Piece  {
 		movement();
 		return legalMovements;
 	}
-	
-	public ArrayList<Move>getAttackingMoves(){
-		movement();
-		return legalAttackMovements;
-	}
-	
-	
+
 	
 	/*
 	 The following are adding all the candidate movements for the Rook,Queen, Bishop and King.
-	 The rest of the pieces has diffrent unique candidate movements hence using diffrent approach. 
-	 
+	 The rest of the pieces has diffrent unique candidate movements hence using diffrent approach. 	 
 	*/
 	protected void forwardMovement() {
 		int currX = this.spot.getX();

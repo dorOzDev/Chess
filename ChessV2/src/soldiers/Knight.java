@@ -87,29 +87,22 @@ public class Knight extends Piece  {
 	@Override
 	public void setValidMovements() {
 		
-		System.out.println(this);
 		//Adding all legal none attack movements.
 		while(candidateMovements.iterator().hasNext()) {
-			
-			if(!candidateMovements.peek().getDestSpot().isOccupied())
+			if(!candidateMovements.peek().getDestSpot().isOccupied()) {
 				legalMovements.add(new NoneAttackMove(this.spot.getSpot(),candidateMovements.pop().getDestSpot(), this));
-			
+			}
 		//Adding all legal attack movements.
-			else { 
-				//System.out.println(candidateMovements.peek().getDestSpot().getPieceBySpot().getPlayerCoulor());
-				
+			else { 					
 				if(candidateMovements.peek().getDestSpot().getPiece().getPlayerCoulor() != this.playerCoulor) {
-					
-					legalAttackMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.peek().getDestSpot(), this, candidateMovements.peek().getDestSpot().getPiece()));
-				
+					legalMovements.add(new AttackMove(this.spot.getSpot(), candidateMovements.peek().getDestSpot(), this, candidateMovements.peek().getDestSpot().getPiece()));									
 				}
-					candidateMovements.pop();
-				
-			
-		}	
+				candidateMovements.pop();		
+			}
+		
+		}
 		candidateMovements.clear();
 	}
- }
 }
 
 

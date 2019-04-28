@@ -29,7 +29,6 @@ public class Pawn extends Piece {
 	public void movement() {
 		candidateMovements.clear();
 		legalMovements.clear();
-		legalAttackMovements.clear();
 		setCandidateMovements();
 		setValidMovements();
 		setPawnAttackMovements();
@@ -91,7 +90,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();			
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 				}
 				
 			}
@@ -102,7 +101,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 				}
 			}
 			
@@ -116,7 +115,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 				}
 			}
 			
@@ -126,7 +125,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalAttackMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
 			
 				}
 		

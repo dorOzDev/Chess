@@ -3,10 +3,12 @@ package game;
 import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Vector;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import movement.AttackMove;
 import movement.Move;
 import player.Player;
 import player.PlayerBlack;
@@ -20,6 +22,7 @@ public class Board {
 	private static final int BISHOP_SIZE = 2;
 	private static final int KNIGHT_SIZE = 2;
 	private static final int ROOK_SIZE = 2;
+	private static final int OFFSET_CLEAN_ROW_COUNT = 8; 
 	public static Spot[][] spots;
 	protected static ArrayList<Piece> piecesPlayerWhite;
 	protected  ArrayList<Piece> piecesPlayerBlack;
@@ -55,6 +58,29 @@ public class Board {
 		setCurrPlayer();
 }
 	
+	public static  Board startNewBoard() {
+		if(board == null) {
+			board = new Board();	
+		 }									
+		else {	
+			//System.out.println("Attempt to create two boards avoided.");
+		}
+		return board;	
+ }
+	
+	public PlayerColour getCurrentPlayerColour() {
+		if(currPlayer.getPlayerColour() == PlayerColour.BLACK) {
+			return PlayerColour.BLACK;
+		} 
+		else if(currPlayer.getPlayerColour() == PlayerColour.WHITE) {
+			return PlayerColour.WHITE;
+		}
+		else {
+			System.out.println("Shouldn't reach here");
+			return null;
+		}
+	}
+	
 	//TODO  need to realize how to operate this two.
 	public Player getCurrPlayer() {
 		return currPlayer;
@@ -64,6 +90,17 @@ public class Board {
 	public void setCurrPlayer() {
 		// Letting white player play first.
 		if(currPlayer == null) {
+			/*
+			// Optional, i might add random starting player.
+			Random randomGenerator = new Random();
+			int randomPlayerIndex = randomGenerator.nextInt(2);
+			if(randomPlayerIndex == 0) {
+				currPlayer = playerWhite;
+			}
+			else {
+				currPlayer = playerBlack;
+			}
+			*/
 			currPlayer = playerWhite;
 		}
 		
@@ -71,7 +108,7 @@ public class Board {
 			
 			currPlayer = ((currPlayer == playerWhite) ? playerBlack : playerWhite);
 		}
-		System.out.println(currPlayer);
+		
 	}
 	
 	public Board getUpdatedBoard() {
@@ -182,32 +219,20 @@ public class Board {
 		return this.piecesPlayerBlack;
 	}
 	
-	public static  Board startNewBoard() {
-		if(board == null) {
-			board = new Board();	
-		 }									
-		else			
-			System.out.println("Attempt to create two boards avoided.");
-		return board;	
- }
+
 		
-	public void calcLegalBlackMoves () {
+	private void calcLegalBlackMoves () {
 		//Calc legal moves when not in chess.
 		legalMovesBlack.clear();
 		for(Piece piece : piecesPlayerBlack) {			
-			legalMovesBlack.addAll(piece.getAttackingMoves());
 			legalMovesBlack.addAll(piece.getLegalMovements());
-
 			}
 		
 	}
-	public void calcLegalWhiteMoves () {
+	private void calcLegalWhiteMoves () {
 		//Calc legal moves when not in chess.
 		legalMovesWhite.clear();
-		//System.out.print(piecesPlayerWhite);
-		System.out.println();
 		for(Piece piece : piecesPlayerWhite) {
-			legalMovesWhite.addAll(piece.getAttackingMoves());
 			legalMovesWhite.addAll(piece.getLegalMovements());		
 		}		
 	}
@@ -225,11 +250,32 @@ public class Board {
 				
 	}
 
-	public String toAlgebricCordinate(Spot destSpot) {
+	public String castToBoardCordinate(Spot destSpot) {
 		
-		return Integer.toString(destSpot.getY()) ;
+		char intToAlgebric =(char) (destSpot.getY() + 'a'); // Cast row number to letter
+		return intToAlgebric + Integer.toString(Math.abs(destSpot.getX() - OFFSET_CLEAN_ROW_COUNT)) ;
 	}
 	
+	public void removeAttackedPiece(Move move) {
+		int index = 0;
+		System.out.println("Match found :)");
+		if(move.getAttackedPiece().playerCoulor == PlayerColour.WHITE) {
+			for(Piece piece:piecesPlayerWhite) {
+				if(checkIfSpotsMatch(move.getDestSpot(), piece.getSpot())) {
+					piecesPlayerWhite.remove(index);
+					
+				}
+				index++;
+			}
+		}
+	}
+	
+	private boolean checkIfSpotsMatch(Spot sourceSpot, Spot destSpot) {
+		if((sourceSpot.getX() == destSpot.getX() ) && (sourceSpot.getY() == destSpot.getY())) {
+			return true;
+		}
+		return false;
+	}
 
 
 	

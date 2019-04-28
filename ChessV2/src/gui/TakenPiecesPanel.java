@@ -28,8 +28,8 @@ public class TakenPiecesPanel extends JPanel {
 	private final JPanel northPanel;
 	private final JPanel southPanel;
 	
-	private static final Color PANEL_COLOR = Color.decode("0xFDE6");
-	private static final String BACKGROUND_COLOR =("0xFD5E6");
+	private static final Color PANEL_COLOR = Color.decode("0xFFFFFF");
+	private static final String BACKGROUND_COLOR =("0xFFFFFF");
 	private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(50, 50); 
 	private static final EtchedBorder PANEL_BORDER = new EtchedBorder(EtchedBorder.RAISED);
 	
@@ -79,21 +79,21 @@ public class TakenPiecesPanel extends JPanel {
 		
 		for(final Piece takenPiece : whiteTakenPieces) {
 			try {
-			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.toString() + ".gif"));
-			final ImageIcon icon = new ImageIcon(image);
-			final JLabel imageLabel = new JLabel();
+			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
+			final ImageIcon imageIcon = new ImageIcon(image);
+			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 35, imageIcon.getIconWidth() - 35, Image.SCALE_SMOOTH)));
 			this.southPanel.add(imageLabel);
 		} 
 			catch(final IOException e){
-				
+				e.printStackTrace();
 			}
 	}
 		
 		for(final Piece takenPiece : blackTakenPieces) {
-			try {
-			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.toString() + ".gif"));
-			final ImageIcon icon = new ImageIcon(image);
-			final JLabel imageLabel = new JLabel();
+			try {		
+			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
+			final ImageIcon imageIcon = new ImageIcon(image);
+			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 35, imageIcon.getIconWidth() - 35, Image.SCALE_SMOOTH)));
 			this.northPanel.add(imageLabel);
 		} 
 			catch(final IOException e){
@@ -101,6 +101,7 @@ public class TakenPiecesPanel extends JPanel {
 			}
 	}
 		validate();
+		
 	
 	
  }

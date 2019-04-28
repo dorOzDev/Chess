@@ -10,7 +10,8 @@ import soldiers.Piece;
 public class PlayerBlack extends Player {
 	
 	public PlayerBlack(ArrayList<Piece> remainingPieces,Board board){
-		super(remainingPieces, board, PlayerColour.BLACK);		
+		super(remainingPieces, board, PlayerColour.BLACK);
+		remainingPieces = board.getPiecesBlack();
 	}
 
 	@Override
@@ -51,6 +52,12 @@ public class PlayerBlack extends Player {
 	public boolean isBlack() {
 		
 		return true;
+	}
+
+	@Override
+	public void updateCurrentAvailablePieces() {
+		remainingPieces = board.getPiecesBlack();
+		
 	}
 	
 	 

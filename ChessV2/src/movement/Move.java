@@ -44,7 +44,7 @@ public abstract class Move {
 	
 	@Override
 	public String toString() {
-		return board.toAlgebricCordinate(destSpot);
+		return board.castToBoardCordinate(destSpot);
 	}
 
 }

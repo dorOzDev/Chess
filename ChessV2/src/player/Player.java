@@ -93,7 +93,6 @@ public abstract class Player {
 	
 	public boolean makeMove(Move move) {
 		legalMoves.clear();
-		legalMoves.addAll(move.getPiece().getAttackingMoves());
 		legalMoves.addAll(move.getPiece().getLegalMovements());
 		Spot sourceSpot;
 		Spot destSpot;
@@ -104,20 +103,33 @@ public abstract class Player {
 			return false;
 		}
 		else {
-			sourceSpot = board.getSpot(move.getSourceSpot());		// setting piece on new positioin
+			System.out.println(move.isAttackMove());
+			sourceSpot = board.getSpot(move.getSourceSpot());		// getting piece new positioin
 			destSpot = board.getSpot(move.getDestSpot());
 			move.getPiece().setPiecePos(destSpot);                 // setting piece's new position
-			destSpot.setPieceOnSpot(move.getPiece());
-			if(move.getPiece().isFirstMove()) { 				  // If this is the first move of the piece I shall mark the first move as done. Usefull for pawn movement and castling movement.
+			destSpot.setPieceOnSpot(move.getPiece());	          
+			if(move.getPiece().isFirstMove()) { 				 // If this is the first move of the piece I shall mark the first move as done. Usefull for pawn movement and castling movement.
 				move.getPiece().makeFirstMove();
 			}
 			sourceSpot.setPieceOnSpot(null);
+			/*
+			if(move.isAttackMove()) {
+				
+				board.removeAttackedPiece(move);
+			}
+			*/
 		}
 		return true;
 	}
 	
-	protected boolean checkLegalMove(Move move) {
-		for(Move legalMove:legalMoves) {
+
+	
+	protected boolean checkLegalMove(final Move move) {
+		
+		if(move.getPiece().getPlayerCoulor() != board.getCurrentPlayerColour()) {  // Check if clicked piece belongs to the current active player.
+			return false;
+		}
+		for(Move legalMove:legalMoves) {                                          // Check if the clicked move is in the current legal moves for the same piece type.
 			if(move.getDestSpot() == legalMove.getDestSpot())
 				return true;
 		}
@@ -126,5 +138,7 @@ public abstract class Player {
 	
 	public abstract boolean isWhite();
 	public abstract boolean isBlack();
+	
+	public abstract void updateCurrentAvailablePieces();
 
 }

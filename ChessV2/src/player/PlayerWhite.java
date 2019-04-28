@@ -12,6 +12,7 @@ public class PlayerWhite extends Player {
 	
 	public PlayerWhite(ArrayList<Piece> remainingPieces, Board board){
 		super(remainingPieces, board, PlayerColour.WHITE);
+		remainingPieces = board.getPiecesWhite();
 	}
 	
 	@Override
@@ -49,6 +50,12 @@ public class PlayerWhite extends Player {
 	@Override
 	public boolean isBlack() {
 		return false;
+	}
+
+	@Override
+	public void updateCurrentAvailablePieces() {
+		remainingPieces = board.getPiecesWhite();
+		
 	}
 	
 }
