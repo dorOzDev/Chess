@@ -2,7 +2,9 @@ package player;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import enaum.MoveType;
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
@@ -14,7 +16,7 @@ public abstract class Player {
 	
 	protected Board board;
 	protected  ArrayList<Piece> remainingPieces;
-	protected ArrayList<Move> legalMoves;
+	protected List<Move> legalMoves;
 	//Player opponent;
 	protected final Piece king;
 	protected ArrayList<Move> legalOpponentMoves;
@@ -40,7 +42,7 @@ public abstract class Player {
 	public PlayerColour getPlayerColour() {
 		return this.playerColour;
 	}
-	protected  Piece getKing() {
+	public  Piece getKing() {
 		
 		for(Piece piece: remainingPieces) {
 			if(piece.getPieceType() == PieceType.KING){
@@ -55,55 +57,19 @@ public abstract class Player {
 		return isInCheck;
 	}
 	
-	//While in chess only legal moves are ones that escapes the king
-	protected void filterInChessMoves(ArrayList<Move> legalMoves) {
-		Iterator<Move> moveIterator = legalMoves.iterator();
-		if(this.getInCheckStatus()) {
-			while(moveIterator.hasNext()) {
-				if(!testMove(moveIterator.next(), this)) {
-					moveIterator.remove();
-				}	
-			}
-		}
-	}
-	
-	// Return true if this move escapes the king from chess.	
-	//TODO Keep checking this when GUI is installed, the king might get in chess falsely
-	//Possible solution to check only if getting out of threatening piece chess.
-	private boolean testMove(Move move, Player player) {
-		boolean checkMovement;
-		Piece tempPiece = move.getDestSpot().getPiece();
-		move.getSourceSpot().setOccupied(false);	
-		move.getPiece().setPiecePos(move.getDestSpot());
-		move.getDestSpot().setPieceOnSpot(move.getPiece());
-		checkMovement = player.getInCheckStatus();
-		move.getPiece().setPiecePos(move.getSourceSpot());	
-		move.getSourceSpot().setOccupied(true);
-		
-		if(tempPiece != null) {
-			move.getDestSpot().setPieceOnSpot(tempPiece);
-		}
-		else {
-			move.getDestSpot().setOccupied(false);
-		}
-		
-		return checkMovement;
-	}
+
 	
 	
 	public boolean makeMove(Move move) {
 		legalMoves.clear();
-		legalMoves.addAll(move.getPiece().getLegalMovements());
+		legalMoves.addAll(move.getPiece().getLegalMovements());		
 		Spot sourceSpot;
 		Spot destSpot;
 		
 		if(!checkLegalMove(move)) {
-			
-			System.out.println("illegal move");
 			return false;
 		}
 		else {
-			System.out.println(move.isAttackMove());
 			sourceSpot = board.getSpot(move.getSourceSpot());		// getting piece new positioin
 			destSpot = board.getSpot(move.getDestSpot());
 			move.getPiece().setPiecePos(destSpot);                 // setting piece's new position
@@ -111,25 +77,21 @@ public abstract class Player {
 			if(move.getPiece().isFirstMove()) { 				 // If this is the first move of the piece I shall mark the first move as done. Usefull for pawn movement and castling movement.
 				move.getPiece().makeFirstMove();
 			}
-			sourceSpot.setPieceOnSpot(null);
-			/*
-			if(move.isAttackMove()) {
-				
+			sourceSpot.setPieceOnSpot(null);			
+			if(move.isAttackMove()) {	
 				board.removeAttackedPiece(move);
 			}
-			*/
 		}
 		return true;
 	}
-	
-
-	
-	protected boolean checkLegalMove(final Move move) {
 		
-		if(move.getPiece().getPlayerCoulor() != board.getCurrentPlayerColour()) {  // Check if clicked piece belongs to the current active player.
+	protected boolean checkLegalMove(final Move move) {
+		// Check if clicked piece belongs to the current active player.
+		if(move.getPiece().getPlayerCoulor() != board.getCurrentPlayerColour()) {  
 			return false;
 		}
-		for(Move legalMove:legalMoves) {                                          // Check if the clicked move is in the current legal moves for the same piece type.
+		// Check if the clicked move is in the current legal moves for the same piece type.
+		for(Move legalMove:legalMoves) {
 			if(move.getDestSpot() == legalMove.getDestSpot())
 				return true;
 		}

@@ -1,6 +1,6 @@
 package movement;
 
-import enaum.MoveStatus;
+import enaum.MoveType;
 import enaum.PieceType;
 import game.Board;
 import game.Spot;
@@ -11,14 +11,14 @@ public abstract class Move {
 	protected Spot sourceSpot;
 	protected Spot destSpot;
 	protected Piece piece;
-	protected MoveStatus moveStatus;
+	protected MoveType moveType;
 	protected Board board;
 	
-	public Move(final Spot sourceSpot,final Spot destSpot, final Piece piece){
+	public Move(final Spot sourceSpot,final Spot destSpot, final Piece piece, MoveType moveType){
 		this.destSpot = destSpot;
 		this.sourceSpot = sourceSpot;
 		this.piece = piece;
-		moveStatus = MoveStatus.NOT_DONE;
+		moveType = moveType;
 		board = Board.startNewBoard();
 	}
 	
@@ -34,11 +34,15 @@ public abstract class Move {
 		return piece;
 	}
 	
-	public boolean isMoveDone() {
-		return moveStatus == MoveStatus.DONE;
+	public MoveType getMoveType() {
+		return this.moveType;
 	}
 	
 	public abstract boolean isAttackMove();
+	
+	public abstract boolean isCastleMove();
+	
+	public abstract boolean isCastleAllowed();
 	
 	public abstract Piece getAttackedPiece();
 	
@@ -46,5 +50,7 @@ public abstract class Move {
 	public String toString() {
 		return board.castToBoardCordinate(destSpot);
 	}
+	
+	
 
 }

@@ -1,13 +1,16 @@
 package soldiers;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import enaum.MoveType;
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
+import movement.Move;
 import movement.NoneAttackMove;
 
 public class Pawn extends Piece {
@@ -16,14 +19,6 @@ public class Pawn extends Piece {
 		super(playerColour, pieceType, board, true);
 		
 	}
-
-	@Override
-	public void setPiecePos(Spot spot) {
-		this.spot = spot;
-
-			
-	}
-
 
 	@Override
 	public void movement() {
@@ -40,38 +35,33 @@ public class Pawn extends Piece {
 		int currY = this.spot.getY();
 		
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this));
+			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
 			if(isFirstMove)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(),board.spots[--currX][currY].getSpot(), this));
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
+			
+			
 			
 		}
 
 		else {
 			
-			candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this));
+			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
 			if(isFirstMove)
-				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this));
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
 		}
+		
 		
 		
 	}
 	
 	@Override
-	public void setValidMovements() {
-		
-		while(!candidateMovements.isEmpty()) {
-			if(candidateMovements.peek().getDestSpot().isOccupied()) {
-				candidateMovements.pop();
+	public void setValidMovements() {		
+		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getDestSpot().isOccupied()) {
+				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.NONE_ATTACK_MOVE));
 				
-			}
-			else {
-				
-				legalMovements.add(new NoneAttackMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this));
-			}
-			
-		}
-		
+			}			
 	}
+		
 	
 	public void setPawnAttackMovements() {
 		
@@ -90,7 +80,8 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();			
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+					
 				}
 				
 			}
@@ -101,7 +92,8 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+					
 				}
 			}
 			
@@ -115,7 +107,8 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+					
 				}
 			}
 			
@@ -125,13 +118,21 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(new AttackMove(this.getSpot(), board.getSpot(currX, currY), this, potentialAttackedPiece));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+					
 			
 				}
 		
 			}
 		}
 	}
-
+	
+	
+	@Override
+	public List<Move> getCastleMovements() {
+		System.out.println("shouldn't reach here, castling not allowed for this type.");
+		return null;
+		
+	}
 }
 

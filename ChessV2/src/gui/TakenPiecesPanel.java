@@ -19,6 +19,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
 import enaum.PlayerColour;
+import game.Board;
 import gui.GuiTable.MoveLog;
 import movement.Move;
 import soldiers.Piece;
@@ -27,10 +28,11 @@ public class TakenPiecesPanel extends JPanel {
 	
 	private final JPanel northPanel;
 	private final JPanel southPanel;
+	private final Board board;
 	
 	private static final Color PANEL_COLOR = Color.decode("0xFFFFFF");
 	private static final String BACKGROUND_COLOR =("0xFFFFFF");
-	private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(50, 50); 
+	private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(100, 100); 
 	private static final EtchedBorder PANEL_BORDER = new EtchedBorder(EtchedBorder.RAISED);
 	
 	public TakenPiecesPanel() {
@@ -44,6 +46,7 @@ public class TakenPiecesPanel extends JPanel {
 		add(this.northPanel, BorderLayout.NORTH);
 		add(this.southPanel, BorderLayout.SOUTH);
 		setPreferredSize(TAKEN_PIECES_DIMENSION);
+		board = Board.startNewBoard();
 	}
 	
 	public void redo(final MoveLog moveLog) {
@@ -53,7 +56,10 @@ public class TakenPiecesPanel extends JPanel {
 		final List<Piece> whiteTakenPieces = new ArrayList<>();
 		final List<Piece> blackTakenPieces = new ArrayList<>();
 		
+		List<Piece> takenPieces = new ArrayList<>();
+		takenPieces = board.getTakenPieces();
 		//TODO finish this
+		/*
 		for(final Move move :moveLog.getMoves()) {
 			if(move.isAttackMove()) {
 				final Piece takenPiece = move.getAttackedPiece();
@@ -61,6 +67,16 @@ public class TakenPiecesPanel extends JPanel {
 					whiteTakenPieces.add(takenPiece);
 				else
 					blackTakenPieces.add(takenPiece);
+			}
+		}
+		*/
+		
+		for(final Piece piece : takenPieces) {
+			if(piece.getPlayerCoulor() == PlayerColour.WHITE) {
+				whiteTakenPieces.add(piece);
+			}
+			else {
+				blackTakenPieces.add(piece);
 			}
 		}
 		
@@ -81,7 +97,7 @@ public class TakenPiecesPanel extends JPanel {
 			try {
 			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
 			final ImageIcon imageIcon = new ImageIcon(image);
-			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 35, imageIcon.getIconWidth() - 35, Image.SCALE_SMOOTH)));
+			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() , imageIcon.getIconWidth() , Image.SCALE_SMOOTH)));
 			this.southPanel.add(imageLabel);
 		} 
 			catch(final IOException e){
@@ -93,7 +109,7 @@ public class TakenPiecesPanel extends JPanel {
 			try {		
 			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
 			final ImageIcon imageIcon = new ImageIcon(image);
-			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 35, imageIcon.getIconWidth() - 35, Image.SCALE_SMOOTH)));
+			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() , imageIcon.getIconWidth() , Image.SCALE_SMOOTH)));
 			this.northPanel.add(imageLabel);
 		} 
 			catch(final IOException e){

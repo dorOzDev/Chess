@@ -2,11 +2,13 @@ package soldiers;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import game.Spot;
+import movement.Move;
 
 public class Queen extends Piece{
 
@@ -15,12 +17,7 @@ public class Queen extends Piece{
 		
 	}
 
-	@Override
-	public void setPiecePos(Spot spot) {
-		this.spot = spot;
 
-			
-	}
 	@Override
 	public void setCandidateMovements() {
 		forwardMovement();		
@@ -34,4 +31,10 @@ public class Queen extends Piece{
 		
 	}
 	
+	@Override
+	public List<Move> getCastleMovements() {
+		System.out.println("shouldn't reach here, castling not allowed for this type.");
+		return null;
+		
+	}
 }

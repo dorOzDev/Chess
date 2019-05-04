@@ -1,11 +1,14 @@
 package soldiers;
 
+import java.util.List;
+
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
+import movement.Move;
 import movement.NoneAttackMove;
 
 public class Knight extends Piece  {
@@ -103,6 +106,14 @@ public class Knight extends Piece  {
 		}
 		candidateMovements.clear();
 	}
+	
+	@Override
+	public List<Move> getCastleMovements() {
+		System.out.println("shouldn't reach here, castling not allowed for this type.");
+		return null;
+		
+	}
+	
 }
 
 

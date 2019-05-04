@@ -3,11 +3,14 @@ package game;
 import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import enaum.MoveType;
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.StrategyGameLogic.*;
 import movement.AttackMove;
 import movement.Move;
 import player.Player;
@@ -26,20 +29,24 @@ public class Board {
 	public static Spot[][] spots;
 	protected static ArrayList<Piece> piecesPlayerWhite;
 	protected  ArrayList<Piece> piecesPlayerBlack;
+	protected ArrayList<Piece> takenPieces;
 	private static Board board = null;
 	protected ArrayList<Move> legalMovesWhite = new ArrayList<Move>();
 	protected ArrayList<Move> legalMovesBlack = new ArrayList<Move>();
 	private  PlayerBlack playerBlack;
 	private  PlayerWhite playerWhite;
 	private Player currPlayer;
+	private ContextGameLogic contextGameLogic; 
 	
 
-	
-	/*Creating a Singletone board 
-	  */
+	/*******************
+	 * Creating the board using singleton design pattern. 
+	 *  The board class in responsible for the current state of the board, keeps track of remaining pieces on board, which player's turn is  and so on.
+	 *******************/
 	private Board() {
 		piecesPlayerWhite = new ArrayList<Piece>();
 		piecesPlayerBlack = new ArrayList<Piece>();
+		takenPieces = new ArrayList<Piece>();
 		spots = new Spot[NUM_ROWS][NUM_COLS];
 		
 		for(int i = 0; i < NUM_ROWS ; i++) {
@@ -55,7 +62,7 @@ public class Board {
 		
 		playerBlack = new PlayerBlack(piecesPlayerBlack, this);
 		playerWhite = new PlayerWhite(piecesPlayerWhite, this);
-		setCurrPlayer();
+		setCurrPlayer();  // Set starting player.
 }
 	
 	public static  Board startNewBoard() {
@@ -220,33 +227,17 @@ public class Board {
 	}
 	
 
-		
-	private void calcLegalBlackMoves () {
-		//Calc legal moves when not in chess.
-		legalMovesBlack.clear();
-		for(Piece piece : piecesPlayerBlack) {			
-			legalMovesBlack.addAll(piece.getLegalMovements());
-			}
-		
-	}
-	private void calcLegalWhiteMoves () {
-		//Calc legal moves when not in chess.
-		legalMovesWhite.clear();
-		for(Piece piece : piecesPlayerWhite) {
-			legalMovesWhite.addAll(piece.getLegalMovements());		
-		}		
-	}
 	
 
-	public ArrayList<Move> getAllLegalWhiteMoves() {
-		calcLegalWhiteMoves();
-		return legalMovesWhite;
+	public List<Move> getAllLegalWhiteMoves() {
+		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
+		return contextGameLogic.getLegalMoves(playerWhite.getKing());
 				
 	}
 	
-	public ArrayList<Move> getAllLegalBlackMoves() {
-		calcLegalBlackMoves();
-		return legalMovesBlack;
+	public List<Move> getAllLegalBlackMoves() {
+		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer());
+		return contextGameLogic.getLegalMoves(playerBlack.getKing());
 				
 	}
 
@@ -256,28 +247,90 @@ public class Board {
 		return intToAlgebric + Integer.toString(Math.abs(destSpot.getX() - OFFSET_CLEAN_ROW_COUNT)) ;
 	}
 	
+	
+	
 	public void removeAttackedPiece(Move move) {
 		int index = 0;
-		System.out.println("Match found :)");
 		if(move.getAttackedPiece().playerCoulor == PlayerColour.WHITE) {
 			for(Piece piece:piecesPlayerWhite) {
 				if(checkIfSpotsMatch(move.getDestSpot(), piece.getSpot())) {
+					takenPieces.add(piecesPlayerWhite.get(index));
 					piecesPlayerWhite.remove(index);
+					break;		
+				}
+				index++;
+			}
+		}
+		else if(move.getAttackedPiece().playerCoulor == PlayerColour.BLACK) {
+			for(Piece piece:piecesPlayerBlack) {
+				if(checkIfSpotsMatch(move.getDestSpot(), piece.getSpot())) {
+					takenPieces.add(piecesPlayerBlack.get(index));
+					piecesPlayerBlack.remove(index);
+					break;
 					
 				}
 				index++;
 			}
 		}
+		
+		else {
+			System.out.println("Shouldn't reach herer !@#@$");
+		}
 	}
 	
+	//Sole purpose serve removeAttackedPiece method 
 	private boolean checkIfSpotsMatch(Spot sourceSpot, Spot destSpot) {
 		if((sourceSpot.getX() == destSpot.getX() ) && (sourceSpot.getY() == destSpot.getY())) {
 			return true;
 		}
 		return false;
 	}
-
-
 	
+	public ArrayList<Piece> getTakenPieces(){
+		return this.takenPieces;
+	}
+	
+	
+	public boolean getInCheckStatusWhitePlayer() {
+		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
+		return contextGameLogic.getInCheckStatus(playerWhite.getKing());
+	}
+	
+	public boolean getInCheckStatusBlackPlayer() {
+		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer());
+		return contextGameLogic.getInCheckStatus(playerBlack.getKing());
+	}
+	
+	public boolean isCastleAllowedBlackPlayer(Piece king, Piece rook, MoveType moveType) {
+		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer());
+		return contextGameLogic.isCastleAllowed(king, rook, moveType);
+	}
+	
+	public boolean isCastleAllowedWhitePlayer(Piece king, Piece rook, MoveType moveType) {
+		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
+		return contextGameLogic.isCastleAllowed(king, rook, moveType);
+	}
+	
+	
+	public boolean isInCheckMateBlackPlayer() {
+		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer());
+		return contextGameLogic.getInCheckMateStatus(playerBlack.getKing());	
+		
+	}
+	
+	public boolean isInCheckMateWhitePlayer() {
+		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
+		return contextGameLogic.getInCheckMateStatus(playerWhite.getKing());			
+	}
+	
+	public boolean isInStaleMateBlackPlayer() {
+		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer());
+		return contextGameLogic.getInStaleMateStatus(playerBlack.getKing());
+	}
+	
+	public boolean isInStaleMateWhitePlayer() {
+		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
+		return contextGameLogic.getInStaleMateStatus(playerWhite.getKing());
+	}
 }
 
