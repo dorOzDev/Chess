@@ -33,9 +33,24 @@ public class CandidateMove extends Move {
 	
 	@Override
 	public boolean isCastleAllowed() {
-		throw new ExceptionInInitializerError("Shounld't reach here");
+		throw new RuntimeException("Shouldn't reach here, none castle move");
 	}
 	
+
+	@Override
+	public Spot getRookDestSpot() {
+		throw new RuntimeException("Shouldn't reach here, none castle move");
+	}
+	
+	@Override
+	public Spot getRookSourceSpot() {
+		throw new RuntimeException("Shouldn't reach here, none castle move");
+	}
+	
+	@Override
+	public Piece getRook() {
+		throw new RuntimeException("Shouldn't reach here, none castle move");
+	}
 	
 
 }

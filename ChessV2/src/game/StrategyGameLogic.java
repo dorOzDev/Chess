@@ -22,7 +22,9 @@ public interface StrategyGameLogic {
 	
 	
 	
-	
+	/*
+	 * Operations for black player. 
+	 */
 	
 	public class OperationBlackPlayer implements StrategyGameLogic{
 		Board board;
@@ -64,13 +66,22 @@ public interface StrategyGameLogic {
 		
 		private boolean simulateAndTestMove(Move move, Piece blackKing) {
 			boolean isLegalMove;
+			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
+			move.getPiece().setPiecePos(move.getDestSpot());
 			
 			isLegalMove = getInCheckStatus(blackKing);
 			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(null);
+			if(move.isAttackMove()) {
+				board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getAttackedPiece());
+				move.getAttackedPiece().setPiecePos(move.getDestSpot());
+			}
+			else {
+				board.getSpot(move.getDestSpot()).setPieceOnSpot(null);			
+			}
+			move.getPiece().setPiecePos(move.getSourceSpot());
 			
 			return isLegalMove;		
 		}
@@ -96,9 +107,9 @@ public interface StrategyGameLogic {
 		}
 		
 		private void filterInChessMoves(Piece blackKing) {
-			for(Move move : blackPlayerLegalMoves) {
-				if(simulateAndTestMove(move, blackKing)) {
-					blackPlayerLegalMoves.remove(move);
+			for(int index = 0; index < blackPlayerLegalMoves.size(); index++) {
+				if(simulateAndTestMove(blackPlayerLegalMoves.get(index), blackKing)) {
+					blackPlayerLegalMoves.remove(index);
 				}
 			}		
 		}
@@ -164,15 +175,15 @@ public interface StrategyGameLogic {
 				return true;
 			}
 			return false;
-		}
-		
+		}		
 	}
 	
 	
 	
 	
-	
-	
+	/*
+	 * Operations for white player class.
+	 */
 	
 	public class OperationWhitePlayer implements StrategyGameLogic{
 		
@@ -213,8 +224,12 @@ public interface StrategyGameLogic {
 		}
 
 		
+		
 		private boolean simulateAndTestMove(Move move, Piece whiteKing) {
 			
+			if(getInCheckStatus(whiteKing) && move.isCastleMove()) {
+				return false;
+			}
 			boolean isLegalMove;
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
@@ -222,9 +237,16 @@ public interface StrategyGameLogic {
 			isLegalMove = getInCheckStatus(whiteKing);
 			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(null);
+			if(move.isAttackMove()) {
+				board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getAttackedPiece());
+				move.getAttackedPiece().setPiecePos(move.getDestSpot());
+			}
+			else {
+				board.getSpot(move.getDestSpot()).setPieceOnSpot(null);			
+			}
+			move.getPiece().setPiecePos(move.getSourceSpot());
 			
-			return isLegalMove;		
+			return isLegalMove;			
 		}
 
 		@Override
@@ -248,9 +270,9 @@ public interface StrategyGameLogic {
 
 		
 		private void filterInChessMoves(Piece whiteKing) {
-			for(Move move : whitePlayerLegalMoves) {
-				if(simulateAndTestMove(move, whiteKing)) {
-					whitePlayerLegalMoves.remove(move);
+			for(int index = 0; index < whitePlayerLegalMoves.size(); index++) {
+				if(simulateAndTestMove(whitePlayerLegalMoves.get(index), whiteKing)) {
+					whitePlayerLegalMoves.remove(index);
 				}
 			}		
 		}
@@ -317,15 +339,19 @@ public interface StrategyGameLogic {
 				return true;
 			}
 			return false;
-		}
-		
-		
-		
+		}		
 	}
 	
 	
 	
+
 	
+	
+	
+	
+	/*
+	 * Class that execute the proper algorithm.
+	 */
 	
 	public class ContextGameLogic{
 		private StrategyGameLogic strategy;

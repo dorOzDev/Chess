@@ -51,6 +51,12 @@ public abstract class Move {
 		return board.castToBoardCordinate(destSpot);
 	}
 	
+	public abstract Spot getRookDestSpot();
+	
+	public abstract Spot getRookSourceSpot();
+	
+	public abstract Piece getRook();
+	
 	
 
 }

@@ -60,41 +60,19 @@ public abstract class Player {
 
 	
 	
-	public boolean makeMove(Move move) {
-		legalMoves.clear();
-		legalMoves.addAll(move.getPiece().getLegalMovements());		
-		Spot sourceSpot;
-		Spot destSpot;
+	public  abstract boolean makeMove(Move move);
 		
-		if(!checkLegalMove(move)) {
-			return false;
-		}
-		else {
-			sourceSpot = board.getSpot(move.getSourceSpot());		// getting piece new positioin
-			destSpot = board.getSpot(move.getDestSpot());
-			move.getPiece().setPiecePos(destSpot);                 // setting piece's new position
-			destSpot.setPieceOnSpot(move.getPiece());	          
-			if(move.getPiece().isFirstMove()) { 				 // If this is the first move of the piece I shall mark the first move as done. Usefull for pawn movement and castling movement.
-				move.getPiece().makeFirstMove();
-			}
-			sourceSpot.setPieceOnSpot(null);			
-			if(move.isAttackMove()) {	
-				board.removeAttackedPiece(move);
-			}
-		}
-		return true;
-	}
-		
-	protected boolean checkLegalMove(final Move move) {
+	protected boolean checkLegalMove(final Move potentialMove, final Move legalMove) {
 		// Check if clicked piece belongs to the current active player.
-		if(move.getPiece().getPlayerCoulor() != board.getCurrentPlayerColour()) {  
+		if(potentialMove.getPiece().getPlayerCoulor() != board.getCurrentPlayerColour()) {  
 			return false;
 		}
-		// Check if the clicked move is in the current legal moves for the same piece type.
-		for(Move legalMove:legalMoves) {
-			if(move.getDestSpot() == legalMove.getDestSpot())
-				return true;
-		}
+		
+		
+		// Check if the clicked move is in the current legal moves for the same piece type.	
+		if(potentialMove.getDestSpot() == legalMove.getDestSpot() && potentialMove.getPiece().getPieceType() == legalMove.getPiece().getPieceType())
+			return true;
+		
 		return false;
 	}
 	

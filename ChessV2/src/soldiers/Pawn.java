@@ -38,9 +38,7 @@ public class Pawn extends Piece {
 			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
 			if(isFirstMove)
 				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
-			
-			
-			
+		
 		}
 
 		else {

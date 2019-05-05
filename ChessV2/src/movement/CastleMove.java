@@ -10,16 +10,18 @@ public abstract class CastleMove extends NoneAttackMove {
 		super(sourceSpot, destSpot, piece);
 	}
 	
-	
-	
 	@Override
 	public boolean isCastleMove() {
-		
 		return true;
 	}
-
-
-
-	public abstract boolean isCastleAllowed();
+	
+	@Override
+	public abstract Spot getRookDestSpot();
+	
+	@Override
+	public abstract Spot getRookSourceSpot();
+	
+	@Override 
+	public abstract Piece getRook();
 
 }

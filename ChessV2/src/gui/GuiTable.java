@@ -284,8 +284,8 @@ public class GuiTable {
 							} else {
 								
 								destSpot = board.getSpot(xSpotPos, ySpotPos);
-								MoveType moveType = getMoveType(sourceSpot, destSpot);
-								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, moveType);
+								
+								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN);
 			
 								 final boolean hasMoveSucceed = board.getCurrPlayer().makeMove(move); 
 								 if(hasMoveSucceed){
@@ -324,17 +324,6 @@ public class GuiTable {
 				});
 
 				validate();
-			}
-			
-			//Method to decide which kind of move the player picked based on the destination spot picked.
-			private MoveType getMoveType(Spot sourceSpot, Spot destSpot) {
-				if(destSpot.isOccupied() && (sourceSpot.getPiece().getPlayerCoulor() != destSpot.getPiece().getPlayerCoulor())){
-					return MoveType.ATTACK_MOVE;
-					}
-					else if(!destSpot.isOccupied()) {
-						return MoveType.CANDIDATE_MOVE;					
-					}
-				return null;
 			}
 			
 			private void highlightLegalMoves(Board board) {
@@ -379,6 +368,9 @@ public class GuiTable {
 				ArrayList<Move> legalMoves = new ArrayList<Move>();
 				if(humanMovedPiece != null && humanMovedPiece.getPlayerCoulor() == board.getCurrPlayer().getPlayerColour()) {
 					legalMoves.addAll((Collection<? extends Move>) humanMovedPiece.getLegalMovements());
+					if(humanMovedPiece.getPieceType() == PieceType.KING) {
+						legalMoves.addAll(humanMovedPiece.getCastleMovements());
+					}
 				}
 				
 				return legalMoves;
