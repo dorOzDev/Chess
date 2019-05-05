@@ -291,6 +291,7 @@ public abstract class  Piece  {
 		return spot.getY();
 	}
 	public abstract List<Move> getCastleMovements();
+	public abstract boolean isPawnPromotionMove();
 		
 }
 

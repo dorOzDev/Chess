@@ -1,12 +1,14 @@
 package game;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import enaum.MoveType;
 import enaum.PieceType;
 import movement.Move;
 import soldiers.Piece;
+import soldiers.Queen;
 
 /**********
  * The following class using strategy design pattern in order to
@@ -19,6 +21,7 @@ public interface StrategyGameLogic {
 	public boolean isCastleAllowed(Piece king, Piece rook, MoveType moveType);
 	public boolean getInCheckMateStatus(Piece king);
 	public boolean getInStaleMate(Piece king);
+	public void promotePawn(Move move);
 	
 	
 	
@@ -107,14 +110,16 @@ public interface StrategyGameLogic {
 		}
 		
 		private void filterInChessMoves(Piece blackKing) {
-			for(int index = 0; index < blackPlayerLegalMoves.size(); index++) {
-				if(simulateAndTestMove(blackPlayerLegalMoves.get(index), blackKing)) {
-					blackPlayerLegalMoves.remove(index);
+			Move tempMove;
+			Iterator<Move>itr = blackPlayerLegalMoves.iterator();
+			while(itr.hasNext()){
+				tempMove = itr.next();
+				if(simulateAndTestMove(tempMove, blackKing)) {
+					itr.remove();
 				}
 			}		
 		}
-		
-		
+			
 		//Simulate and test castle movements.	
 		private boolean simulateAndTestMove(Piece blackKing, Piece rook, MoveType moveType) {
 			boolean isCastleAllowed;
@@ -175,8 +180,19 @@ public interface StrategyGameLogic {
 				return true;
 			}
 			return false;
+		}
+
+		// TODO set an option to pick the the piece type for promotion
+		@Override
+		public void promotePawn(Move move) {
+			Piece newPromotedPawn = new Queen(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, board);
+			newPromotedPawn.setPiecePos(move.getDestSpot());
+			board.getSpot(move.getDestSpot()).setPieceOnSpot(newPromotedPawn);
+			board.removePiece(move.getPiece());
+			board.addPromotedPiece(newPromotedPawn);
 		}		
 	}
+	
 	
 	
 	
@@ -270,11 +286,14 @@ public interface StrategyGameLogic {
 
 		
 		private void filterInChessMoves(Piece whiteKing) {
-			for(int index = 0; index < whitePlayerLegalMoves.size(); index++) {
-				if(simulateAndTestMove(whitePlayerLegalMoves.get(index), whiteKing)) {
-					whitePlayerLegalMoves.remove(index);
+			Move tempMove;
+			Iterator<Move>itr = whitePlayerLegalMoves.iterator();
+			while(itr.hasNext()){
+				tempMove = itr.next();
+				if(simulateAndTestMove(tempMove, whiteKing)) {
+					itr.remove();
 				}
-			}		
+			}
 		}
 
 		//Simulate and test castle movements.	
@@ -339,8 +358,20 @@ public interface StrategyGameLogic {
 				return true;
 			}
 			return false;
+		}
+
+
+		//TODO change the promotion to a selected base piece type promotion.
+		@Override
+		public void promotePawn(Move move) {		
+			Piece newPromotedPawn = new Queen(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, board);
+			newPromotedPawn.setPiecePos(move.getDestSpot());
+			board.getSpot(move.getDestSpot()).setPieceOnSpot(newPromotedPawn);
+			board.removePiece(move.getPiece());
+			board.addPromotedPiece(newPromotedPawn);
 		}		
-	}
+	}	
+	
 	
 	
 	
@@ -352,7 +383,6 @@ public interface StrategyGameLogic {
 	/*
 	 * Class that execute the proper algorithm.
 	 */
-	
 	public class ContextGameLogic{
 		private StrategyGameLogic strategy;
 		
@@ -379,8 +409,14 @@ public interface StrategyGameLogic {
 		public boolean getInStaleMateStatus(Piece king) {
 			return strategy.getInStaleMate(king);
 		}
+
+		public void promotePawn(Move move) {
+			strategy.promotePawn(move);
+		}
 		
 	}
+
+
 }
 
 

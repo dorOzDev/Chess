@@ -132,5 +132,17 @@ public class Pawn extends Piece {
 		return null;
 		
 	}
+
+	@Override
+	public boolean isPawnPromotionMove() {
+		
+		if(this.getX() == 0 || this.getX() == 7) {
+			System.out.println("Checking promotion");
+			return true;
+		}
+		return false;
+	}
+	
+	
 }
 

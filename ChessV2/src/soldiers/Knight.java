@@ -114,6 +114,12 @@ public class Knight extends Piece  {
 		
 	}
 	
+	@Override
+	public boolean isPawnPromotionMove() {
+		throw new RuntimeException("Shouldn't reach here, not a pawn piece");
+	}
+	
+	
 }
 
 

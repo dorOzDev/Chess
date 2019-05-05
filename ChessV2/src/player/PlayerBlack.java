@@ -3,6 +3,7 @@ package player;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import movement.Move;
@@ -74,7 +75,15 @@ public class PlayerBlack extends Player {
 			move.getPiece().setPiecePos(move.getDestSpot());
 			
 			if(move.isAttackMove()) {
-				board.removeAttackedPiece(move);
+				board.removePiece(move.getAttackedPiece());
+			}
+			
+			// Check if pawn has reached the end board and be promoted to Queen.
+			//TODO need to provide the client with option to promote the pawn to any other piece type except for king and pawn(obviously).
+			if(move.getPiece().getPieceType() == PieceType.PAWN) {
+				if(move.getPiece().isPawnPromotionMove()) {
+					board.pawnToPromote(move, move.getPiece().getPlayerCoulor());
+				}
 			}
 		}
 		
@@ -88,7 +97,9 @@ public class PlayerBlack extends Player {
 			move.getPiece().setPiecePos(move.getDestSpot());
 			move.getRook().setPiecePos(move.getRookDestSpot());
 		}
-		move.getPiece().makeFirstMove();
+		if(move.getPiece().isFirstMove()) {
+			move.getPiece().makeFirstMove();
+		}
 		
 	}
 	

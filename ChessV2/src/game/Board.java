@@ -247,13 +247,23 @@ public class Board {
 		return intToAlgebric + Integer.toString(Math.abs(destSpot.getX() - OFFSET_CLEAN_ROW_COUNT)) ;
 	}
 	
+	public void addPromotedPiece(Piece piece) {
+		
+		if(piece.playerCoulor == PlayerColour.WHITE) {
+			piecesPlayerWhite.add(piece);
+		}
+		else {
+			piecesPlayerBlack.add(piece);
+		}
+		System.out.println("Promoted");
+	}
 	
-	
-	public void removeAttackedPiece(Move move) {
+	public void removePiece(Piece pieceToRemove) {
 		int index = 0;
-		if(move.getAttackedPiece().playerCoulor == PlayerColour.WHITE) {
+		if(pieceToRemove.playerCoulor == PlayerColour.WHITE) {
 			for(Piece piece:piecesPlayerWhite) {
-				if(checkIfSpotsMatch(move.getDestSpot(), piece.getSpot())) {
+				if(checkIfSpotsMatch(pieceToRemove.getSpot(), piece.getSpot())) {
+					System.out.println("found");
 					takenPieces.add(piecesPlayerWhite.get(index));
 					piecesPlayerWhite.remove(index);
 					break;		
@@ -261,9 +271,9 @@ public class Board {
 				index++;
 			}
 		}
-		else if(move.getAttackedPiece().playerCoulor == PlayerColour.BLACK) {
+		else if(pieceToRemove.playerCoulor == PlayerColour.BLACK) {
 			for(Piece piece:piecesPlayerBlack) {
-				if(checkIfSpotsMatch(move.getDestSpot(), piece.getSpot())) {
+				if(checkIfSpotsMatch(pieceToRemove.getSpot(), piece.getSpot())) {
 					takenPieces.add(piecesPlayerBlack.get(index));
 					piecesPlayerBlack.remove(index);
 					break;
@@ -277,6 +287,7 @@ public class Board {
 			System.out.println("Shouldn't reach herer !@#@$");
 		}
 	}
+
 	
 	//Sole purpose serve removeAttackedPiece method 
 	private boolean checkIfSpotsMatch(Spot sourceSpot, Spot destSpot) {
@@ -331,6 +342,16 @@ public class Board {
 	public boolean isInStaleMateWhitePlayer() {
 		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
 		return contextGameLogic.getInStaleMateStatus(playerWhite.getKing());
+	}
+
+	public void pawnToPromote(Move move, PlayerColour playerColour) {
+		if(playerColour == PlayerColour.BLACK) {
+			contextGameLogic = new ContextGameLogic(new OperationBlackPlayer());
+		}
+		else {
+			contextGameLogic = new ContextGameLogic(new OperationWhitePlayer());
+		}
+		contextGameLogic.promotePawn(move);
 	}
 }
 

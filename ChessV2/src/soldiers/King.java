@@ -163,4 +163,9 @@ public class King extends Piece {
 		
 		return true;
 	}
+	@Override
+	public boolean isPawnPromotionMove() {
+		throw new RuntimeException("Shouldn't reach here, not a pawn piece");
+	}
+	
 }

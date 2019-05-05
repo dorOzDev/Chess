@@ -2,6 +2,7 @@ package player;
 
 import java.util.ArrayList;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 
@@ -71,7 +72,13 @@ public class PlayerWhite extends Player {
 			move.getPiece().setPiecePos(move.getDestSpot());
 			
 			if(move.isAttackMove()) {
-				board.removeAttackedPiece(move);
+				board.removePiece(move.getAttackedPiece());
+			}
+			
+			if(move.getPiece().getPieceType() == PieceType.PAWN) {
+				if(move.getPiece().isPawnPromotionMove()) {
+					board.pawnToPromote(move, move.getPiece().getPlayerCoulor());
+				}
 			}
 		}
 		

@@ -28,6 +28,10 @@ public  class Bishop extends Piece {
 		return null;
 		
 	}
+	@Override
+	public boolean isPawnPromotionMove() {
+		throw new RuntimeException("Shouldn't reach here, not a pawn piece");
+	}
 	
 	
 
