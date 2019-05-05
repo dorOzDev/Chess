@@ -11,14 +11,16 @@ public class MoveFactory {
 		
 	}
 	
-	public Move createMove(Spot sourceSpot, Spot destSpot, Piece movedPiece, MoveType moveType) {
+	public Move createMove(Spot sourceSpot, Spot destSpot, Piece movedPiece, MoveType moveType, Piece enPassntAttacedPiece) {
 		
 		if(moveType == MoveType.ATTACK_MOVE) {
 			return new AttackMove(sourceSpot, destSpot, movedPiece, destSpot.getPiece());
 		}
-		
+		else if(moveType == MoveType.EN_PASSANT_MOVE) {
+			return new EnPassntAttack(sourceSpot, destSpot, movedPiece, enPassntAttacedPiece);
+		}
 		else if(moveType == MoveType.NONE_ATTACK_MOVE) {
-			return new NoneAttackMove(sourceSpot, destSpot, movedPiece);
+			return new ProgressMove(sourceSpot, destSpot, movedPiece);
 		}
 		
 		else if(moveType == MoveType.CASTLE_MOVE_KING_SIDE) {
@@ -28,6 +30,9 @@ public class MoveFactory {
 		else if (moveType == MoveType.CASTLE_MOVE_QUEEN_SIDE){
 			
 			return new CastleMoveQueenSide(sourceSpot, destSpot, movedPiece);
+		}
+		else if(moveType == MoveType.PAWN_JUMP) {
+			return new PawnJump(sourceSpot, destSpot, movedPiece);
 		}
 		else {
 			return new CandidateMove(sourceSpot, destSpot, movedPiece);

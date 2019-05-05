@@ -4,7 +4,7 @@ import enaum.MoveType;
 import game.Spot;
 import soldiers.Piece;
 
-public abstract class CastleMove extends NoneAttackMove {
+public abstract class CastleMove extends ProgressMove {
 
 	public CastleMove(Spot sourceSpot, Spot destSpot, Piece piece) {
 		super(sourceSpot, destSpot, piece);

@@ -57,6 +57,8 @@ public abstract class Move {
 	
 	public abstract Piece getRook();
 	
+	public abstract boolean isPawnJumpMove();
 	
+	public abstract boolean isEnPassntMove();
 
 }

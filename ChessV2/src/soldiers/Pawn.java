@@ -11,10 +11,11 @@ import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
 import movement.Move;
-import movement.NoneAttackMove;
+import movement.ProgressMove;
 
 public class Pawn extends Piece {
 	
+	private Move lastMove;
 	public Pawn(PlayerColour playerColour, PieceType pieceType, Board board) {
 		super(playerColour, pieceType, board, true);
 		
@@ -27,25 +28,45 @@ public class Pawn extends Piece {
 		setCandidateMovements();
 		setValidMovements();
 		setPawnAttackMovements();
+		setEnPassntAttackMovements();
 	}
 	
+	private void setEnPassntAttackMovements() {
+		lastMove = board.getLastMove();
+		if(lastMove != null) {
+		if(lastMove.isPawnJumpMove()) {
+			
+			if(this.getPlayerCoulor() != lastMove.getPiece().getPlayerCoulor()) {
+				if(Math.abs(this.getY() - lastMove.getPiece().getY()) == 1 && lastMove.getPiece().getX() == this.getX()) {
+					if(this.getPlayerCoulor() == PlayerColour.WHITE) {
+						legalMovements.add(moveFactory.createMove(this.spot.getSpot(), board.getSpot(this.getX() - 1, lastMove.getPiece().getY()), this, MoveType.EN_PASSANT_MOVE, lastMove.getPiece()));
+				}
+					else {
+						legalMovements.add(moveFactory.createMove(this.spot.getSpot(), board.getSpot(this.getX() + 1, lastMove.getPiece().getY()), this, MoveType.EN_PASSANT_MOVE, lastMove.getPiece()));
+						}
+						
+					}
+				}
+			}
+		}
+	}
 	@Override 
 	public void setCandidateMovements() {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
+			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
 			if(isFirstMove)
-				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
 		
 		}
 
 		else {
 			
-			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
+			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
 			if(isFirstMove)
-				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE));
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
 		}
 		
 		
@@ -53,11 +74,18 @@ public class Pawn extends Piece {
 	}
 	
 	@Override
-	public void setValidMovements() {		
+	public void setValidMovements() {
+		int countMoves = 0;
 		while(!candidateMovements.isEmpty() && !candidateMovements.peek().getDestSpot().isOccupied()) {
-				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.NONE_ATTACK_MOVE));
+			if(countMoves == 1) {
+				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.PAWN_JUMP, null));
+			}
+			else {
+				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.NONE_ATTACK_MOVE, null));
+				countMoves++;
+			}
 				
-			}			
+		}			
 	}
 		
 	
@@ -78,7 +106,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();			
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE, null));
 					
 				}
 				
@@ -90,7 +118,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE, null));
 					
 				}
 			}
@@ -105,7 +133,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE, null));
 					
 				}
 			}
@@ -116,7 +144,7 @@ public class Pawn extends Piece {
 				potentialAttackedPiece = board.getSpot(currX, currY).getPiece();
 				if(potentialAttackedPiece != null) {
 					if(potentialAttackedPiece.getPlayerCoulor() != this.playerCoulor)
-						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE));
+						legalMovements.add(moveFactory.createMove(this.getSpot(), board.getSpot(currX, currY), this, MoveType.ATTACK_MOVE, null));
 					
 			
 				}
@@ -137,7 +165,6 @@ public class Pawn extends Piece {
 	public boolean isPawnPromotionMove() {
 		
 		if(this.getX() == 0 || this.getX() == 7) {
-			System.out.println("Checking promotion");
 			return true;
 		}
 		return false;

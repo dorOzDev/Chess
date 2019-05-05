@@ -49,6 +49,17 @@ public class AttackMove extends Move {
 	public Piece getRook() {
 		throw new RuntimeException("Shouldn't reach here, none castle move");
 	}
+
+	@Override
+	public boolean isPawnJumpMove() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnPassntMove() {
+		
+		return false;
+	}
 	
 	
 

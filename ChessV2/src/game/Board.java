@@ -31,6 +31,7 @@ public class Board {
 	protected  ArrayList<Piece> piecesPlayerBlack;
 	protected ArrayList<Piece> takenPieces;
 	private static Board board = null;
+	public Move lastMove = null;
 	protected ArrayList<Move> legalMovesWhite = new ArrayList<Move>();
 	protected ArrayList<Move> legalMovesBlack = new ArrayList<Move>();
 	private  PlayerBlack playerBlack;
@@ -64,6 +65,13 @@ public class Board {
 		playerWhite = new PlayerWhite(piecesPlayerWhite, this);
 		setCurrPlayer();  // Set starting player.
 }
+	public void setLastMove(Move lastMove) {
+		this.lastMove = lastMove;
+	}
+	
+	public Move getLastMove() {
+		return this.lastMove;
+	}
 	
 	public static  Board startNewBoard() {
 		if(board == null) {
@@ -247,7 +255,7 @@ public class Board {
 		return intToAlgebric + Integer.toString(Math.abs(destSpot.getX() - OFFSET_CLEAN_ROW_COUNT)) ;
 	}
 	
-	public void addPromotedPiece(Piece piece) {
+	public void addPiece(Piece piece) {
 		
 		if(piece.playerCoulor == PlayerColour.WHITE) {
 			piecesPlayerWhite.add(piece);
@@ -255,16 +263,17 @@ public class Board {
 		else {
 			piecesPlayerBlack.add(piece);
 		}
-		System.out.println("Promoted");
 	}
 	
-	public void removePiece(Piece pieceToRemove) {
+	public void removePiece(Piece pieceToRemove, boolean isGuiRelated) {
 		int index = 0;
 		if(pieceToRemove.playerCoulor == PlayerColour.WHITE) {
 			for(Piece piece:piecesPlayerWhite) {
 				if(checkIfSpotsMatch(pieceToRemove.getSpot(), piece.getSpot())) {
-					System.out.println("found");
-					takenPieces.add(piecesPlayerWhite.get(index));
+					//Checks if needed to add the removed piece to the GUI taken panel on the left side.
+					if(!isGuiRelated) {
+						takenPieces.add(piecesPlayerWhite.get(index));
+					}
 					piecesPlayerWhite.remove(index);
 					break;		
 				}
@@ -274,7 +283,9 @@ public class Board {
 		else if(pieceToRemove.playerCoulor == PlayerColour.BLACK) {
 			for(Piece piece:piecesPlayerBlack) {
 				if(checkIfSpotsMatch(pieceToRemove.getSpot(), piece.getSpot())) {
-					takenPieces.add(piecesPlayerBlack.get(index));
+					if(!isGuiRelated) {
+						takenPieces.add(piecesPlayerBlack.get(index));
+					}
 					piecesPlayerBlack.remove(index);
 					break;
 					
@@ -284,7 +295,7 @@ public class Board {
 		}
 		
 		else {
-			System.out.println("Shouldn't reach herer !@#@$");
+			System.out.println("Shouldn't reach here !@#@$");
 		}
 	}
 

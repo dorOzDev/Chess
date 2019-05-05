@@ -51,6 +51,17 @@ public class CandidateMove extends Move {
 	public Piece getRook() {
 		throw new RuntimeException("Shouldn't reach here, none castle move");
 	}
+
+	@Override
+	public boolean isPawnJumpMove() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnPassntMove() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 
 }

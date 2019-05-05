@@ -58,6 +58,7 @@ public class PlayerWhite extends Player {
 			foundLegalMove = checkLegalMove(move, legalMoves.get(index));
 			if(foundLegalMove) {
 				executeMove(legalMoves.get(index));
+				board.setLastMove(legalMoves.get(index));
 			}
 		}
 		return foundLegalMove;
@@ -72,7 +73,7 @@ public class PlayerWhite extends Player {
 			move.getPiece().setPiecePos(move.getDestSpot());
 			
 			if(move.isAttackMove()) {
-				board.removePiece(move.getAttackedPiece());
+				board.removePiece(move.getAttackedPiece(), false);
 			}
 			
 			if(move.getPiece().getPieceType() == PieceType.PAWN) {

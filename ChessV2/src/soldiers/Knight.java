@@ -9,7 +9,7 @@ import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
 import movement.Move;
-import movement.NoneAttackMove;
+import movement.ProgressMove;
 
 public class Knight extends Piece  {
 
@@ -93,7 +93,7 @@ public class Knight extends Piece  {
 		//Adding all legal none attack movements.
 		while(candidateMovements.iterator().hasNext()) {
 			if(!candidateMovements.peek().getDestSpot().isOccupied()) {
-				legalMovements.add(new NoneAttackMove(this.spot.getSpot(),candidateMovements.pop().getDestSpot(), this));
+				legalMovements.add(new ProgressMove(this.spot.getSpot(),candidateMovements.pop().getDestSpot(), this));
 			}
 		//Adding all legal attack movements.
 			else { 					

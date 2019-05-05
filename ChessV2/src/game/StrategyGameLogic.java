@@ -188,8 +188,8 @@ public interface StrategyGameLogic {
 			Piece newPromotedPawn = new Queen(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, board);
 			newPromotedPawn.setPiecePos(move.getDestSpot());
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(newPromotedPawn);
-			board.removePiece(move.getPiece());
-			board.addPromotedPiece(newPromotedPawn);
+			board.removePiece(move.getPiece(), true);
+			board.addPiece(newPromotedPawn);
 		}		
 	}
 	
@@ -247,13 +247,18 @@ public interface StrategyGameLogic {
 				return false;
 			}
 			boolean isLegalMove;
+			if(move.isAttackMove()) {
+				board.removePiece(move.getAttackedPiece(), true);
+			}
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
+			
 			
 			isLegalMove = getInCheckStatus(whiteKing);
 			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
 			if(move.isAttackMove()) {
+				board.addPiece(move.getAttackedPiece());
 				board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getAttackedPiece());
 				move.getAttackedPiece().setPiecePos(move.getDestSpot());
 			}
@@ -367,8 +372,8 @@ public interface StrategyGameLogic {
 			Piece newPromotedPawn = new Queen(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, board);
 			newPromotedPawn.setPiecePos(move.getDestSpot());
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(newPromotedPawn);
-			board.removePiece(move.getPiece());
-			board.addPromotedPiece(newPromotedPawn);
+			board.removePiece(move.getPiece(), true);
+			board.addPiece(newPromotedPawn);
 		}		
 	}	
 	

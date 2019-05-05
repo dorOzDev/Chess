@@ -5,10 +5,10 @@ import enaum.PieceType;
 import game.Spot;
 import soldiers.Piece;
 
-public class NoneAttackMove extends Move {
+public class ProgressMove extends Move {
 	
 	
-	public NoneAttackMove(Spot sourceSpot, Spot destSpot, Piece piece) {
+	public ProgressMove(Spot sourceSpot, Spot destSpot, Piece piece) {
 		super(sourceSpot, destSpot, piece, MoveType.NONE_ATTACK_MOVE);
 		
 	}
@@ -47,6 +47,17 @@ public class NoneAttackMove extends Move {
 	@Override
 	public Piece getRook() {
 		throw new RuntimeException("Shouldn't reach here, none castle move");
+	}
+
+	@Override
+	public boolean isPawnJumpMove() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnPassntMove() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

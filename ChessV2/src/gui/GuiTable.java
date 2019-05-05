@@ -59,9 +59,11 @@ public class GuiTable {
 	private Piece potenticalAttackedPiece;
 	private Move lastMove;
 	private MoveFactory moveFactory;
+	
 	public static String defaultPieceImagePath = "art/pieces/";
 	private static String defaultHighlightImagePath = "art/misc/Glow_Bluev2.png";
 	private static String defaultHighlightAttackImagePath = "art/misc/Glow_Redv2.png";
+
 	
 
 	private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(800, 800);
@@ -285,7 +287,7 @@ public class GuiTable {
 								
 								destSpot = board.getSpot(xSpotPos, ySpotPos);
 								
-								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN);
+								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN, null);
 			
 								 final boolean hasMoveSucceed = board.getCurrPlayer().makeMove(move); 
 								 if(hasMoveSucceed){

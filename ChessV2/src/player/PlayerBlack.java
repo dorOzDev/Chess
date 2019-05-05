@@ -61,7 +61,7 @@ public class PlayerBlack extends Player {
 			foundLegalMove = checkLegalMove(move, legalMoves.get(index));
 			if(foundLegalMove) {
 				executeMove(legalMoves.get(index));
-				
+				board.setLastMove(legalMoves.get(index));
 			}
 		}
 		return foundLegalMove;
@@ -74,8 +74,8 @@ public class PlayerBlack extends Player {
 			
 			move.getPiece().setPiecePos(move.getDestSpot());
 			
-			if(move.isAttackMove()) {
-				board.removePiece(move.getAttackedPiece());
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.removePiece(move.getAttackedPiece(), false);
 			}
 			
 			// Check if pawn has reached the end board and be promoted to Queen.

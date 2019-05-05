@@ -43,11 +43,11 @@ public class King extends Piece {
 	public List<Move> getCastleMovements() {
 		castleMovements.clear();
 		if(isCastleKingSideAllowed()) {
-			castleMoveKingSide = moveFactory.createMove(this.getSpot(), board.getSpot(this.getX(), this.getY() + CASTLE_MOVE_OFFSET), this, MoveType.CASTLE_MOVE_KING_SIDE);
+			castleMoveKingSide = moveFactory.createMove(this.getSpot(), board.getSpot(this.getX(), this.getY() + CASTLE_MOVE_OFFSET), this, MoveType.CASTLE_MOVE_KING_SIDE, null);
 			castleMovements.add(castleMoveKingSide);
 		}
 		if(isCastleQueenSideAllowed()) {
-			castleMoveQueenSide = moveFactory.createMove(this.getSpot(), board.getSpot(this.getX(), this.getY() - CASTLE_MOVE_OFFSET), this, MoveType.CASTLE_MOVE_QUEEN_SIDE);
+			castleMoveQueenSide = moveFactory.createMove(this.getSpot(), board.getSpot(this.getX(), this.getY() - CASTLE_MOVE_OFFSET), this, MoveType.CASTLE_MOVE_QUEEN_SIDE, null);
 			castleMovements.add(castleMoveQueenSide);
 		}
 		
