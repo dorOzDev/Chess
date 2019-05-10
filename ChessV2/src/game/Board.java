@@ -256,48 +256,40 @@ public class Board {
 	}
 	
 	public void addPiece(Piece piece) {
-		
 		if(piece.playerCoulor == PlayerColour.WHITE) {
 			piecesPlayerWhite.add(piece);
 		}
 		else {
 			piecesPlayerBlack.add(piece);
 		}
+		getSpot(piece.getSpot()).setPieceOnSpot(piece);
 	}
 	
-	public void removePiece(Piece pieceToRemove, boolean isGuiRelated) {
-		int index = 0;
-		if(pieceToRemove.playerCoulor == PlayerColour.WHITE) {
-			for(Piece piece:piecesPlayerWhite) {
-				if(checkIfSpotsMatch(pieceToRemove.getSpot(), piece.getSpot())) {
-					//Checks if needed to add the removed piece to the GUI taken panel on the left side.
-					if(!isGuiRelated) {
-						takenPieces.add(piecesPlayerWhite.get(index));
-					}
-					piecesPlayerWhite.remove(index);
-					break;		
-				}
-				index++;
-			}
+	public void removePiece(Piece pieceToRemove, boolean updateGui) {
+		
+		Iterator<Piece>itr;
+		Piece tempPiece;
+		if(pieceToRemove.getPlayerCoulor() == PlayerColour.WHITE) {
+			itr = piecesPlayerWhite.iterator();
 		}
-		else if(pieceToRemove.playerCoulor == PlayerColour.BLACK) {
-			for(Piece piece:piecesPlayerBlack) {
-				if(checkIfSpotsMatch(pieceToRemove.getSpot(), piece.getSpot())) {
-					if(!isGuiRelated) {
-						takenPieces.add(piecesPlayerBlack.get(index));
-					}
-					piecesPlayerBlack.remove(index);
-					break;
-					
-				}
-				index++;
-			}
+		else {
+			itr = piecesPlayerBlack.iterator();
 		}
 		
-		else {
-			System.out.println("Shouldn't reach here !@#@$");
+		
+		while(itr.hasNext()) {
+			tempPiece = itr.next();
+			
+			if(checkIfSpotsMatch(pieceToRemove.getSpot(), tempPiece.getSpot())) {
+				if(updateGui) {					
+					takenPieces.add(tempPiece);
+				}
+				itr.remove();
+				break;
+			}
 		}
 	}
+		
 
 	
 	//Sole purpose serve removeAttackedPiece method 

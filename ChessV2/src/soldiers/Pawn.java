@@ -81,7 +81,7 @@ public class Pawn extends Piece {
 				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.PAWN_JUMP, null));
 			}
 			else {
-				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.NONE_ATTACK_MOVE, null));
+				legalMovements.add(moveFactory.createMove(this.spot.getSpot(), candidateMovements.pop().getDestSpot(), this, MoveType.PROGRESS_MOVE, null));
 				countMoves++;
 			}
 				

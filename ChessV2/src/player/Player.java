@@ -18,7 +18,7 @@ public abstract class Player {
 	protected  ArrayList<Piece> remainingPieces;
 	protected List<Move> legalMoves;
 	//Player opponent;
-	protected final Piece king;
+	//protected final Piece king;
 	protected ArrayList<Move> legalOpponentMoves;
 	protected boolean isInCheck;
 	protected PlayerColour playerColour;
@@ -28,7 +28,6 @@ public abstract class Player {
 		this.legalMoves = new ArrayList<Move>();
 		this.legalOpponentMoves = new ArrayList<Move>();
 		this.remainingPieces = remainingPieces;
-		this.king = getKing();
 		this.board = board;
 		this.isInCheck = false;
 		this.playerColour = playerColor;
@@ -42,15 +41,7 @@ public abstract class Player {
 	public PlayerColour getPlayerColour() {
 		return this.playerColour;
 	}
-	public  Piece getKing() {
-		
-		for(Piece piece: remainingPieces) {
-			if(piece.getPieceType() == PieceType.KING){
-				return piece;
-			}
-		}
-		throw new RuntimeException("Shouldn't reach here without king!@#$");
-	}
+	public abstract  Piece getKing();
 	
 	public boolean getInCheckStatus() {
 		isInCheck = isInCheck();
@@ -70,7 +61,7 @@ public abstract class Player {
 		
 		
 		// Check if the clicked move is in the current legal moves for the same piece type.	
-		if(potentialMove.getDestSpot() == legalMove.getDestSpot() && potentialMove.getPiece().getPieceType() == legalMove.getPiece().getPieceType())
+		if(potentialMove.getSourceSpot() == legalMove.getSourceSpot() && potentialMove.getDestSpot() == legalMove.getDestSpot() && potentialMove.getPiece().getPieceType() == legalMove.getPiece().getPieceType())
 			return true;
 		
 		return false;
@@ -80,5 +71,4 @@ public abstract class Player {
 	public abstract boolean isBlack();
 	
 	public abstract void updateCurrentAvailablePieces();
-
 }

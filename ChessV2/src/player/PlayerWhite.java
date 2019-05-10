@@ -67,14 +67,15 @@ public class PlayerWhite extends Player {
 	
 	private void executeMove(Move move) {
 		if(!move.isCastleMove()) {
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.getSpot(move.getAttackedPiece().getSpot()).setPieceOnSpot(null);
+				board.removePiece(move.getAttackedPiece(), true);
+			}
+			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
 			
 			move.getPiece().setPiecePos(move.getDestSpot());
-			
-			if(move.isAttackMove()) {
-				board.removePiece(move.getAttackedPiece(), false);
-			}
 			
 			if(move.getPiece().getPieceType() == PieceType.PAWN) {
 				if(move.getPiece().isPawnPromotionMove()) {
@@ -96,6 +97,17 @@ public class PlayerWhite extends Player {
 		move.getPiece().makeFirstMove();
 		
 	}
+
+	@Override
+	public Piece getKing() {
+		remainingPieces = board.getPiecesWhite();
+		for(Piece piece: remainingPieces) {
+			if(piece.getPieceType() == PieceType.KING){
+				return piece;
+			}
+		}
+		
+		throw new RuntimeException("Shouldn't reach here without king!@#$");
+	}
 	
 }
-

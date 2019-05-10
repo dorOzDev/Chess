@@ -19,7 +19,7 @@ public class MoveFactory {
 		else if(moveType == MoveType.EN_PASSANT_MOVE) {
 			return new EnPassntAttack(sourceSpot, destSpot, movedPiece, enPassntAttacedPiece);
 		}
-		else if(moveType == MoveType.NONE_ATTACK_MOVE) {
+		else if(moveType == MoveType.PROGRESS_MOVE) {
 			return new ProgressMove(sourceSpot, destSpot, movedPiece);
 		}
 		

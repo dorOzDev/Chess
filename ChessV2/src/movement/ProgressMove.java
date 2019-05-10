@@ -9,7 +9,7 @@ public class ProgressMove extends Move {
 	
 	
 	public ProgressMove(Spot sourceSpot, Spot destSpot, Piece piece) {
-		super(sourceSpot, destSpot, piece, MoveType.NONE_ATTACK_MOVE);
+		super(sourceSpot, destSpot, piece, MoveType.PROGRESS_MOVE);
 		
 	}
 

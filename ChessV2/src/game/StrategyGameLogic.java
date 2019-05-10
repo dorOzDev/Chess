@@ -69,6 +69,13 @@ public interface StrategyGameLogic {
 		
 		private boolean simulateAndTestMove(Move move, Piece blackKing) {
 			boolean isLegalMove;
+			/*********
+			 * Simulating Piece on new position.
+			 */
+			
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.removePiece(move.getAttackedPiece(), false);
+			}
 			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
@@ -76,15 +83,14 @@ public interface StrategyGameLogic {
 			
 			isLegalMove = getInCheckStatus(blackKing);
 			
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
-			if(move.isAttackMove()) {
-				board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getAttackedPiece());
-				move.getAttackedPiece().setPiecePos(move.getDestSpot());
-			}
-			else {
-				board.getSpot(move.getDestSpot()).setPieceOnSpot(null);			
-			}
 			move.getPiece().setPiecePos(move.getSourceSpot());
+			board.getSpot(move.getDestSpot()).setPieceOnSpot(null);
+			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
+			
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.addPiece(move.getAttackedPiece());
+				
+			}
 			
 			return isLegalMove;		
 		}
@@ -243,31 +249,31 @@ public interface StrategyGameLogic {
 		
 		private boolean simulateAndTestMove(Move move, Piece whiteKing) {
 			
-			if(getInCheckStatus(whiteKing) && move.isCastleMove()) {
-				return false;
-			}
 			boolean isLegalMove;
-			if(move.isAttackMove()) {
-				board.removePiece(move.getAttackedPiece(), true);
+			/*********
+			 * Simulating Piece on new position.
+			 */
+			
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.removePiece(move.getAttackedPiece(), false);
 			}
+			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
-			
+			move.getPiece().setPiecePos(move.getDestSpot());
 			
 			isLegalMove = getInCheckStatus(whiteKing);
 			
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
-			if(move.isAttackMove()) {
-				board.addPiece(move.getAttackedPiece());
-				board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getAttackedPiece());
-				move.getAttackedPiece().setPiecePos(move.getDestSpot());
-			}
-			else {
-				board.getSpot(move.getDestSpot()).setPieceOnSpot(null);			
-			}
 			move.getPiece().setPiecePos(move.getSourceSpot());
+			board.getSpot(move.getDestSpot()).setPieceOnSpot(null);
+			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
 			
-			return isLegalMove;			
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.addPiece(move.getAttackedPiece());
+				
+			}
+			
+			return isLegalMove;				
 		}
 
 		@Override
@@ -284,6 +290,7 @@ public interface StrategyGameLogic {
 		private void calcLegalOppenentMoves() {
 			blackPlayerLegalMoves.clear();
 			blackPlayerPieces = board.getPiecesBlack();
+			
 			for(Piece piece : blackPlayerPieces) {
 				blackPlayerLegalMoves.addAll(piece.getLegalMovements());
 			}
@@ -423,5 +430,3 @@ public interface StrategyGameLogic {
 
 
 }
-
-

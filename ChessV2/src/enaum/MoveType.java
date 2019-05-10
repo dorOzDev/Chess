@@ -2,7 +2,7 @@ package enaum;
 
 public enum MoveType {
 	CANDIDATE_MOVE,
-	NONE_ATTACK_MOVE,
+	PROGRESS_MOVE,
 	PAWN_JUMP,
 	ATTACK_MOVE,
 	CASTLE_MOVE_KING_SIDE,

@@ -69,14 +69,18 @@ public class PlayerBlack extends Player {
 
 	private void executeMove(Move move) {
 		if(!move.isCastleMove()) {
+			
+			if(move.isAttackMove() || move.isEnPassntMove()) {
+				board.getSpot(move.getAttackedPiece().getSpot()).setPieceOnSpot(null);
+				board.removePiece(move.getAttackedPiece(), true);
+			}
+			
 			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
 			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
 			
 			move.getPiece().setPiecePos(move.getDestSpot());
 			
-			if(move.isAttackMove() || move.isEnPassntMove()) {
-				board.removePiece(move.getAttackedPiece(), false);
-			}
+
 			
 			// Check if pawn has reached the end board and be promoted to Queen.
 			//TODO need to provide the client with option to promote the pawn to any other piece type except for king and pawn(obviously).
@@ -102,7 +106,20 @@ public class PlayerBlack extends Player {
 		}
 		
 	}
+
+	@Override
+	public Piece getKing() {
+		remainingPieces = board.getPiecesBlack();
+		for(Piece piece: remainingPieces) {
+			if(piece.getPieceType() == PieceType.KING){
+				return piece;
+			}
+		}
+		System.out.println(remainingPieces);
+		throw new RuntimeException("Shouldn't reach here without king!@#$");
+	}
+	
+	
 	
 
 }
- 
