@@ -2,12 +2,14 @@ package game;
 
 import java.util.ArrayList;
 
+import javax.naming.ldap.SortControl;
+
 import game.Board;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class Spot {
 	
-	char identifier;
+	
 	private int x;
 	private int y;
 	Piece piece;
@@ -20,6 +22,13 @@ public class Spot {
 		this.isOccupied = false;
 		this.piece = null;
 		
+	}
+	
+	public Spot(Spot spot) {
+		this.x = spot.x;
+		this.y = spot.y;
+		this.isOccupied = spot.isOccupied;
+		this.piece = piece;
 	}
 
 	public boolean isOccupied() {
@@ -55,6 +64,7 @@ public class Spot {
 		else
 			setOccupied(false);
 		this.piece = piece;
+		
 	}
 	
 	public Piece getPiece() {

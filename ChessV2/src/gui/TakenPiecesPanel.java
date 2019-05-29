@@ -22,7 +22,7 @@ import enaum.PlayerColour;
 import game.Board;
 import gui.GuiTable.MoveLog;
 import movement.Move;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class TakenPiecesPanel extends JPanel {
 	
@@ -35,7 +35,7 @@ public class TakenPiecesPanel extends JPanel {
 	private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(100, 100); 
 	private static final EtchedBorder PANEL_BORDER = new EtchedBorder(EtchedBorder.RAISED);
 	
-	public TakenPiecesPanel() {
+	public TakenPiecesPanel(Board board) {
 		super(new BorderLayout());
 		setBackground(Color.decode(BACKGROUND_COLOR));
 		setBorder(PANEL_BORDER);
@@ -46,7 +46,8 @@ public class TakenPiecesPanel extends JPanel {
 		add(this.northPanel, BorderLayout.NORTH);
 		add(this.southPanel, BorderLayout.SOUTH);
 		setPreferredSize(TAKEN_PIECES_DIMENSION);
-		board = Board.startNewBoard();
+		this.board = board;
+		
 	}
 	
 	public void redo(final MoveLog moveLog) {
@@ -58,6 +59,7 @@ public class TakenPiecesPanel extends JPanel {
 		
 		List<Piece> takenPieces = new ArrayList<>();
 		takenPieces = board.getTakenPieces();
+	
 		//TODO finish this
 		/*
 		for(final Move move :moveLog.getMoves()) {

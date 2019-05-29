@@ -2,14 +2,15 @@ package movement;
 
 import enaum.MoveType;
 import enaum.PieceType;
+import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class ProgressMove extends Move {
 	
 	
-	public ProgressMove(Spot sourceSpot, Spot destSpot, Piece piece) {
-		super(sourceSpot, destSpot, piece, MoveType.PROGRESS_MOVE);
+	public ProgressMove(Spot sourceSpot, Spot destSpot, Piece piece, Board board) {
+		super(sourceSpot, destSpot, piece, MoveType.PROGRESS_MOVE, board);
 		
 	}
 

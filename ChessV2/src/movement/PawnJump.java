@@ -1,14 +1,15 @@
 package movement;
 
+import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class PawnJump extends ProgressMove {
 	
 	
 	
-	public PawnJump(final Spot sourceSpot,final Spot destSpot,final  Piece piece) {
-		super(sourceSpot, destSpot, piece);
+	public PawnJump(final Spot sourceSpot,final Spot destSpot,final  Piece piece, Board board) {
+		super(sourceSpot, destSpot, piece, board);
 		
 		
 	}

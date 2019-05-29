@@ -1,4 +1,4 @@
-package soldiers;
+package pieces;
 
 import java.util.List;
 
@@ -13,16 +13,10 @@ import movement.ProgressMove;
 
 public class Knight extends Piece  {
 
-	public Knight(PlayerColour playerColour, PieceType pieceType, Board board) {
-		super(playerColour, pieceType, board, true);
+	public Knight(PlayerColour playerColour, PieceType pieceType, Board board, Spot spot) {
+		super(playerColour, pieceType, board, true, 300, spot);
 	}
 
-	@Override
-	public void setPiecePos(Spot spot) {
-		this.spot = spot;
-
-			
-	}
 
 	@Override
 	public void setCandidateMovements() {
@@ -33,13 +27,13 @@ public class Knight extends Piece  {
 		int j = currY;
 		
 		i += 2;
-		if(i < board.spots.length) {
+		if(isCordinatedInBoardsBounds(i, j)) {
 			
-			if(++j < board.spots.length)
+			if(isCordinatedInBoardsBounds(i, ++j))
 				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 			
 			j -= 2;
-			if(j >= 0)
+			if(isCordinatedInBoardsBounds(i, j))
 				candidateMovements.add(new CandidateMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this));
 		}
 		
@@ -115,7 +109,7 @@ public class Knight extends Piece  {
 	}
 	
 	@Override
-	public boolean isPawnPromotionMove() {
+	public boolean isPawnPromotionMove(int rowDestinaition) {
 		throw new RuntimeException("Shouldn't reach here, not a pawn piece");
 	}
 	

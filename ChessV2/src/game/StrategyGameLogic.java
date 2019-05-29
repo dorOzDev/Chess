@@ -6,9 +6,12 @@ import java.util.List;
 
 import enaum.MoveType;
 import enaum.PieceType;
+import enaum.PlayerColour;
+import game.Board.BoardBuilder;
 import movement.Move;
-import soldiers.Piece;
-import soldiers.Queen;
+import pieces.Piece;
+import pieces.PieceFactory;
+import pieces.Queen;
 
 /**********
  * The following class using strategy design pattern in order to
@@ -17,11 +20,13 @@ import soldiers.Queen;
  ***********/
 public interface StrategyGameLogic {
 	public List<Move> getLegalMoves(Piece king);
-	public boolean getInCheckStatus(Piece king);
-	public boolean isCastleAllowed(Piece king, Piece rook, MoveType moveType);
+	public boolean getInCheckStatus(Piece king, Board board);
+	public boolean isCastleAllowed(Move move, Piece king);
 	public boolean getInCheckMateStatus(Piece king);
 	public boolean getInStaleMate(Piece king);
-	public void promotePawn(Move move);
+	
+	
+
 	
 	
 	
@@ -31,27 +36,35 @@ public interface StrategyGameLogic {
 	
 	public class OperationBlackPlayer implements StrategyGameLogic{
 		Board board;
-		List<Piece> blackPlayerPieces;
-		List<Piece> whitePlayerPieces;
+		BoardBuilder boardBuilder;
+		ArrayList<Piece> blackPlayerPieces;
+		ArrayList<Piece> whitePlayerPieces;
 		List<Move> blackPlayerLegalMoves;
 		List<Move> whitePlayerLegalMoves;
+		PieceFactory pieceFactory;
+		ArrayList<Piece> whitePlayerPiecesClonedList;
+		ArrayList<Piece> blackPlayerPiecesClonedList;
 		
-		public OperationBlackPlayer() {
-			board = board.startNewBoard();
+		
+		public OperationBlackPlayer(Board board) {
+			this.board = board;
 			blackPlayerPieces = new ArrayList<Piece>();
 			whitePlayerPieces = new ArrayList<Piece>();
 			blackPlayerLegalMoves = new ArrayList<Move>();
 			whitePlayerLegalMoves = new ArrayList<Move>();
+			pieceFactory = new PieceFactory();
+			
+			whitePlayerPieces = board.getPiecesWhite();
+			blackPlayerPieces = board.getPiecesBlack();
 		}
-		
-		
+	
 		private void calcLegalMoves() {
 			blackPlayerLegalMoves.clear();
 			blackPlayerPieces = board.getPiecesBlack();
 			for(Piece piece : blackPlayerPieces) {
-				blackPlayerLegalMoves.addAll(piece.getLegalMovements());
+				blackPlayerLegalMoves.addAll(piece.getLegalMovements(board));
 				if(piece.getPieceType() == PieceType.KING) {
-					blackPlayerLegalMoves.addAll(piece.getCastleMovements());
+					blackPlayerLegalMoves.addAll(piece.getCastleMovements(board));
 				}
 			}
 			
@@ -69,35 +82,41 @@ public interface StrategyGameLogic {
 		
 		private boolean simulateAndTestMove(Move move, Piece blackKing) {
 			boolean isLegalMove;
-			/*********
-			 * Simulating Piece on new position.
-			 */
-			
-			if(move.isAttackMove() || move.isEnPassntMove()) {
-				board.removePiece(move.getAttackedPiece(), false);
+			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
+			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
+			if(move.isCastleMove()) {
+				return simulateAndTestCastleMove(move, blackKing);
 			}
 			
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
-			move.getPiece().setPiecePos(move.getDestSpot());
-			
-			isLegalMove = getInCheckStatus(blackKing);
-			
-			move.getPiece().setPiecePos(move.getSourceSpot());
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(null);
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
-			
 			if(move.isAttackMove() || move.isEnPassntMove()) {
-				board.addPiece(move.getAttackedPiece());
-				
+				Iterator <Piece>itr = whitePlayerPiecesClonedList.iterator();
+				Piece tempPiece;
+				while(itr.hasNext()) {
+					tempPiece = itr.next();
+					if(checkEquality(move.getAttackedPiece(), tempPiece)) {
+						itr.remove();
+					}	
+				}
 			}
 			
+			Iterator <Piece> itr = blackPlayerPiecesClonedList.iterator();
+			while(itr.hasNext()) {
+				Piece tempPiece = itr.next();
+				if(checkEquality(move.getPiece(), tempPiece)) {
+					tempPiece.setPiecePos(move.getDestSpot());
+					break;
+				}
+			}	
+			isLegalMove = getInCheckStatus(blackKing, new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPiecesClonedList).build());
 			return isLegalMove;		
 		}
 
 		@Override
-		public boolean getInCheckStatus(Piece blackKing) {
-			calcLegalOppenentMoves();
+		public boolean getInCheckStatus(Piece blackKing, Board board) {
+			if(blackKing == null) {
+				return true;
+			}
+			calcLegalOppenentMoves(board);
 			for(Move move : whitePlayerLegalMoves) {
 				if(move.getDestSpot() == blackKing.getSpot()) {
 					return true;
@@ -106,11 +125,11 @@ public interface StrategyGameLogic {
 			return false;
 		}
 		
-		private void calcLegalOppenentMoves() {
+		private void calcLegalOppenentMoves(Board board) {
 			whitePlayerLegalMoves.clear();
 			whitePlayerPieces = board.getPiecesWhite();
 			for(Piece piece : whitePlayerPieces) {
-				whitePlayerLegalMoves.addAll(piece.getLegalMovements());
+				whitePlayerLegalMoves.addAll(piece.getLegalMovements(board));
 			}
 			
 		}
@@ -127,53 +146,38 @@ public interface StrategyGameLogic {
 		}
 			
 		//Simulate and test castle movements.	
-		private boolean simulateAndTestMove(Piece blackKing, Piece rook, MoveType moveType) {
+		private boolean simulateAndTestCastleMove(Move move, Piece blackKing) {
 			boolean isCastleAllowed;
-			if(moveType == MoveType.CASTLE_MOVE_KING_SIDE) {
-				Spot kingDestSpot = board.getSpot(blackKing.getX(), blackKing.getY() + 2);
-				Spot rookDestSpot = board.getSpot(rook.getX(), rook.getY() - 2);
-				board.getSpot(blackKing.getSpot()).setPieceOnSpot(null);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(null);
-				board.getSpot(kingDestSpot).setPieceOnSpot(blackKing);
-				board.getSpot(rookDestSpot).setPieceOnSpot(rook);
-				
-				isCastleAllowed = getInCheckStatus(blackKing);
-				
-				board.getSpot(kingDestSpot).setPieceOnSpot(null);
-				board.getSpot(rookDestSpot).setPieceOnSpot(null);
-				board.getSpot(blackKing.getSpot()).setPieceOnSpot(blackKing);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(rook);		
-				
-			}
+			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
+			Iterator<Piece> itr = blackPlayerPiecesClonedList.iterator();
 			
-			else {
-				Spot kingDestSpot = board.getSpot(blackKing.getX(), blackKing.getY() - 2);
-				Spot rookDestSpot = board.getSpot(rook.getX(), rook.getY() + 3);
-				board.getSpot(blackKing.getSpot()).setPieceOnSpot(null);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(null);
-				board.getSpot(kingDestSpot).setPieceOnSpot(blackKing);
-				board.getSpot(rookDestSpot).setPieceOnSpot(rook);
+			while(itr.hasNext()) {
+				Piece tempPiece = itr.next();
+				if(checkEquality(move.getPiece(), tempPiece)){
+					tempPiece.setPiecePos(move.getDestSpot());
+				}
 				
-				isCastleAllowed = getInCheckStatus(blackKing);
-				
-				board.getSpot(kingDestSpot).setPieceOnSpot(null);
-				board.getSpot(rookDestSpot).setPieceOnSpot(null);
-				board.getSpot(blackKing.getSpot()).setPieceOnSpot(blackKing);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(rook);		
-			}
+				if( checkEquality(move.getRook(), tempPiece)) {
+					tempPiece.setPiecePos(move.getRookDestSpot());
+				}
+			}		
+			isCastleAllowed = getInCheckStatus(blackKing, new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPieces).build());		
 			return isCastleAllowed;
 		}
-
+		
+		private boolean checkEquality(Piece comparePiece, Piece comparePiece2) {
+			return comparePiece.getX() == comparePiece2.getX() && comparePiece.getY() == comparePiece2.getY() && comparePiece.getPieceType() == comparePiece2.getPieceType();
+		}
 
 		@Override
-		public boolean isCastleAllowed(Piece blackKing, Piece blackRook, MoveType moveType) {
-			return simulateAndTestMove(blackKing, blackRook, moveType);
+		public boolean isCastleAllowed(Move move, Piece blackKing ) {
+			return simulateAndTestMove(move, blackKing);
 		}
 
 
 		@Override
 		public boolean getInCheckMateStatus(Piece blackKing) {
-			if(getInCheckStatus(blackKing) && getLegalMoves(blackKing).isEmpty()) {
+			if(getInCheckStatus(blackKing, board) && getLegalMoves(blackKing).isEmpty()) {
 				return true;
 			}
 			return false;
@@ -182,21 +186,12 @@ public interface StrategyGameLogic {
 
 		@Override
 		public boolean getInStaleMate(Piece blackKing) {
-			if(!getInCheckStatus(blackKing) && getLegalMoves(blackKing).isEmpty()) {
+			if(!getInCheckStatus(blackKing, board) && getLegalMoves(blackKing).isEmpty()) {
 				return true;
 			}
 			return false;
 		}
-
-		// TODO set an option to pick the the piece type for promotion
-		@Override
-		public void promotePawn(Move move) {
-			Piece newPromotedPawn = new Queen(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, board);
-			newPromotedPawn.setPiecePos(move.getDestSpot());
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(newPromotedPawn);
-			board.removePiece(move.getPiece(), true);
-			board.addPiece(newPromotedPawn);
-		}		
+	
 	}
 	
 	
@@ -210,18 +205,26 @@ public interface StrategyGameLogic {
 	public class OperationWhitePlayer implements StrategyGameLogic{
 		
 		Board board;
-		List<Piece> blackPlayerPieces;
-		List<Piece> whitePlayerPieces;
+		ArrayList<Piece> blackPlayerPieces;
+		ArrayList<Piece> whitePlayerPieces;
 		List<Move> blackPlayerLegalMoves;
 		List<Move> whitePlayerLegalMoves;
+		PieceFactory pieceFactory;
+		ArrayList<Piece> whitePlayerPiecesClonedList;
+		ArrayList<Piece> blackPlayerPiecesClonedList;
 		
 		
-		public OperationWhitePlayer() {
-			board = board.startNewBoard();
+		
+		public OperationWhitePlayer(Board board) {
+			this.board = board;
 			blackPlayerPieces = new ArrayList<Piece>();
 			whitePlayerPieces = new ArrayList<Piece>();
 			blackPlayerLegalMoves = new ArrayList<Move>();
 			whitePlayerLegalMoves = new ArrayList<Move>();
+			pieceFactory = new PieceFactory();
+			
+			whitePlayerPieces = board.getPiecesWhite();
+			blackPlayerPieces = board.getPiecesBlack();
 		}
 		
 		
@@ -230,9 +233,9 @@ public interface StrategyGameLogic {
 			whitePlayerLegalMoves.clear();
 			whitePlayerPieces = board.getPiecesWhite();
 			for(Piece piece : whitePlayerPieces) {
-				whitePlayerLegalMoves.addAll(piece.getLegalMovements());
+				whitePlayerLegalMoves.addAll(piece.getLegalMovements(board));
 				if(piece.getPieceType() == PieceType.KING) {
-					whitePlayerLegalMoves.addAll(piece.getCastleMovements());
+					whitePlayerLegalMoves.addAll(piece.getCastleMovements(board));
 				}
 			}
 			
@@ -248,37 +251,46 @@ public interface StrategyGameLogic {
 		
 		
 		private boolean simulateAndTestMove(Move move, Piece whiteKing) {
-			
 			boolean isLegalMove;
-			/*********
-			 * Simulating Piece on new position.
-			 */
-			
-			if(move.isAttackMove() || move.isEnPassntMove()) {
-				board.removePiece(move.getAttackedPiece(), false);
+			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
+			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
+			if(move.isCastleMove()) {
+				return simulateAndTestCastleMove(move, whiteKing);
 			}
 			
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
-			move.getPiece().setPiecePos(move.getDestSpot());
-			
-			isLegalMove = getInCheckStatus(whiteKing);
-			
-			move.getPiece().setPiecePos(move.getSourceSpot());
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(null);
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(move.getPiece());
-			
 			if(move.isAttackMove() || move.isEnPassntMove()) {
-				board.addPiece(move.getAttackedPiece());
-				
+				Iterator <Piece>itr = blackPlayerPiecesClonedList.iterator();
+				Piece tempPiece;
+				while(itr.hasNext()) {
+					tempPiece = itr.next();
+					if(checkEquality(move.getAttackedPiece(), tempPiece)) {
+						itr.remove();
+					}	
+				}
 			}
 			
-			return isLegalMove;				
+			Iterator <Piece> itr = whitePlayerPiecesClonedList.iterator();
+			while(itr.hasNext()) {
+				Piece tempPiece = itr.next();
+				if(checkEquality(move.getPiece(), tempPiece)) {
+					tempPiece.setPiecePos(move.getDestSpot());
+					break;
+				}
+			}	
+			isLegalMove = getInCheckStatus(whiteKing, new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPiecesClonedList).build());
+			return isLegalMove;					
+		}
+		
+		private boolean checkEquality(Piece comparePiece, Piece comparePiece2) {
+			return comparePiece.getX() == comparePiece2.getX() && comparePiece.getY() == comparePiece2.getY() && comparePiece.getPieceType() == comparePiece2.getPieceType();
 		}
 
 		@Override
-		public boolean getInCheckStatus(Piece whiteKing) {
-			calcLegalOppenentMoves();
+		public boolean getInCheckStatus(Piece whiteKing, Board board) {
+			if(whiteKing == null) {
+				return true;
+			}
+			calcLegalOppenentMoves(board);
 			for(Move move : blackPlayerLegalMoves) {
 				if(move.getDestSpot() == whiteKing.getSpot())
 					return true;
@@ -287,12 +299,12 @@ public interface StrategyGameLogic {
 		}
 
 		
-		private void calcLegalOppenentMoves() {
+		private void calcLegalOppenentMoves(Board board) {
 			blackPlayerLegalMoves.clear();
 			blackPlayerPieces = board.getPiecesBlack();
 			
 			for(Piece piece : blackPlayerPieces) {
-				blackPlayerLegalMoves.addAll(piece.getLegalMovements());
+				blackPlayerLegalMoves.addAll(piece.getLegalMovements(board));
 			}
 		}
 
@@ -309,54 +321,36 @@ public interface StrategyGameLogic {
 		}
 
 		//Simulate and test castle movements.	
-		private boolean simulateAndTestMove(Piece whiteKing, Piece rook, MoveType moveType) {
+		private boolean simulateAndTestCastleMove(Move move, Piece whiteKing) {
 			boolean isCastleAllowed;
-			if(moveType == MoveType.CASTLE_MOVE_KING_SIDE) {
-				Spot kingDestSpot = board.getSpot(whiteKing.getX(), whiteKing.getY() + 2);
-				Spot rookDestSpot = board.getSpot(rook.getX(), rook.getY() - 2);
-				board.getSpot(whiteKing.getSpot()).setPieceOnSpot(null);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(null);
-				board.getSpot(kingDestSpot).setPieceOnSpot(whiteKing);
-				board.getSpot(rookDestSpot).setPieceOnSpot(rook);
-				
-				isCastleAllowed = getInCheckStatus(whiteKing);
-				
-				board.getSpot(kingDestSpot).setPieceOnSpot(null);
-				board.getSpot(rookDestSpot).setPieceOnSpot(null);
-				board.getSpot(whiteKing.getSpot()).setPieceOnSpot(whiteKing);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(rook);		
-				
-			}
+			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
+			Iterator<Piece> itr = whitePlayerPiecesClonedList.iterator();
 			
-			else {
-				Spot kingDestSpot = board.getSpot(whiteKing.getX(), whiteKing.getY() - 2);
-				Spot rookDestSpot = board.getSpot(rook.getX(), rook.getY() + 3);
-				board.getSpot(whiteKing.getSpot()).setPieceOnSpot(null);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(null);
-				board.getSpot(kingDestSpot).setPieceOnSpot(whiteKing);
-				board.getSpot(rookDestSpot).setPieceOnSpot(rook);
+			while(itr.hasNext()) {
+				Piece tempPiece = itr.next();
+				if(checkEquality(move.getPiece(), tempPiece)){
+					tempPiece.setPiecePos(move.getDestSpot());
+				}
 				
-				isCastleAllowed = getInCheckStatus(whiteKing);
-				
-				board.getSpot(kingDestSpot).setPieceOnSpot(null);
-				board.getSpot(rookDestSpot).setPieceOnSpot(null);
-				board.getSpot(whiteKing.getSpot()).setPieceOnSpot(whiteKing);
-				board.getSpot(rook.getSpot()).setPieceOnSpot(rook);		
-			}
+				if( checkEquality(move.getRook(), tempPiece)) {
+					tempPiece.setPiecePos(move.getRookDestSpot());
+				}
+			}		
+			isCastleAllowed = getInCheckStatus(whiteKing, new BoardBuilder(blackPlayerPieces, whitePlayerPiecesClonedList).build());		
 			return isCastleAllowed;
 		}
 
 
 		@Override
-		public boolean isCastleAllowed(Piece whiteKing, Piece whiteRook, MoveType moveType) {
-			return simulateAndTestMove(whiteKing, whiteRook, moveType);
+		public boolean isCastleAllowed(Move move, Piece whiteKing) {
+			return simulateAndTestMove(move, whiteKing);
 		}
 
 
 
 		@Override
 		public boolean getInCheckMateStatus(Piece whiteKing) {
-			if(getInCheckStatus(whiteKing) && getLegalMoves(whiteKing).isEmpty()) {
+			if(getInCheckStatus(whiteKing, board) && getLegalMoves(whiteKing).isEmpty()) {
 				return true;
 			}
 			return false;
@@ -366,22 +360,12 @@ public interface StrategyGameLogic {
 
 		@Override
 		public boolean getInStaleMate(Piece whiteKing) {
-			if(!getInCheckStatus(whiteKing) && getLegalMoves(whiteKing).isEmpty()) {
+			if(!getInCheckStatus(whiteKing, board) && getLegalMoves(whiteKing).isEmpty()) {
 				return true;
 			}
 			return false;
 		}
 
-
-		//TODO change the promotion to a selected base piece type promotion.
-		@Override
-		public void promotePawn(Move move) {		
-			Piece newPromotedPawn = new Queen(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, board);
-			newPromotedPawn.setPiecePos(move.getDestSpot());
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(newPromotedPawn);
-			board.removePiece(move.getPiece(), true);
-			board.addPiece(newPromotedPawn);
-		}		
 	}	
 	
 	
@@ -400,18 +384,19 @@ public interface StrategyGameLogic {
 		
 		public ContextGameLogic(StrategyGameLogic strategy) {
 			this.strategy = strategy;
+			
 		}
 		
 		public List<Move> getLegalMoves(Piece king){
 			return strategy.getLegalMoves(king);
 		}
 		
-		public boolean getInCheckStatus(Piece king) {
-			return strategy.getInCheckStatus(king);
+		public boolean getInCheckStatus(Piece king, Board board) {
+			return strategy.getInCheckStatus(king, board);
 		}
 		
-		public boolean isCastleAllowed(Piece king, Piece rook, MoveType moveType) {
-			return strategy.isCastleAllowed(king, rook, moveType);
+		public boolean isCastleAllowed(Move move, Piece king) {
+			return strategy.isCastleAllowed(move, king);
 		}
 		
 		public boolean getInCheckMateStatus(Piece king) {
@@ -422,9 +407,6 @@ public interface StrategyGameLogic {
 			return strategy.getInStaleMate(king);
 		}
 
-		public void promotePawn(Move move) {
-			strategy.promotePawn(move);
-		}
 		
 	}
 

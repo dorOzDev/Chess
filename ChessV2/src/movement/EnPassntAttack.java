@@ -1,12 +1,13 @@
 package movement;
 
+import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class EnPassntAttack extends AttackMove  {
 
-	public EnPassntAttack(Spot sourceSpot, Spot destSpot, Piece piece, Piece attackedPiece) {
-		super(sourceSpot, destSpot, piece, attackedPiece);
+	public EnPassntAttack(Spot sourceSpot, Spot destSpot, Piece piece, Piece attackedPiece, Board board) {
+		super(sourceSpot, destSpot, piece, attackedPiece, board);
 		// TODO Auto-generated constructor stub
 	}
 	

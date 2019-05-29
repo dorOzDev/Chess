@@ -2,8 +2,9 @@ package movement;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
+import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class CastleMoveQueenSide extends CastleMove {
 	
@@ -12,12 +13,14 @@ public class CastleMoveQueenSide extends CastleMove {
 	private Piece rook;
 	private Piece king;
 	private Spot rookDestspot;
+	private Spot rookSourceSpot;
 
-	public CastleMoveQueenSide(Spot sourceSpot, Spot destSpot, Piece king) {
-		super(sourceSpot, destSpot, king);		
+	public CastleMoveQueenSide(Spot sourceSpot, Spot destSpot, Piece king, Board board) {
+		super(sourceSpot, destSpot, king, board);		
 		this.king = king;
 		this.rook = board.getSpot(king.getX(), ROOK_QUEEN_SIDE_Y_AXIX).getPiece();
-		this.rookDestspot = board.getSpot(rook.getX(), ROOK_QUEEN_SIDE_Y_AXIX + 3);
+		this.rookDestspot = board.getSpot(king.getX(), ROOK_QUEEN_SIDE_Y_AXIX + 3);
+		rookSourceSpot = board.getSpot(piece.getX(),ROOK_QUEEN_SIDE_Y_AXIX );
 	}
 
 	@Override
@@ -27,7 +30,7 @@ public class CastleMoveQueenSide extends CastleMove {
 
 	@Override
 	public Spot getRookSourceSpot() {
-		return rook.getSpot();
+		return rookSourceSpot;
 	}
 
 	@Override

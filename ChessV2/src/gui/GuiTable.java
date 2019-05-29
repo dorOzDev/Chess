@@ -1,12 +1,15 @@
 package gui;
 
 import game.Board;
+import game.Board.BoardBuilder;
+import game.GameState;
 import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
+import movement.CommandMove.MoveExecuter;
 import movement.Move;
 import movement.MoveFactory;
-import soldiers.Piece;
+import pieces.Piece;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,6 +21,9 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.ExecutionException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -40,10 +46,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
+import ai.MiniMax;
+import ai.MoveStrategy;
 import enaum.MoveType;
 import enaum.PieceType;
-public class GuiTable {
+import enaum.PlayerType;
+public class GuiTable extends Observable{
 	
 	private final JFrame frame;
 	private final GameHistoryPanel gameHistoryPanel;
@@ -59,6 +69,10 @@ public class GuiTable {
 	private Piece potenticalAttackedPiece;
 	private Move lastMove;
 	private MoveFactory moveFactory;
+	//private final GameSetup gameSetup;
+	private Move computerMove;
+	private GameState gameState;
+	
 	
 	public static String defaultPieceImagePath = "art/pieces/";
 	private static String defaultHighlightImagePath = "art/misc/Glow_Bluev2.png";
@@ -78,25 +92,51 @@ public class GuiTable {
 	private final String darkSpotTilePath = "art/Tile/Black_Tile.png";
 	private final String lightSpotTilePath = "art/Tile/White_Tile.png";
 	
-	public GuiTable() {
-		frame = new JFrame("Chess Game");
+	private static final GuiTable guiTable = new GuiTable();
+	
+	/*******************
+	 * Two different design patterns here:
+	 * GuiTable is a singleton design pattern.
+	 * Also the whole GUI is MVC Design patterns:
+	 * The model is the Board class which holds the current state of the game.
+	 * We have 3 Views: the GameHistoryPanel, GameSetup, TakenPiecesPanel
+	 *  Last the very same Singleton Gui table acts as the Controller in the MVC design pattern.
+	 * 
+	 */
+	
+	
+	
+	
+	private GuiTable() {
+		this.frame = new JFrame("Chess Game");
+		this.board = startNewGame();
+		this.board.setCurrentPlayer();
 		this.frame.setLayout(new BorderLayout());
-		board = Board.startNewBoard();
 		menuBar = createTableMenuBar();
 		gameHistoryPanel = new GameHistoryPanel();
-		takenPiecesPanel = new TakenPiecesPanel();
+		takenPiecesPanel = new TakenPiecesPanel(board);
+		this.gameState = GameState.get(board);
 		frame.setJMenuBar(menuBar);
 		frame.setSize(OUTER_FRAME_DIMENSION);
 		frame.add(takenPiecesPanel, BorderLayout.WEST);
 		frame.add(gameHistoryPanel, BorderLayout.EAST);	
 		moveLog = new MoveLog();
 		this.boardPanel = new BoardPanel();
+		//addObserver(new TableGameAIWatcher());
         frame.add(boardPanel, BorderLayout.CENTER);
 		center(this.frame);
 		frame.setVisible(true);
 		moveFactory = new MoveFactory();
+		//gameSetup = new GameSetup(this.frame, true);
+	
+	}
+	
+	private Board startNewGame() {
+		return new BoardBuilder(null, null).build();
+	}
 
-		
+	public static GuiTable get() {
+		return guiTable;
 	}
 
 	
@@ -115,6 +155,7 @@ public class GuiTable {
 		final JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		menuBar.add(createPreferncesMenu());
+		//menuBar.add(createOptionsMenu());
 		return menuBar;
 		
 	}
@@ -148,10 +189,7 @@ public class GuiTable {
 				}
 			});
 			fileMenu.add(openPGN);	
-			
-			
-
-			
+		
 			
 			exitMenuItem.addActionListener(new ActionListener() {
 				
@@ -166,6 +204,128 @@ public class GuiTable {
 			return fileMenu;
 	}
 		
+		private Board getBoard() {
+			return this.board;
+		}
+		/*
+		private JMenu createOptionsMenu() {
+			final JMenu optionMenu = new JMenu("Options");
+			
+			final JMenuItem setupGameMenuItem = new JMenuItem("Setup Game");
+			setupGameMenuItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					GuiTable.get().getGameSetup().promptUser();
+					
+				}
+			});
+			
+			optionMenu.add(setupGameMenuItem);
+			
+			return optionMenu;
+		}
+		
+		private GameSetup getGameSetup() {
+			return this.gameSetup;
+		}
+		
+		
+		private void setupUpdate(final GameSetup gameSetup) {
+			setChanged();
+			notifyObservers(gameSetup);
+		}
+		
+		private static class TableGameAIWatcher implements Observer{
+			
+			// TODO consider change this.
+			@Override
+			public void update(final Observable arg0,final Object arg1) {
+				// TODO Auto-generated method stub
+				if(GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer()) && !(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) && !(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate())) {
+					final AIThinkTank thinkTank = new AIThinkTank();
+					thinkTank.execute();
+					
+				}
+				
+				if(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) {
+					System.out.println("Game over current player checked mate" );
+				}
+				if(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate()) {
+					System.out.println("Game over game in statemate" );
+				}
+				
+			}
+			
+		}
+		*/
+		
+		public void updateComputerMove(Move move) {
+			this.computerMove = move;
+		}
+		
+		private MoveLog getMoveLog() {
+			return this.moveLog;
+		}
+		
+		private GameHistoryPanel getGameHistoryPanel() {
+			return this.gameHistoryPanel;
+		}
+		
+		private TakenPiecesPanel getTakenPiecesPanel() {
+			return this.takenPiecesPanel;
+		}
+		
+		private BoardPanel getBoardPanel() {
+			return this.boardPanel;
+		}
+		/*
+		private void moveMadeUpdate(final PlayerType playerType) {
+			setChanged();
+			notifyObservers(playerType);
+			
+		}
+		
+		private static class AIThinkTank extends SwingWorker<Move, String>{
+			private AIThinkTank() {
+				
+			}
+
+			@Override
+			protected Move doInBackground() throws Exception {
+				int depthThinking = GuiTable.get().getGameSetup().getSearchDepth();
+				final MoveStrategy miniMax = new MiniMax(depthThinking);
+				final Move bestMove = miniMax.execute(GuiTable.get().getBoard());
+				return bestMove;
+				
+			}
+			
+			@Override 
+			public void done() {
+				
+				try {
+					//MoveExecuter moveExecuter = new MoveExecuter(PieceType.QUEEN, true);	
+					final Move bestMove = get();
+					GuiTable.get().updateComputerMove(bestMove);
+					//moveExecuter.makeMove(bestMove);
+					GuiTable.get().getBoard().getCurrPlayer().makeMove(bestMove);
+					GuiTable.get().getBoard().setCurrPlayer();
+					GuiTable.get().getMoveLog().addMove(bestMove);
+					GuiTable.get().getGameHistoryPanel().redo(GuiTable.get().getBoard(), GuiTable.get().getMoveLog());
+					GuiTable.get().getTakenPiecesPanel().redo(GuiTable.get().getMoveLog());
+					GuiTable.get().getBoardPanel().drawBoard(GuiTable.get().getBoard());
+					GuiTable.get().moveMadeUpdate(PlayerType.COMPUTER);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		*/
 		private class BoardPanel extends JPanel{
 			final List<SpotPanel> boardSpots;
 			 
@@ -239,7 +399,7 @@ public class GuiTable {
 			private final int ySpotPos;
 			
 			
-			//TODO check if mouse event listener can be moved out of constructor scope.
+			
 			SpotPanel(final BoardPanel boardPanel, final int xSpotPos, final int ySpotPos){
 				super(new GridBagLayout());
 				this.xSpotPos= xSpotPos;
@@ -277,6 +437,7 @@ public class GuiTable {
 					public void mouseClicked(final MouseEvent event) {
 						Move move;
 						//Left click to make a move.
+						//if(!GuiTable.get().getGameSetup().isAIPlayer(board.getCurrPlayer()));
 						if(SwingUtilities.isLeftMouseButton(event)) {
 							if(sourceSpot == null) {
 								sourceSpot = board.getSpot(xSpotPos, ySpotPos);
@@ -286,15 +447,12 @@ public class GuiTable {
 							} else {
 								
 								destSpot = board.getSpot(xSpotPos, ySpotPos);
-								
-								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN, null);
-			
-								 final boolean hasMoveSucceed = board.getCurrPlayer().makeMove(move); 
-								 if(hasMoveSucceed){
-									 
-										board = board.getUpdatedBoard(); 
+								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN, null, board);
+								final Board destinationBoard = board.getCurrPlayer().makeMove(move, board);								 
+								 if(destinationBoard != null){			
+										board = gameState.getUpdatedBoard(destinationBoard);
 										moveLog.addMove(move);
-										board.setCurrPlayer();
+										board.setCurrentPlayer();				
 									}
 									sourceSpot =  null;
 									destSpot = null;
@@ -303,6 +461,7 @@ public class GuiTable {
 							}
 						
 						}
+						
 						//Right click cancel any click (in case user regrets the click)
 						else if(SwingUtilities.isRightMouseButton(event)) {
 							System.out.println("Right clicked");
@@ -317,16 +476,23 @@ public class GuiTable {
 							public void run() {
 								gameHistoryPanel.redo(board, moveLog);
 								takenPiecesPanel.redo(moveLog);
+								/*
+								if(gameSetup.isAIPlayer(board.getCurrPlayer())) {
+									GuiTable.get().moveMadeUpdate(PlayerType.HUMAN);
+								}
+								*/
 								boardPanel.drawBoard(board);
 								
 							}
 						});
 						
-					}
-				});
+					//}
+				}});
+				
 
 				validate();
 			}
+			
 			
 			private void highlightLegalMoves(Board board) {
 			
@@ -368,10 +534,11 @@ public class GuiTable {
 			private  ArrayList<Move> pieceLegalMoves(Board board){
 				
 				ArrayList<Move> legalMoves = new ArrayList<Move>();
+				
 				if(humanMovedPiece != null && humanMovedPiece.getPlayerCoulor() == board.getCurrPlayer().getPlayerColour()) {
-					legalMoves.addAll((Collection<? extends Move>) humanMovedPiece.getLegalMovements());
+					legalMoves.addAll((Collection<? extends Move>) humanMovedPiece.getLegalMovements(board));
 					if(humanMovedPiece.getPieceType() == PieceType.KING) {
-						legalMoves.addAll(humanMovedPiece.getCastleMovements());
+						legalMoves.addAll(humanMovedPiece.getCastleMovements(board));
 					}
 				}
 				
@@ -379,7 +546,6 @@ public class GuiTable {
 			}
 			
 			public void drawSpot(final Board board) {
-				
 				assignSpotColor();
 				assignPiecePanel(board);
 				highlightLegalMoves(board);
@@ -395,8 +561,7 @@ public class GuiTable {
 						final BufferedImage image = ImageIO.read(new File(defaultPieceImagePath  + drawPiece.getPlayerCoulor().toString().substring(0, 1) + drawPiece.getPieceType().toString() + ".png"));
 						final JLabel imageLabel =new JLabel(new ImageIcon(image));		
 						add(imageLabel);
-						
-						
+												
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -419,6 +584,8 @@ public class GuiTable {
 			}
 			
 		}
+
+
 		
 		
 		

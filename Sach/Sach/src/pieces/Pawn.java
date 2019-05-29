@@ -1,4 +1,4 @@
-package soldiers;
+package pieces;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,8 @@ import movement.ProgressMove;
 public class Pawn extends Piece {
 	
 	private Move lastMove;
-	public Pawn(PlayerColour playerColour, PieceType pieceType, Board board) {
-		super(playerColour, pieceType, board, true);
+	public Pawn(PlayerColour playerColour, PieceType pieceType, Board board, Spot spot) {
+		super(playerColour, pieceType, board, true, 100, spot);
 		
 	}
 
@@ -55,18 +55,19 @@ public class Pawn extends Piece {
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
-		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
-			if(isFirstMove)
-				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[--currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
+		if(this.getPlayerCoulor() == PlayerColour.WHITE && isCordinatedInBoardsBounds(--currX, currY)) {		
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
+			if(isFirstMove && isCordinatedInBoardsBounds(--currX, currY)){
+					candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));			
+			}
 		
 		}
 
-		else {
-			
-			candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
-			if(isFirstMove)
-				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[++currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
+		else if(this.getPlayerCoulor() == PlayerColour.BLACK && isCordinatedInBoardsBounds(++currX, currY)){			
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
+			if(isFirstMove && isCordinatedInBoardsBounds(++currX, currY)) {
+				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[currX][currY].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
+			}
 		}
 		
 		
@@ -162,9 +163,9 @@ public class Pawn extends Piece {
 	}
 
 	@Override
-	public boolean isPawnPromotionMove() {
+	public boolean isPawnPromotionMove(int rowDestinaition) {
 		
-		if(this.getX() == 0 || this.getX() == 7) {
+		if(rowDestinaition == 0 || rowDestinaition == 7) {
 			return true;
 		}
 		return false;

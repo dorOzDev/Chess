@@ -2,13 +2,14 @@ package movement;
 
 import enaum.MoveType;
 import enaum.PieceType;
+import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public class CandidateMove extends Move {
 
-	public CandidateMove(Spot sourceSpot, Spot destSpot, Piece piece) {
-		super(sourceSpot, destSpot, piece, MoveType.UNKNOWN);
+	public CandidateMove(Spot sourceSpot, Spot destSpot, Piece piece, Board board) {
+		super(sourceSpot, destSpot, piece, MoveType.UNKNOWN, board);
 		
 	}
 

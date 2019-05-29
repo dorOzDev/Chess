@@ -4,7 +4,7 @@ import enaum.MoveType;
 import enaum.PieceType;
 import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public abstract class Move {
 	
@@ -12,14 +12,16 @@ public abstract class Move {
 	protected Spot destSpot;
 	protected Piece piece;
 	protected MoveType moveType;
-	protected Board board;
+	Board board;
 	
-	public Move(final Spot sourceSpot,final Spot destSpot, final Piece piece, MoveType moveType){
+	
+	public Move(final Spot sourceSpot,final Spot destSpot, final Piece piece, MoveType moveType, Board board){
+		this.board = board;
 		this.destSpot = destSpot;
 		this.sourceSpot = sourceSpot;
 		this.piece = piece;
-		moveType = moveType;
-		board = Board.startNewBoard();
+		this.moveType = moveType;
+		
 	}
 	
 	public Spot getSourceSpot() {
@@ -35,7 +37,7 @@ public abstract class Move {
 	}
 	
 	public MoveType getMoveType() {
-		return this.moveType;
+		return moveType;
 	}
 	
 	public abstract boolean isAttackMove();

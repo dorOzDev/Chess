@@ -9,5 +9,4 @@ public enum MoveType {
 	CASTLE_MOVE_QUEEN_SIDE,
 	EN_PASSANT_MOVE,
 	UNKNOWN;
-
 }

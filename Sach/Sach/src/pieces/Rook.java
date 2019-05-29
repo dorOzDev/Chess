@@ -1,7 +1,5 @@
-package soldiers;
+package pieces;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import enaum.PieceType;
@@ -10,25 +8,22 @@ import game.Board;
 import game.Spot;
 import movement.Move;
 
-public class Queen extends Piece{
+public class Rook extends Piece {
+	
+	
 
-	public Queen(PlayerColour playerColour, PieceType pieceType, Board board) {
-		super(playerColour, pieceType, board, true);
+	public Rook(PlayerColour playerColour, PieceType pieceType,Board board, Spot spot) {
+		super(playerColour, pieceType, board, true, 500, spot);
+		
 		
 	}
-
-
+	
 	@Override
-	public void setCandidateMovements() {
-		forwardMovement();		
+	public void setCandidateMovements() {	
+		forwardMovement();
 		backwardMovement();
 		rightSideMovement();
 		leftSideMovement();
-		diagonalBottomRightMovement();
-		diagonalTopRightMovement();
-		diagonalBottomLeftMovement();
-		diagonalTopLeftMovement();
-		
 	}
 	
 	@Override
@@ -39,8 +34,9 @@ public class Queen extends Piece{
 	}
 	
 	@Override
-	public boolean isPawnPromotionMove() {
+	public boolean isPawnPromotionMove(int rowDestinaition) {
 		throw new RuntimeException("Shouldn't reach here, not a pawn piece");
 	}
+	
 	
 }

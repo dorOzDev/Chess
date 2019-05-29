@@ -1,4 +1,4 @@
-package soldiers;
+package pieces;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,11 +24,12 @@ public abstract class  Piece  {
 	public PlayerColour playerCoulor;
 	protected ArrayList<Move> legalMovements;
 	protected MoveFactory moveFactory;
+	protected int pieceValue;
 
 	protected LinkedList<Move> candidateMovements;
 	
 	
-	public Piece(PlayerColour playerCoulor, PieceType pieceType, Board board, boolean isFirstMove) {
+	public Piece(final PlayerColour playerCoulor,final PieceType pieceType,final Board board, boolean isFirstMove,final int pieceValue, Spot spot) {
 		legalMovements = new ArrayList<Move>();
 		candidateMovements = new LinkedList<Move>();
 
@@ -37,6 +38,8 @@ public abstract class  Piece  {
 		this.board = board;
 		this.isFirstMove = isFirstMove;
 		this.moveFactory = new MoveFactory();
+		this.pieceValue = pieceValue;
+		this.spot = spot;
 		
 	}
 	public boolean isFirstMove() {
@@ -50,7 +53,6 @@ public abstract class  Piece  {
 	public PlayerColour getPlayerCoulor() {
 		return playerCoulor;
 	}
-	
 	public void setPlayerCoulor(PlayerColour playerCoulor) {
 		this.playerCoulor = playerCoulor;
 	}
@@ -67,7 +69,11 @@ public abstract class  Piece  {
 	
 	public void setPiecePos(Spot spot) {
 		this.spot = spot;
-		board.getSpot(spot).setPieceOnSpot(this);	
+		
+	}
+	
+	public void setFirstMove(boolean isFirstMove) {
+		this.isFirstMove = isFirstMove;
 	}
 
 	
@@ -115,6 +121,7 @@ public abstract class  Piece  {
 	 The rest of the pieces has different unique candidate movements hence using different approach. 	 
 	*/
 	protected void forwardMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -135,6 +142,7 @@ public abstract class  Piece  {
 	}
 	
 	protected void backwardMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -153,6 +161,7 @@ public abstract class  Piece  {
 	}
 	
 	protected void rightSideMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -170,6 +179,7 @@ public abstract class  Piece  {
 	}
 	
 	protected void leftSideMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -188,6 +198,7 @@ public abstract class  Piece  {
 	}
 	
 	protected void diagonalBottomRightMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -209,6 +220,7 @@ public abstract class  Piece  {
 	}
 	
 	protected void diagonalTopRightMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -223,13 +235,14 @@ public abstract class  Piece  {
 			}
 		}
 		else {
-			if(--i >= 0 && j++ < board.spots.length)
+			if(--i >= 0 && ++j < board.spots.length)
 				candidateMovements.add(moveFactory.createMove(this.spot.getSpot(), board.spots[i][j].getSpot(), this, MoveType.CANDIDATE_MOVE, null));
 		}
 		setValidMovements();	
 	}
 	
 	protected void diagonalBottomLeftMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -252,6 +265,7 @@ public abstract class  Piece  {
 	}
 	
 	protected void diagonalTopLeftMovement() {
+		candidateMovements.clear();
 		int currX = this.spot.getX();
 		int currY = this.spot.getY();
 		
@@ -291,7 +305,19 @@ public abstract class  Piece  {
 		return spot.getY();
 	}
 	public abstract List<Move> getCastleMovements();
-	public abstract boolean isPawnPromotionMove();
+	public abstract boolean isPawnPromotionMove(int rowDestinaition);
+	
+	public int getPieceValue() {
+		return this.pieceValue;
+	}
+	
+	public void unMakeFirstMove() {
+		this.isFirstMove = true;
+	}
+	
+	public boolean isCordinatedInBoardsBounds(int x, int y) {
+		return ((x >= 0) && (x <= 7) && (y >= 0) && (y <= 7));
+	}
 		
 }
 

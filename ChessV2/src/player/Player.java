@@ -9,8 +9,11 @@ import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import game.Spot;
+import movement.CommandMove;
+import movement.CommandMove.ExecuteMove;
+import movement.CommandMove.MoveExecuter;
+import pieces.*;
 import movement.Move;
-import soldiers.*;
 
 public abstract class Player {
 	
@@ -22,6 +25,8 @@ public abstract class Player {
 	protected ArrayList<Move> legalOpponentMoves;
 	protected boolean isInCheck;
 	protected PlayerColour playerColour;
+	protected MoveExecuter moveExecuter;
+	protected PieceType preferdPieceTypePormotion;
 	
 	public Player(ArrayList<Piece> remainingPieces, Board board, PlayerColour playerColor){
 		this.remainingPieces = new ArrayList <Piece>();		
@@ -31,9 +36,15 @@ public abstract class Player {
 		this.board = board;
 		this.isInCheck = false;
 		this.playerColour = playerColor;
+		
+		//Default piece promotion shall be Queen
+		this.preferdPieceTypePormotion = PieceType.QUEEN;
 	}
 	
-	protected abstract boolean  isInCheck();
+	public void setPreferedPieceTypePromotion(PieceType pieceType) {
+		this.preferdPieceTypePormotion = pieceType;
+	}
+	public abstract boolean  isInCheck();
 	
 	public abstract boolean  isInCheckMate();
 	public abstract boolean isInStaleMate();
@@ -43,15 +54,11 @@ public abstract class Player {
 	}
 	public abstract  Piece getKing();
 	
-	public boolean getInCheckStatus() {
-		isInCheck = isInCheck();
-		return isInCheck;
-	}
-	
 
+
+	public abstract List<Move> getLegalMoves();
 	
-	
-	public  abstract boolean makeMove(Move move);
+	public  abstract Board makeMove(Move move, Board board);
 		
 	protected boolean checkLegalMove(final Move potentialMove, final Move legalMove) {
 		// Check if clicked piece belongs to the current active player.
@@ -59,10 +66,10 @@ public abstract class Player {
 			return false;
 		}
 		
-		
 		// Check if the clicked move is in the current legal moves for the same piece type.	
-		if(potentialMove.getSourceSpot() == legalMove.getSourceSpot() && potentialMove.getDestSpot() == legalMove.getDestSpot() && potentialMove.getPiece().getPieceType() == legalMove.getPiece().getPieceType())
+		if(legalMove.getDestSpot().getX() == potentialMove.getDestSpot().getX() && legalMove.getDestSpot().getY() == potentialMove.getDestSpot().getY() && legalMove.getPiece().getPieceType() == potentialMove.getPiece().getPieceType()) {
 			return true;
+		}
 		
 		return false;
 	}
@@ -71,4 +78,10 @@ public abstract class Player {
 	public abstract boolean isBlack();
 	
 	public abstract void updateCurrentAvailablePieces();
+	
+	public abstract List<Piece> getPlayerRemaningPieces();
+	
+	public abstract Player getOpponent ();
+	
+	public abstract boolean hasKingCaptured();
 }

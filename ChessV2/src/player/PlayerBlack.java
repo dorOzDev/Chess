@@ -2,12 +2,16 @@ package player;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board;
 import movement.Move;
-import soldiers.Piece;
+import movement.CommandMove;
+import movement.CommandMove.ExecuteMove;
+import movement.CommandMove.MoveExecuter;
+import pieces.Piece;
 
 public class PlayerBlack extends Player {
 	
@@ -17,7 +21,7 @@ public class PlayerBlack extends Player {
 	}
 
 	@Override
-	protected boolean isInCheck() {	
+	public boolean isInCheck() {	
 		return board.getInCheckStatusBlackPlayer();
 		
 	}
@@ -25,7 +29,7 @@ public class PlayerBlack extends Player {
 	@Override
 	public boolean isInCheckMate() {
 		
-		return board.isInCheckMateBlackPlayer();
+		return hasKingCaptured() || board.isInCheckMateBlackPlayer();
 	}
 
 	@Override
@@ -53,58 +57,24 @@ public class PlayerBlack extends Player {
 	//This method gets potential move making from the clicked event made by player on the GUI class.
 	//Need to validate if the same clicked move is valid or not.
 	@Override
-	public boolean makeMove(Move move) {
+	public Board makeMove(Move move, Board board) {
 		boolean foundLegalMove = false;
 		legalMoves = board.getAllLegalBlackMoves();
 		int index = 0;
 		for(; index < legalMoves.size() && !foundLegalMove; index++) {
 			foundLegalMove = checkLegalMove(move, legalMoves.get(index));
 			if(foundLegalMove) {
-				executeMove(legalMoves.get(index));
+				
 				board.setLastMove(legalMoves.get(index));
+				return executeMove(legalMoves.get(index), board);
 			}
 		}
-		return foundLegalMove;
+		return null;
 	}
 
-	private void executeMove(Move move) {
-		if(!move.isCastleMove()) {
-			
-			if(move.isAttackMove() || move.isEnPassntMove()) {
-				board.getSpot(move.getAttackedPiece().getSpot()).setPieceOnSpot(null);
-				board.removePiece(move.getAttackedPiece(), true);
-			}
-			
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
-			
-			move.getPiece().setPiecePos(move.getDestSpot());
-			
-
-			
-			// Check if pawn has reached the end board and be promoted to Queen.
-			//TODO need to provide the client with option to promote the pawn to any other piece type except for king and pawn(obviously).
-			if(move.getPiece().getPieceType() == PieceType.PAWN) {
-				if(move.getPiece().isPawnPromotionMove()) {
-					board.pawnToPromote(move, move.getPiece().getPlayerCoulor());
-				}
-			}
-		}
-		
-		else if(move.isCastleMove()){
-			board.getSpot(move.getSourceSpot()).setPieceOnSpot(null);
-			board.getSpot(move.getRookSourceSpot()).setPieceOnSpot(null);
-			
-			board.getSpot(move.getDestSpot()).setPieceOnSpot(move.getPiece());
-			board.getSpot(move.getRookDestSpot()).setPieceOnSpot(move.getRook());
-			
-			move.getPiece().setPiecePos(move.getDestSpot());
-			move.getRook().setPiecePos(move.getRookDestSpot());
-		}
-		if(move.getPiece().isFirstMove()) {
-			move.getPiece().makeFirstMove();
-		}
-		
+	private Board executeMove(Move move, Board board) {
+		moveExecuter = new MoveExecuter(preferdPieceTypePormotion);
+		return moveExecuter.makeMove(move, board);
 	}
 
 	@Override
@@ -115,8 +85,35 @@ public class PlayerBlack extends Player {
 				return piece;
 			}
 		}
-		System.out.println(remainingPieces);
-		throw new RuntimeException("Shouldn't reach here without king!@#$");
+		return null;
+		
+	}
+
+	@Override
+	public List<Move> getLegalMoves() {
+		return board.getAllLegalBlackMoves();
+	}
+
+	@Override
+	public List<Piece> getPlayerRemaningPieces() {
+		updateCurrentAvailablePieces();
+		return remainingPieces;
+	}
+
+	@Override
+	public Player getOpponent() {
+		return board.getWhitePlayer();
+	}
+
+	@Override
+	public boolean hasKingCaptured() {
+		remainingPieces = board.getPiecesBlack();
+		for(Piece piece : remainingPieces) {
+			if(piece.getPieceType() == PieceType.KING) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	

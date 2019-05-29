@@ -1,13 +1,14 @@
 package movement;
 
 import enaum.MoveType;
+import game.Board;
 import game.Spot;
-import soldiers.Piece;
+import pieces.Piece;
 
 public abstract class CastleMove extends ProgressMove {
 
-	public CastleMove(Spot sourceSpot, Spot destSpot, Piece piece) {
-		super(sourceSpot, destSpot, piece);
+	public CastleMove(Spot sourceSpot, Spot destSpot, Piece piece, Board board) {
+		super(sourceSpot, destSpot, piece, board);
 	}
 	
 	@Override
