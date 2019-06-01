@@ -34,11 +34,12 @@ public  class Board {
 	private static Move lastMove = null;
 	private ArrayList<Move> legalMovesWhite;
 	private ArrayList<Move> legalMovesBlack;
+	
 	private  PlayerBlack playerBlack;
 	private  PlayerWhite playerWhite;
 	private static Player currPlayer;
 	private ContextGameLogic contextGameLogic;
-	private PieceFactory pieceFactory;
+	//private PieceFactory pieceFactory;
 	
 	
 
@@ -63,12 +64,12 @@ public  class Board {
 		
 	}
 	
-	public void setLastMove(Move lastMove) {
-		this.lastMove = lastMove;
+	public void setLastMove(Move move) {
+		lastMove = move;
 	}
 	
 	public Move getLastMove() {
-		return this.lastMove;
+		return lastMove;
 	}
 	
 
@@ -140,19 +141,7 @@ public  class Board {
 		return this.blackPlayerPieces;
 	}
 	
-
-	public List<Move> getAllLegalWhiteMoves() {
-		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer(this));
-		return contextGameLogic.getLegalMoves(playerWhite.getKing());
-				
-	}
 	
-	public List<Move> getAllLegalBlackMoves() {
-		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer(this));
-		return contextGameLogic.getLegalMoves(playerBlack.getKing());
-				
-	}
-
 	public String castToBoardCordinate(Spot destSpot) {
 		
 		char intToAlgebric =(char) (destSpot.getY() + 'a'); // Cast row number to letter
@@ -161,51 +150,37 @@ public  class Board {
 	
 
 	public ArrayList<Piece> getTakenPieces(){
-		return this.takenPieces;
+		return takenPieces;
+	}
+	
+	public List<Move> getAllLegalMoves(PlayerColour playerColour) {
+		contextGameLogic = new ContextGameLogic(playerColour, this);
+		return contextGameLogic.getLegalMoves();
+				
+	}
+	
+	public boolean getInCheckStatus(PlayerColour playerColour) {
+		contextGameLogic = new ContextGameLogic(playerColour, this);
+		return contextGameLogic.getInCheckStatus();
+	}
+	
+	public boolean isCastleAllowed(Move move, PlayerColour playerColour) {
+		contextGameLogic = new ContextGameLogic(playerColour, this);
+		return contextGameLogic.isCastleAllowed(move);
 	}
 	
 	
-	public boolean getInCheckStatusWhitePlayer() {
-		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer(this));
-		return contextGameLogic.getInCheckStatus(playerWhite.getKing(), this);
-	}
-	
-	public boolean getInCheckStatusBlackPlayer() {
-		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer(this));
-		return contextGameLogic.getInCheckStatus(playerBlack.getKing(), this);
-	}
-	
-	public boolean isCastleAllowedBlackPlayer(Move move, Piece king) {
-		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer(this));
-		return contextGameLogic.isCastleAllowed(move, king);
-	}
-	
-	public boolean isCastleAllowedWhitePlayer(Move move, Piece king) {
-		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer(this));
-		return contextGameLogic.isCastleAllowed(move, king);
+	public boolean isInCheckMate(PlayerColour playerColour) {
+		contextGameLogic = new ContextGameLogic(playerColour, this);
+		return contextGameLogic.getInCheckMateStatus();	
 	}
 	
 	
-	public boolean isInCheckMateBlackPlayer() {
-		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer(this));
-		return contextGameLogic.getInCheckMateStatus(playerBlack.getKing());	
-		
+	public boolean isInStaleMate(PlayerColour playerColour) {
+		contextGameLogic = new ContextGameLogic(playerColour, this);
+		return contextGameLogic.getInStaleMateStatus();
 	}
 	
-	public boolean isInCheckMateWhitePlayer() {
-		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer(this));
-		return contextGameLogic.getInCheckMateStatus(playerWhite.getKing());			
-	}
-	
-	public boolean isInStaleMateBlackPlayer() {
-		contextGameLogic = new ContextGameLogic(new OperationBlackPlayer(this));
-		return contextGameLogic.getInStaleMateStatus(playerBlack.getKing());
-	}
-	
-	public boolean isInStaleMateWhitePlayer() {
-		contextGameLogic = new ContextGameLogic(new OperationWhitePlayer(this));
-		return contextGameLogic.getInStaleMateStatus(playerWhite.getKing());
-	}
 
 
 	
@@ -217,7 +192,9 @@ public  class Board {
 		return this.playerBlack;
 	}
 	
-
+	public Piece getPiece(int x, int y) {
+		return boardSpots[x][y].getPiece();
+	}
 	
 	
 	
@@ -228,14 +205,13 @@ public  class Board {
 		private final ArrayList<Piece>blackPlayerPieces;
 		private final ArrayList<Piece>whitePlayerPieces;
 		private final Spot boardSpots[][];
-		private Player currPlayer;
+		
 		
 		public BoardBuilder(ArrayList<Piece>blackPlayerPieces, ArrayList<Piece>whitePlayerPieces) {
 			this.blackPlayerPieces = new ArrayList<Piece>();
 			this.whitePlayerPieces = new ArrayList<Piece>();
 			this.boardSpots = new Spot[NUM_ROWS][NUM_COLS];
 			this.pieceFactory = new PieceFactory();
-			this.currPlayer = currPlayer;
 			createBoardSpots();
 			
 			//If starting new game pieces should be created in their original spots

@@ -91,20 +91,20 @@ public class King extends Piece {
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
 			
 			// If king is in chess, castling is not allowed.
-			if(board.getInCheckStatusWhitePlayer()) 
+			if(board.getInCheckStatus(PlayerColour.WHITE)) 
 				return false;
 			// Checking if king lands on chess spot by the end of the rook, if true castle is not allowed.
-			if(board.isCastleAllowedWhitePlayer(move, this)) {
+			if(board.isCastleAllowed(move, PlayerColour.WHITE)) {
 				
 				return false;
 			}
 					
 		}
 		else if(this.getPlayerCoulor() == PlayerColour.BLACK) {
-			if(board.getInCheckStatusBlackPlayer()) {
+			if(board.getInCheckStatus(PlayerColour.BLACK)) {
 				return false;
 			}
-			if(board.isCastleAllowedBlackPlayer(move, this)) {
+			if(board.isCastleAllowed(move, PlayerColour.BLACK)) {
 				
 				return false;
 			}
@@ -146,20 +146,20 @@ public class King extends Piece {
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
 			
 			// If king is in chess, castling is not allowed.
-			if(board.getInCheckStatusWhitePlayer()) 
+			if(board.getInCheckStatus(PlayerColour.WHITE)) 
 				return false;
 			// Checking if king lands on chess spot by the end of the rook, if true castle is not allowed.
-			if(board.isCastleAllowedWhitePlayer(move, this)) {
+			if(board.isCastleAllowed(move, PlayerColour.WHITE)) {
 				
 				return false;
 			}
 					
 		}
 		else if(this.getPlayerCoulor() == PlayerColour.BLACK) {
-			if(board.getInCheckStatusBlackPlayer()) {
+			if(board.getInCheckStatus(PlayerColour.BLACK)) {
 				return false;
 			}
-			if(board.isCastleAllowedBlackPlayer(move, this)) {
+			if(board.isCastleAllowed(move, PlayerColour.BLACK)) {
 				
 				return false;
 			}

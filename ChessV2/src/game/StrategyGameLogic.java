@@ -19,16 +19,13 @@ import pieces.Queen;
  * 
  ***********/
 public interface StrategyGameLogic {
-	public List<Move> getLegalMoves(Piece king);
-	public boolean getInCheckStatus(Piece king, Board board);
-	public boolean isCastleAllowed(Move move, Piece king);
-	public boolean getInCheckMateStatus(Piece king);
-	public boolean getInStaleMate(Piece king);
-	
+	public List<Move> getLegalMoves();
+	public boolean getInCheckStatus(Board board);
+	public boolean isCastleAllowed(Move move);
+	public boolean getInCheckMateStatus();
+	public boolean getInStaleMate();
 	
 
-	
-	
 	
 	/*
 	 * Operations for black player. 
@@ -36,6 +33,7 @@ public interface StrategyGameLogic {
 	
 	public class OperationBlackPlayer implements StrategyGameLogic{
 		Board board;
+		
 		BoardBuilder boardBuilder;
 		ArrayList<Piece> blackPlayerPieces;
 		ArrayList<Piece> whitePlayerPieces;
@@ -60,7 +58,6 @@ public interface StrategyGameLogic {
 	
 		private void calcLegalMoves() {
 			blackPlayerLegalMoves.clear();
-			blackPlayerPieces = board.getPiecesBlack();
 			for(Piece piece : blackPlayerPieces) {
 				blackPlayerLegalMoves.addAll(piece.getLegalMovements(board));
 				if(piece.getPieceType() == PieceType.KING) {
@@ -71,21 +68,21 @@ public interface StrategyGameLogic {
 		}
 
 		@Override
-		public List<Move> getLegalMoves(Piece blackKing) {
+		public List<Move> getLegalMoves() {
 			calcLegalMoves();
-			filterInChessMoves(blackKing);
+			filterInChessMoves();
 			return blackPlayerLegalMoves;
 		}	
 		
 		//This method simulate the move on the board if legal move according to chess rules
 		//that is you may not make a move that leaves the king in chess.
 		
-		private boolean simulateAndTestMove(Move move, Piece blackKing) {
+		private boolean simulateAndTestMove(Move move) {
 			boolean isLegalMove;
 			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
 			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
 			if(move.isCastleMove()) {
-				return simulateAndTestCastleMove(move, blackKing);
+				return simulateAndTestCastleMove(move);
 			}
 			
 			if(move.isAttackMove() || move.isEnPassntMove()) {
@@ -107,18 +104,19 @@ public interface StrategyGameLogic {
 					break;
 				}
 			}	
-			isLegalMove = getInCheckStatus(blackKing, new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPiecesClonedList).build());
+			isLegalMove = getInCheckStatus(new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPiecesClonedList).build());
 			return isLegalMove;		
 		}
 
 		@Override
-		public boolean getInCheckStatus(Piece blackKing, Board board) {
+		public boolean getInCheckStatus(Board board) {
+			Piece blackKing = board.getBlackPlayer().getKing();
 			if(blackKing == null) {
 				return true;
 			}
 			calcLegalOppenentMoves(board);
 			for(Move move : whitePlayerLegalMoves) {
-				if(move.getDestSpot() == blackKing.getSpot()) {
+				if(move.getDestSpot().getX() == blackKing.getX() && move.getDestSpot().getY() == blackKing.getY()) {
 					return true;
 				}		
 			}
@@ -127,26 +125,25 @@ public interface StrategyGameLogic {
 		
 		private void calcLegalOppenentMoves(Board board) {
 			whitePlayerLegalMoves.clear();
-			whitePlayerPieces = board.getPiecesWhite();
-			for(Piece piece : whitePlayerPieces) {
+			for(Piece piece : board.getPiecesWhite()) {
 				whitePlayerLegalMoves.addAll(piece.getLegalMovements(board));
 			}
 			
 		}
 		
-		private void filterInChessMoves(Piece blackKing) {
+		private void filterInChessMoves() {
 			Move tempMove;
 			Iterator<Move>itr = blackPlayerLegalMoves.iterator();
 			while(itr.hasNext()){
 				tempMove = itr.next();
-				if(simulateAndTestMove(tempMove, blackKing)) {
+				if(simulateAndTestMove(tempMove)) {
 					itr.remove();
 				}
 			}		
 		}
 			
 		//Simulate and test castle movements.	
-		private boolean simulateAndTestCastleMove(Move move, Piece blackKing) {
+		private boolean simulateAndTestCastleMove(Move move) {
 			boolean isCastleAllowed;
 			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
 			Iterator<Piece> itr = blackPlayerPiecesClonedList.iterator();
@@ -161,7 +158,7 @@ public interface StrategyGameLogic {
 					tempPiece.setPiecePos(move.getRookDestSpot());
 				}
 			}		
-			isCastleAllowed = getInCheckStatus(blackKing, new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPieces).build());		
+			isCastleAllowed = getInCheckStatus(new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPieces).build());		
 			return isCastleAllowed;
 		}
 		
@@ -170,14 +167,14 @@ public interface StrategyGameLogic {
 		}
 
 		@Override
-		public boolean isCastleAllowed(Move move, Piece blackKing ) {
-			return simulateAndTestMove(move, blackKing);
+		public boolean isCastleAllowed(Move move) {
+			return simulateAndTestMove(move);
 		}
 
 
 		@Override
-		public boolean getInCheckMateStatus(Piece blackKing) {
-			if(getInCheckStatus(blackKing, board) && getLegalMoves(blackKing).isEmpty()) {
+		public boolean getInCheckMateStatus() {
+			if(getInCheckStatus(board) && getLegalMoves().isEmpty()) {
 				return true;
 			}
 			return false;
@@ -185,8 +182,8 @@ public interface StrategyGameLogic {
 
 
 		@Override
-		public boolean getInStaleMate(Piece blackKing) {
-			if(!getInCheckStatus(blackKing, board) && getLegalMoves(blackKing).isEmpty()) {
+		public boolean getInStaleMate() {
+			if(!getInCheckStatus(board) && getLegalMoves().isEmpty()) {
 				return true;
 			}
 			return false;
@@ -231,7 +228,6 @@ public interface StrategyGameLogic {
 		
 		private void calcLegalMoves() {
 			whitePlayerLegalMoves.clear();
-			whitePlayerPieces = board.getPiecesWhite();
 			for(Piece piece : whitePlayerPieces) {
 				whitePlayerLegalMoves.addAll(piece.getLegalMovements(board));
 				if(piece.getPieceType() == PieceType.KING) {
@@ -242,20 +238,19 @@ public interface StrategyGameLogic {
 		}
 
 		@Override
-		public List<Move> getLegalMoves(Piece whiteKing) {
+		public List<Move> getLegalMoves() {
 			calcLegalMoves();
-			filterInChessMoves(whiteKing);
+			filterInChessMoves();
 			return whitePlayerLegalMoves;
 		}
 
 		
-		
-		private boolean simulateAndTestMove(Move move, Piece whiteKing) {
+		private boolean simulateAndTestMove(Move move) {
 			boolean isLegalMove;
 			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
 			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
 			if(move.isCastleMove()) {
-				return simulateAndTestCastleMove(move, whiteKing);
+				return simulateAndTestCastleMove(move);
 			}
 			
 			if(move.isAttackMove() || move.isEnPassntMove()) {
@@ -277,7 +272,7 @@ public interface StrategyGameLogic {
 					break;
 				}
 			}	
-			isLegalMove = getInCheckStatus(whiteKing, new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPiecesClonedList).build());
+			isLegalMove = getInCheckStatus(new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPiecesClonedList).build());
 			return isLegalMove;					
 		}
 		
@@ -286,13 +281,14 @@ public interface StrategyGameLogic {
 		}
 
 		@Override
-		public boolean getInCheckStatus(Piece whiteKing, Board board) {
+		public boolean getInCheckStatus(Board board) {
+			Piece whiteKing = board.getWhitePlayer().getKing();
 			if(whiteKing == null) {
 				return true;
 			}
 			calcLegalOppenentMoves(board);
 			for(Move move : blackPlayerLegalMoves) {
-				if(move.getDestSpot() == whiteKing.getSpot())
+				if(move.getDestSpot().getX() == whiteKing.getX() && move.getDestSpot().getY() == whiteKing.getY())
 					return true;
 			}
 			return false;
@@ -300,28 +296,27 @@ public interface StrategyGameLogic {
 
 		
 		private void calcLegalOppenentMoves(Board board) {
-			blackPlayerLegalMoves.clear();
-			blackPlayerPieces = board.getPiecesBlack();
 			
-			for(Piece piece : blackPlayerPieces) {
+			blackPlayerLegalMoves.clear();		
+			for(Piece piece : board.getPiecesBlack()) {
 				blackPlayerLegalMoves.addAll(piece.getLegalMovements(board));
 			}
 		}
 
 		
-		private void filterInChessMoves(Piece whiteKing) {
+		private void filterInChessMoves() {
 			Move tempMove;
 			Iterator<Move>itr = whitePlayerLegalMoves.iterator();
 			while(itr.hasNext()){
 				tempMove = itr.next();
-				if(simulateAndTestMove(tempMove, whiteKing)) {
+				if(simulateAndTestMove(tempMove)) {
 					itr.remove();
 				}
 			}
 		}
 
 		//Simulate and test castle movements.	
-		private boolean simulateAndTestCastleMove(Move move, Piece whiteKing) {
+		private boolean simulateAndTestCastleMove(Move move) {
 			boolean isCastleAllowed;
 			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
 			Iterator<Piece> itr = whitePlayerPiecesClonedList.iterator();
@@ -336,21 +331,21 @@ public interface StrategyGameLogic {
 					tempPiece.setPiecePos(move.getRookDestSpot());
 				}
 			}		
-			isCastleAllowed = getInCheckStatus(whiteKing, new BoardBuilder(blackPlayerPieces, whitePlayerPiecesClonedList).build());		
+			isCastleAllowed = getInCheckStatus(new BoardBuilder(blackPlayerPieces, whitePlayerPiecesClonedList).build());		
 			return isCastleAllowed;
 		}
 
 
 		@Override
-		public boolean isCastleAllowed(Move move, Piece whiteKing) {
-			return simulateAndTestMove(move, whiteKing);
+		public boolean isCastleAllowed(Move move) {
+			return simulateAndTestMove(move);
 		}
 
 
 
 		@Override
-		public boolean getInCheckMateStatus(Piece whiteKing) {
-			if(getInCheckStatus(whiteKing, board) && getLegalMoves(whiteKing).isEmpty()) {
+		public boolean getInCheckMateStatus() {
+			if(getInCheckStatus(board) && getLegalMoves().isEmpty()) {
 				return true;
 			}
 			return false;
@@ -359,8 +354,8 @@ public interface StrategyGameLogic {
 
 
 		@Override
-		public boolean getInStaleMate(Piece whiteKing) {
-			if(!getInCheckStatus(whiteKing, board) && getLegalMoves(whiteKing).isEmpty()) {
+		public boolean getInStaleMate() {
+			if(!getInCheckStatus(board) && getLegalMoves().isEmpty()) {
 				return true;
 			}
 			return false;
@@ -370,41 +365,41 @@ public interface StrategyGameLogic {
 	
 	
 	
-	
-
-	
-	
-	
-	
 	/*
 	 * Class that execute the proper algorithm.
 	 */
 	public class ContextGameLogic{
 		private StrategyGameLogic strategy;
-		
-		public ContextGameLogic(StrategyGameLogic strategy) {
-			this.strategy = strategy;
+		private Board board;
+		public ContextGameLogic(PlayerColour playerColour, Board board) {
+			this.board = board;
+			if(playerColour == PlayerColour.WHITE) {
+				this.strategy = new OperationWhitePlayer(board);
+			}
+			else {
+				this.strategy = new OperationBlackPlayer(board);
+			}
 			
 		}
 		
-		public List<Move> getLegalMoves(Piece king){
-			return strategy.getLegalMoves(king);
+		public List<Move> getLegalMoves(){
+			return strategy.getLegalMoves();
 		}
 		
-		public boolean getInCheckStatus(Piece king, Board board) {
-			return strategy.getInCheckStatus(king, board);
+		public boolean getInCheckStatus() {
+			return strategy.getInCheckStatus(this.board);
 		}
 		
-		public boolean isCastleAllowed(Move move, Piece king) {
-			return strategy.isCastleAllowed(move, king);
+		public boolean isCastleAllowed(Move move) {
+			return strategy.isCastleAllowed(move);
 		}
 		
-		public boolean getInCheckMateStatus(Piece king) {
-			return strategy.getInCheckMateStatus(king);
+		public boolean getInCheckMateStatus() {
+			return strategy.getInCheckMateStatus();
 		}
 		
-		public boolean getInStaleMateStatus(Piece king) {
-			return strategy.getInStaleMate(king);
+		public boolean getInStaleMateStatus() {
+			return strategy.getInStaleMate();
 		}
 
 		

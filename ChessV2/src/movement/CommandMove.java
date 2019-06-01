@@ -149,7 +149,12 @@ public interface CommandMove {
 			if(move.getPiece().isPawnPromotionMove(move.getDestSpot().getX())) {
 				promotedPiece = pieceFactory.createPiece(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, move.getDestSpot(), move.getPiece().isFirstMove());
 				attackingPieceItr.remove();
-				((ArrayList<Piece>) attackingPieceItr).add(promotedPiece);
+				if(tempAttakcingPiece.getPlayerCoulor() == PlayerColour.WHITE) {
+					playerWhitePieces.add(promotedPiece);
+				}
+				else {
+					playerBlackPieces.add(promotedPiece);
+				}
 			}
 			else {
 				tempAttakcingPiece.setPiecePos(move.getDestSpot());

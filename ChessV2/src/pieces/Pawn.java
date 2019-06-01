@@ -35,19 +35,17 @@ public class Pawn extends Piece {
 		lastMove = board.getLastMove();
 		if(lastMove != null) {
 		if(lastMove.isPawnJumpMove()) {
-			
-			if(this.getPlayerCoulor() != lastMove.getPiece().getPlayerCoulor()) {
-				if(Math.abs(this.getY() - lastMove.getPiece().getY()) == 1 && lastMove.getPiece().getX() == this.getX()) {
+				if(Math.abs(this.getY() - lastMove.getDestSpot().getY()) == 1 && lastMove.getDestSpot().getX() == this.getX()) {
 					if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-						legalMovements.add(moveFactory.createMove(this.spot.getSpot(), board.getSpot(this.getX() - 1, lastMove.getPiece().getY()), this, MoveType.EN_PASSANT_MOVE, lastMove.getPiece(), board));
+						legalMovements.add(moveFactory.createMove(this.spot.getSpot(), board.getSpot(this.getX() - 1, lastMove.getPiece().getY()), this, MoveType.EN_PASSANT_MOVE, board.getPiece(lastMove.getDestSpot().getX(), lastMove.getDestSpot().getY()), board));
 				}
 					else {
-						legalMovements.add(moveFactory.createMove(this.spot.getSpot(), board.getSpot(this.getX() + 1, lastMove.getPiece().getY()), this, MoveType.EN_PASSANT_MOVE, lastMove.getPiece(), board));
+						legalMovements.add(moveFactory.createMove(this.spot.getSpot(), board.getSpot(this.getX() + 1, lastMove.getPiece().getY()), this, MoveType.EN_PASSANT_MOVE, board.getPiece(lastMove.getDestSpot().getX(), lastMove.getDestSpot().getY()), board));
 						}
 						
 					}
-				}
-			}
+				
+			}	
 		}
 	}
 	@Override 

@@ -61,7 +61,7 @@ public class GuiTable extends Observable{
 	private final JMenuBar menuBar;
 	private final BoardPanel boardPanel;
 	private boolean highLightLegalMoves = true;
-	private Board board;
+	private static Board board;
 	private final MoveLog moveLog;
 	private Spot sourceSpot;
 	private Spot destSpot;
@@ -69,7 +69,7 @@ public class GuiTable extends Observable{
 	private Piece potenticalAttackedPiece;
 	private Move lastMove;
 	private MoveFactory moveFactory;
-	//private final GameSetup gameSetup;
+	private final GameSetup gameSetup;
 	private Move computerMove;
 	private GameState gameState;
 	
@@ -122,12 +122,12 @@ public class GuiTable extends Observable{
 		frame.add(gameHistoryPanel, BorderLayout.EAST);	
 		moveLog = new MoveLog();
 		this.boardPanel = new BoardPanel();
-		//addObserver(new TableGameAIWatcher());
+		addObserver(new TableGameAIWatcher());
         frame.add(boardPanel, BorderLayout.CENTER);
 		center(this.frame);
 		frame.setVisible(true);
 		moveFactory = new MoveFactory();
-		//gameSetup = new GameSetup(this.frame, true);
+		gameSetup = new GameSetup(this.frame, true);
 	
 	}
 	
@@ -155,7 +155,7 @@ public class GuiTable extends Observable{
 		final JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		menuBar.add(createPreferncesMenu());
-		//menuBar.add(createOptionsMenu());
+		menuBar.add(createOptionsMenu());
 		return menuBar;
 		
 	}
@@ -207,7 +207,7 @@ public class GuiTable extends Observable{
 		private Board getBoard() {
 			return this.board;
 		}
-		/*
+		
 		private JMenu createOptionsMenu() {
 			final JMenu optionMenu = new JMenu("Options");
 			
@@ -236,7 +236,7 @@ public class GuiTable extends Observable{
 			notifyObservers(gameSetup);
 		}
 		
-		private static class TableGameAIWatcher implements Observer{
+		private  class TableGameAIWatcher implements Observer{
 			
 			// TODO consider change this.
 			@Override
@@ -258,7 +258,7 @@ public class GuiTable extends Observable{
 			}
 			
 		}
-		*/
+		
 		
 		public void updateComputerMove(Move move) {
 			this.computerMove = move;
@@ -279,7 +279,7 @@ public class GuiTable extends Observable{
 		private BoardPanel getBoardPanel() {
 			return this.boardPanel;
 		}
-		/*
+		
 		private void moveMadeUpdate(final PlayerType playerType) {
 			setChanged();
 			notifyObservers(playerType);
@@ -302,18 +302,16 @@ public class GuiTable extends Observable{
 			
 			@Override 
 			public void done() {
-				
 				try {
-					//MoveExecuter moveExecuter = new MoveExecuter(PieceType.QUEEN, true);	
 					final Move bestMove = get();
 					GuiTable.get().updateComputerMove(bestMove);
-					//moveExecuter.makeMove(bestMove);
-					GuiTable.get().getBoard().getCurrPlayer().makeMove(bestMove);
-					GuiTable.get().getBoard().setCurrPlayer();
+					board = GuiTable.get().getBoard().getCurrPlayer().makeMove(bestMove, GuiTable.get().getBoard());
+
+					//GuiTable.get().getBoard().setCurrentPlayer();
 					GuiTable.get().getMoveLog().addMove(bestMove);
 					GuiTable.get().getGameHistoryPanel().redo(GuiTable.get().getBoard(), GuiTable.get().getMoveLog());
 					GuiTable.get().getTakenPiecesPanel().redo(GuiTable.get().getMoveLog());
-					GuiTable.get().getBoardPanel().drawBoard(GuiTable.get().getBoard());
+					GuiTable.get().getBoardPanel().drawBoard(board);
 					GuiTable.get().moveMadeUpdate(PlayerType.COMPUTER);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -325,7 +323,7 @@ public class GuiTable extends Observable{
 				
 			}
 		}
-		*/
+		
 		private class BoardPanel extends JPanel{
 			final List<SpotPanel> boardSpots;
 			 
@@ -449,10 +447,9 @@ public class GuiTable extends Observable{
 								destSpot = board.getSpot(xSpotPos, ySpotPos);
 								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN, null, board);
 								final Board destinationBoard = board.getCurrPlayer().makeMove(move, board);								 
-								 if(destinationBoard != null){			
+								 if(destinationBoard != board){			
 										board = gameState.getUpdatedBoard(destinationBoard);
-										moveLog.addMove(move);
-										board.setCurrentPlayer();				
+										moveLog.addMove(move);			
 									}
 									sourceSpot =  null;
 									destSpot = null;
@@ -476,11 +473,11 @@ public class GuiTable extends Observable{
 							public void run() {
 								gameHistoryPanel.redo(board, moveLog);
 								takenPiecesPanel.redo(moveLog);
-								/*
+								
 								if(gameSetup.isAIPlayer(board.getCurrPlayer())) {
 									GuiTable.get().moveMadeUpdate(PlayerType.HUMAN);
 								}
-								*/
+								
 								boardPanel.drawBoard(board);
 								
 							}

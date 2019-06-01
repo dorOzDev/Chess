@@ -56,7 +56,7 @@ public class GameSetup extends JDialog {
 		myJPanel.add(blackHumanButton);
 		
 		myJPanel.add(new JLabel("Search"));
-		this.searchDepthSpinner = addLabeledSpinner(myJPanel, "Difficult", new SpinnerNumberModel(1, 1, 5, 1));
+		this.searchDepthSpinner = addLabeledSpinner(myJPanel, "Difficult", new SpinnerNumberModel(1, 1, 4, 1));
 		
 		final JButton cancleButton = new JButton("Cancel");
 		final JButton okayButton = new JButton("Okay");

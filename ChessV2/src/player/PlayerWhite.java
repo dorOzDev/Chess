@@ -21,17 +21,17 @@ public class PlayerWhite extends Player {
 	
 	@Override
 	public boolean isInCheck() {
-		return board.getInCheckStatusWhitePlayer();
+		return board.getInCheckStatus(PlayerColour.WHITE);
 	}
 	
 	@Override
 	public boolean isInCheckMate() {
-		return hasKingCaptured() || board.isInCheckMateWhitePlayer();
+		return hasKingCaptured() || board.isInCheckMate(PlayerColour.WHITE);
 	}
 	
 	@Override
 	public boolean isInStaleMate() {
-		return board.isInStaleMateWhitePlayer();
+		return board.isInStaleMate(PlayerColour.WHITE);
 	}
 
 	@Override
@@ -55,21 +55,23 @@ public class PlayerWhite extends Player {
 	@Override
 	public Board makeMove(Move move, Board board) {
 		boolean foundLegalMove = false;
-		legalMoves = board.getAllLegalWhiteMoves();
+		legalMoves = board.getAllLegalMoves(PlayerColour.WHITE);
 		int index = 0;
 		for(; index < legalMoves.size() && !foundLegalMove; index++) {
 			foundLegalMove = checkLegalMove(move, legalMoves.get(index));
 			if(foundLegalMove) {
 				board.setLastMove(legalMoves.get(index));
+				board.setCurrentPlayer();
 				return executeMove(legalMoves.get(index), board);
 			}
 		}
-		return null;
+		return board;
 	}
 	
 	
 	private Board executeMove(Move move, Board board) { 
 		moveExecuter = new MoveExecuter(preferdPieceTypePormotion);
+		board.setLastMove(move);
 		return moveExecuter.makeMove(move, board);
 		
 	}
@@ -88,7 +90,7 @@ public class PlayerWhite extends Player {
 
 	@Override
 	public List<Move> getLegalMoves() {
-		return board.getAllLegalWhiteMoves();
+		return board.getAllLegalMoves(PlayerColour.WHITE);
 	}
 	
 	@Override
