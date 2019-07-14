@@ -2,6 +2,7 @@ package gui;
 
 import game.Board;
 import game.Board.BoardBuilder;
+import game.FenFormat;
 import game.GameState;
 import game.Spot;
 import movement.AttackMove;
@@ -20,6 +21,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -28,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +55,7 @@ import ai.MiniMax;
 import ai.MoveStrategy;
 import enaum.MoveType;
 import enaum.PieceType;
+import enaum.PlayerColour;
 import enaum.PlayerType;
 public class GuiTable extends Observable{
 	
@@ -66,12 +70,13 @@ public class GuiTable extends Observable{
 	private Spot sourceSpot;
 	private Spot destSpot;
 	private Piece humanMovedPiece;
-	private Piece potenticalAttackedPiece;
 	private Move lastMove;
 	private MoveFactory moveFactory;
 	private final GameSetup gameSetup;
 	private Move computerMove;
-	private GameState gameState;
+	private Terminal terminal;
+	private FenFormat fenFormat;
+	private static GameState gameState;
 	
 	
 	public static String defaultPieceImagePath = "art/pieces/";
@@ -83,11 +88,12 @@ public class GuiTable extends Observable{
 	private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(800, 800);
 	private final static Dimension BOARD_PANAL_DIM = new Dimension(700, 700);
 	private final static Dimension SPOT_PANEL_DIM = new Dimension(50, 50);
-	private final static Integer PIECE_LAYER = new Integer(3);
-	private final static Integer HIGHLIGHT_LAYER = new Integer(2);
+
 	
 	private final Color lightSpotColor= Color.decode("#FFFACD");
 	private final Color darkSpotColor = Color.decode("#705124");
+	private final Color lastMadeMoveColor = Color.decode("#70Cf7A");
+	private final Color highLightMove = Color.decode("#A0B2B9");
 	
 	private final String darkSpotTilePath = "art/Tile/Black_Tile.png";
 	private final String lightSpotTilePath = "art/Tile/White_Tile.png";
@@ -109,30 +115,46 @@ public class GuiTable extends Observable{
 	
 	private GuiTable() {
 		this.frame = new JFrame("Chess Game");
-		this.board = startNewGame();
-		this.board.setCurrentPlayer();
+		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		startNewBoard();
+		this.terminal = new Terminal(board);
 		this.frame.setLayout(new BorderLayout());
-		menuBar = createTableMenuBar();
-		gameHistoryPanel = new GameHistoryPanel();
-		takenPiecesPanel = new TakenPiecesPanel(board);
-		this.gameState = GameState.get(board);
-		frame.setJMenuBar(menuBar);
-		frame.setSize(OUTER_FRAME_DIMENSION);
-		frame.add(takenPiecesPanel, BorderLayout.WEST);
-		frame.add(gameHistoryPanel, BorderLayout.EAST);	
-		moveLog = new MoveLog();
+		this.menuBar = createTableMenuBar();
+		this.gameHistoryPanel = new GameHistoryPanel();
+		this.takenPiecesPanel = new TakenPiecesPanel(board);
+		this.frame.setJMenuBar(menuBar);
+		this.frame.setSize(OUTER_FRAME_DIMENSION);
+		this.frame.add(takenPiecesPanel, BorderLayout.WEST);
+		this.frame.add(gameHistoryPanel, BorderLayout.EAST);	
+		this.frame.add(terminal, BorderLayout.SOUTH);
+		this.moveLog = new MoveLog();
+		this.gameState = new GameState(board);
 		this.boardPanel = new BoardPanel();
 		addObserver(new TableGameAIWatcher());
-        frame.add(boardPanel, BorderLayout.CENTER);
+		addObserver(terminal);
+        this.frame.add(boardPanel, BorderLayout.CENTER);
 		center(this.frame);
-		frame.setVisible(true);
-		moveFactory = new MoveFactory();
-		gameSetup = new GameSetup(this.frame, true);
+		this.frame.setVisible(true);
+		this.moveFactory = new MoveFactory();
+		this.gameSetup = new GameSetup(this.frame, true);
+		
+		
 	
 	}
 	
-	private Board startNewGame() {
-		return new BoardBuilder(null, null).build();
+	private void startNewBoard() {
+		board = new BoardBuilder(null, null).build();
+		board.getTakenPieces().clear();
+		board.setStartingPlayer();
+	}
+	
+	private void restartGame() {
+		startNewBoard();
+		this.terminal.init();
+		this.moveLog.clear();
+		this.gameHistoryPanel.redo(board, moveLog);
+		this.takenPiecesPanel.redo(moveLog);
+		this.boardPanel.drawBoard(board);		
 	}
 
 	public static GuiTable get() {
@@ -177,8 +199,18 @@ public class GuiTable extends Observable{
 		}
 		private JMenu createFileMenu() {
 			final JMenu fileMenu = new JMenu("File");
+			final JMenuItem startNewGame = new JMenuItem("Start new game");
 			final JMenuItem openPGN = new JMenuItem("Load PGN file");
 			final JMenuItem exitMenuItem = new JMenuItem("Exit");
+			
+			startNewGame.addActionListener(new ActionListener() {		
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					restartGame();					
+				}
+
+			});
+			fileMenu.add(startNewGame);
 			
 			openPGN.addActionListener(new ActionListener() {
 				
@@ -217,6 +249,7 @@ public class GuiTable extends Observable{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					GuiTable.get().getGameSetup().promptUser();
+					GuiTable.get().setupUpdate(GuiTable.get().getGameSetup());
 					
 				}
 			});
@@ -240,19 +273,18 @@ public class GuiTable extends Observable{
 			
 			// TODO consider change this.
 			@Override
-			public void update(final Observable arg0,final Object arg1) {
+			public void update(final Observable arg0, final Object arg1) {
 				// TODO Auto-generated method stub
 				if(GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer()) && !(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) && !(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate())) {
 					final AIThinkTank thinkTank = new AIThinkTank();
-					thinkTank.execute();
-					
+					thinkTank.execute();	
 				}
 				
-				if(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) {
-					System.out.println("Game over current player checked mate" );
+				else if(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) {
+					terminal.checkMate();
 				}
-				if(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate()) {
-					System.out.println("Game over game in statemate" );
+				else if(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate()) {
+					terminal.staleMate();
 				}
 				
 			}
@@ -280,9 +312,9 @@ public class GuiTable extends Observable{
 			return this.boardPanel;
 		}
 		
-		private void moveMadeUpdate(final PlayerType playerType) {
+		private void moveMadeUpdate(final Board board) {
 			setChanged();
-			notifyObservers(playerType);
+			notifyObservers(board);
 			
 		}
 		
@@ -304,15 +336,17 @@ public class GuiTable extends Observable{
 			public void done() {
 				try {
 					final Move bestMove = get();
-					GuiTable.get().updateComputerMove(bestMove);
-					board = GuiTable.get().getBoard().getCurrPlayer().makeMove(bestMove, GuiTable.get().getBoard());
-
-					//GuiTable.get().getBoard().setCurrentPlayer();
+					GuiTable.get().updateComputerMove(bestMove);				
+					if(!GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer())) {						
+						board.setCurrentPlayer();
+					}			
+					final Board destionatioBoard = GuiTable.get().getBoard().getCurrPlayer().makeMove(bestMove, GuiTable.get().getBoard(), true);
+					board = gameState.getUpdatedBoard(destionatioBoard);
 					GuiTable.get().getMoveLog().addMove(bestMove);
 					GuiTable.get().getGameHistoryPanel().redo(GuiTable.get().getBoard(), GuiTable.get().getMoveLog());
 					GuiTable.get().getTakenPiecesPanel().redo(GuiTable.get().getMoveLog());
 					GuiTable.get().getBoardPanel().drawBoard(board);
-					GuiTable.get().moveMadeUpdate(PlayerType.COMPUTER);
+					GuiTable.get().moveMadeUpdate(board);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -336,14 +370,12 @@ public class GuiTable extends Observable{
 					for(int j = 0; j < Board.NUM_COLS; j++) {
 						final SpotPanel spotPanel = new SpotPanel(this, i, j);
 						this.boardSpots.add(spotPanel); 
-						add(spotPanel);
-						
-					}
-					
+						add(spotPanel);				
+					}					
 					setPreferredSize(BOARD_PANAL_DIM);
-					validate();
-					
+					validate();					
 				}
+				drawBoard(board);
 			}
 			
 			public void drawBoard(final Board board) {
@@ -355,6 +387,21 @@ public class GuiTable extends Observable{
 				validate();
 				repaint();
 			}
+			
+			
+			public SpotPanel getSpotPanel(int x, int y) {
+				Iterator<SpotPanel> itr = boardSpots.iterator();
+				SpotPanel tempSpotPanel;
+				while(itr.hasNext()) {
+					tempSpotPanel = itr.next();
+					if(tempSpotPanel.xSpotPos == x && tempSpotPanel.ySpotPos == y) {
+						return tempSpotPanel;
+					}
+					
+				}
+				return null;
+			}
+			
 			
 		}
 		
@@ -392,7 +439,7 @@ public class GuiTable extends Observable{
 			
 		}
 		
-		private  class SpotPanel extends JPanel{
+		private  class SpotPanel extends JPanel {
 			private final int xSpotPos;
 			private final int ySpotPos;
 			
@@ -402,9 +449,9 @@ public class GuiTable extends Observable{
 				super(new GridBagLayout());
 				this.xSpotPos= xSpotPos;
 				this.ySpotPos = ySpotPos;
-				setPreferredSize(SPOT_PANEL_DIM);
-				assignSpotColor();
+				setPreferredSize(SPOT_PANEL_DIM);		
 				assignPiecePanel(board);
+				assignSpotColor();
 				addMouseListener(new MouseListener() {
 					
 					@Override
@@ -435,8 +482,9 @@ public class GuiTable extends Observable{
 					public void mouseClicked(final MouseEvent event) {
 						Move move;
 						//Left click to make a move.
-						//if(!GuiTable.get().getGameSetup().isAIPlayer(board.getCurrPlayer()));
+						//if(!GuiTable.get().getGameSetup().isAIPlayer(board.getCurrPlayer())) 
 						if(SwingUtilities.isLeftMouseButton(event)) {
+							
 							if(sourceSpot == null) {
 								sourceSpot = board.getSpot(xSpotPos, ySpotPos);
 								humanMovedPiece = sourceSpot.getPiece();
@@ -446,10 +494,13 @@ public class GuiTable extends Observable{
 								
 								destSpot = board.getSpot(xSpotPos, ySpotPos);
 								move = moveFactory.createMove(sourceSpot, destSpot, humanMovedPiece, MoveType.UNKNOWN, null, board);
-								final Board destinationBoard = board.getCurrPlayer().makeMove(move, board);								 
+								final Board destinationBoard = board.getCurrPlayer().makeMove(move, board, true);								 
 								 if(destinationBoard != board){			
 										board = gameState.getUpdatedBoard(destinationBoard);
-										moveLog.addMove(move);			
+										moveLog.addMove(move);
+										if(!gameSetup.isAIPlayer(board.getCurrPlayer())){
+											GuiTable.get().moveMadeUpdate(board);
+										}
 									}
 									sourceSpot =  null;
 									destSpot = null;
@@ -471,20 +522,23 @@ public class GuiTable extends Observable{
 							
 							@Override
 							public void run() {
+								
 								gameHistoryPanel.redo(board, moveLog);
 								takenPiecesPanel.redo(moveLog);
 								
 								if(gameSetup.isAIPlayer(board.getCurrPlayer())) {
-									GuiTable.get().moveMadeUpdate(PlayerType.HUMAN);
+									
+									GuiTable.get().moveMadeUpdate(board);
+									
 								}
-								
 								boardPanel.drawBoard(board);
-								
+															
 							}
 						});
 						
+						
 					//}
-				}});
+						}});
 				
 
 				validate();
@@ -492,60 +546,40 @@ public class GuiTable extends Observable{
 			
 			
 			private void highlightLegalMoves(Board board) {
-			
 				if(highLightLegalMoves) {
-					
 					for(final Move move : pieceLegalMoves(board)) {
+						boardPanel.getSpotPanel(move.getDestSpot().getX(), move.getDestSpot().getY()).setBackground(highLightMove);
 						
-						if(move.getDestSpot().getX() == xSpotPos && move.getDestSpot().getY() == ySpotPos) {
-							if(!move.isAttackMove()) {
-							try {
-								final BufferedImage image = ImageIO.read(new File(defaultHighlightImagePath));
-								final ImageIcon imageIcon = new ImageIcon(image);
-								final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() , imageIcon.getIconWidth() , Image.SCALE_SMOOTH)));
-	
-								add(imageLabel);
-								
-							}
-							catch(Exception e) {
-								e.printStackTrace();
-							 	}
-							}
-							else {
-								try {
-									final BufferedImage image = ImageIO.read(new File(defaultHighlightAttackImagePath));
-									final ImageIcon imageIcon = new ImageIcon(image);
-									final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() , imageIcon.getIconWidth(), Image.SCALE_SMOOTH)));
-									add(imageLabel);
-								}
-								catch(Exception e) {
-									e.printStackTrace();
-								 	}
-							}
-						}
 					}
 				}
 			}
 		
 		
 			private  ArrayList<Move> pieceLegalMoves(Board board){
+				List<Move> legalPlayerMoves = new ArrayList<Move>();
+				ArrayList<Move> legalPieceMove = new ArrayList<Move>();
+				if(humanMovedPiece == null || humanMovedPiece.getPlayerCoulor() != board.getCurrPlayer().getPlayerColour()) {
+					return legalPieceMove;
+					}
 				
-				ArrayList<Move> legalMoves = new ArrayList<Move>();
+
 				
-				if(humanMovedPiece != null && humanMovedPiece.getPlayerCoulor() == board.getCurrPlayer().getPlayerColour()) {
-					legalMoves.addAll((Collection<? extends Move>) humanMovedPiece.getLegalMovements(board));
-					if(humanMovedPiece.getPieceType() == PieceType.KING) {
-						legalMoves.addAll(humanMovedPiece.getCastleMovements(board));
+				legalPlayerMoves = board.getAllLegalMoves(board.getCurrentPlayerColour());
+				for(Move move : legalPlayerMoves) {
+					if(move.getPiece().getPieceType() == humanMovedPiece.getPieceType() && move.getSourceSpot().getX() == humanMovedPiece.getX() && move.getSourceSpot().getY() == humanMovedPiece.getY()) {
+						legalPieceMove.add(move);
 					}
 				}
+	
 				
-				return legalMoves;
+				return legalPieceMove;
 			}
 			
-			public void drawSpot(final Board board) {
-				assignSpotColor();
+			private void drawSpot(final Board board) {
 				assignPiecePanel(board);
+				assignSpotColor();
 				highlightLegalMoves(board);
+				
 				validate();
 				repaint();
 			}
@@ -556,8 +590,8 @@ public class GuiTable extends Observable{
 					try {
 						Piece drawPiece = board.getSpot(xSpotPos, ySpotPos).getPiece();
 						final BufferedImage image = ImageIO.read(new File(defaultPieceImagePath  + drawPiece.getPlayerCoulor().toString().substring(0, 1) + drawPiece.getPieceType().toString() + ".png"));
-						final JLabel imageLabel =new JLabel(new ImageIcon(image));		
-						add(imageLabel);
+						final JLabel imageLabel = new JLabel(new ImageIcon(image));		
+						this.add(imageLabel);
 												
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -580,8 +614,21 @@ public class GuiTable extends Observable{
 				}
 			}
 			
-		}
+			private void hightLightLastMove() {
+				Move lastMove = board.getLastMove();
+				if(lastMove != null) {
+					SpotPanel sourceSpotPanel = boardPanel.getSpotPanel(lastMove.getSourceSpot().getX(), lastMove.getSourceSpot().getY());
+					SpotPanel destSpotPanel = boardPanel.getSpotPanel(lastMove.getDestSpot().getX(), lastMove.getDestSpot().getY());
+					sourceSpotPanel.setBackground(lastMadeMoveColor);
+					destSpotPanel.setBackground(lastMadeMoveColor);
+				}
+				
+				
+			}
+	
 
+			
+		}
 
 		
 		

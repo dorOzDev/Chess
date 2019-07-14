@@ -80,6 +80,8 @@ public abstract class  Piece  {
 	
 	public abstract void setCandidateMovements(final Board board);
 	
+
+	
 	protected void movement(Board board) {
 		candidateMovements.clear();
 		legalMovements.clear();

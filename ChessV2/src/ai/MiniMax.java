@@ -10,6 +10,10 @@ import movement.CommandMove.MoveExecuter;
 public class MiniMax implements MoveStrategy {
 
 
+	/***********
+	 * Mini Max algorithm implemented with alpha beta pruning
+	 * 
+	************/
 	
 	private final BoardEvaluator boardEvaluator;
 	
@@ -22,33 +26,28 @@ public class MiniMax implements MoveStrategy {
 	public Move execute(Board board) {
 		final long startTime = System.currentTimeMillis();	
 		Move bestMove = null;
-		int highestSeenValue = Integer.MIN_VALUE;
-		int lowestSeenValue = Integer.MAX_VALUE;
+		int beta = Integer.MAX_VALUE;
+		int alpha = Integer.MIN_VALUE;
 		int currentValue;
 
-		System.out.println(board.getCurrPlayer() + "Thinking with depth = " + depth);
+		System.out.println(board.getCurrPlayer() + "Thinking with depth = " + depth);		
 		
-		//int numMoves = board.getCurrPlayer().getLegalMoves().size();
-		
-		for(final Move move : board.getCurrPlayer().getLegalMoves()) {
+		//int numMoves = board.getCurrPlayer().getLegalMoves().size();	
+		for(final Move move : board.getAllLegalMoves(board.getCurrentPlayerColour())) {
 			
-			 final Board newBoard = board.getCurrPlayer().makeMove(move, board);	
-				 currentValue = board.getCurrPlayer().isWhite() ? min(newBoard, this.depth - 1) : max(newBoard, this.depth - 1);
-				 if(board.getCurrPlayer().isWhite() && currentValue >= highestSeenValue){
-						highestSeenValue = currentValue;
+			 final Board newBoard = board.getCurrPlayer().makeMove(move, board, false);	
+				 currentValue = board.getCurrPlayer().isWhite() ? min(newBoard, this.depth - 1, alpha, beta) : max(newBoard, this.depth - 1, alpha ,beta);
+				 if(board.getCurrPlayer().isWhite() && currentValue > alpha){
+					 	alpha = currentValue;
 						bestMove = move;
 						
 					}
-				 else if(board.getCurrPlayer().isBlack() && currentValue <= lowestSeenValue){
-					   lowestSeenValue = currentValue;
+				 else if(board.getCurrPlayer().isBlack() && currentValue < beta){
+					 	beta = currentValue;
 						bestMove = move;
-					}
-				 
-				 if(board.getCurrentPlayerColour() != PlayerColour.BLACK) {
-					 board.setCurrentPlayer();
-				 }
+					}			 
+
 			}
-		
 
 		return bestMove;
 		
@@ -60,18 +59,20 @@ public class MiniMax implements MoveStrategy {
 		return "MiniMax";
 	}
 	
-	public int min(final Board board, final int depth) {
+	public int min(final Board board, final int depth, int alpha, int beta) {
+
 		if(depth == 0  || isEndGame(board)) {
 			return this.boardEvaluator.eveluate(board, depth);
 		}
 		
-		int lowestSeenValue = Integer.MAX_VALUE;
+		int lowestSeenValue = beta;
 		
-		for(final Move move : board.getCurrPlayer().getLegalMoves()){
-			 final Board newBoard = board.getCurrPlayer().makeMove(move, board);
-			 final int currentValue = max(newBoard, depth - 1);
-			 if(currentValue <= lowestSeenValue) {
-				lowestSeenValue = currentValue;
+		for(final Move move : board.getAllLegalMoves(board.getCurrentPlayerColour())){
+			 final Board newBoard = board.getCurrPlayer().makeMove(move, board, false);
+			 final int currentValue = max(newBoard, depth - 1, alpha, beta);
+			 lowestSeenValue = Math.min(lowestSeenValue, currentValue);
+			 if(lowestSeenValue <= alpha) {
+				break;
 			 }
 			
 			}
@@ -80,16 +81,18 @@ public class MiniMax implements MoveStrategy {
 	}
 	
 	
-	public int max(Board board, final int depth) {
+	public int max(Board board, final int depth, int alpha, int beta) {
+
 		if(depth == 0  || isEndGame(board)) {
 			return this.boardEvaluator.eveluate(board, depth);
 		}
-		int highestSeenValue = Integer.MIN_VALUE;
-		for(final Move move : board.getCurrPlayer().getLegalMoves()){
-			final Board newBoard = board.getCurrPlayer().makeMove(move, board);
-			final int currentValue = min(newBoard, depth - 1);
-			if(currentValue >= highestSeenValue) {
-				highestSeenValue = currentValue;
+		int highestSeenValue = alpha;
+		for(final Move move : board.getAllLegalMoves(board.getCurrentPlayerColour())){
+			final Board newBoard = board.getCurrPlayer().makeMove(move, board, false);
+			final int currentValue = min(newBoard, depth - 1, alpha, beta);
+			highestSeenValue = Math.max(highestSeenValue, currentValue);
+			if(beta <= highestSeenValue) {
+				break;
 			}
 			
 		}

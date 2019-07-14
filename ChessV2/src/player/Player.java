@@ -28,8 +28,7 @@ public abstract class Player {
 	protected MoveExecuter moveExecuter;
 	protected PieceType preferdPieceTypePormotion;
 	
-	public Player(ArrayList<Piece> remainingPieces, Board board, PlayerColour playerColor){
-		this.remainingPieces = new ArrayList <Piece>();		
+	public Player(ArrayList<Piece> remainingPieces, Board board, PlayerColour playerColor){	
 		this.legalMoves = new ArrayList<Move>();
 		this.legalOpponentMoves = new ArrayList<Move>();
 		this.remainingPieces = remainingPieces;
@@ -58,7 +57,7 @@ public abstract class Player {
 
 	public abstract List<Move> getLegalMoves();
 	
-	public  abstract Board makeMove(Move move, Board board);
+	public  abstract Board makeMove(Move move, Board board, boolean updateTakenList);
 		
 	protected boolean checkLegalMove(final Move potentialMove, final Move legalMove) {
 		// Check if clicked piece belongs to the current active player.

@@ -60,19 +60,6 @@ public class TakenPiecesPanel extends JPanel {
 		List<Piece> takenPieces = new ArrayList<>();
 		takenPieces = board.getTakenPieces();
 	
-		//TODO finish this
-		/*
-		for(final Move move :moveLog.getMoves()) {
-			if(move.isAttackMove()) {
-				final Piece takenPiece = move.getAttackedPiece();
-				if(takenPiece.playerCoulor == PlayerColour.WHITE)
-					whiteTakenPieces.add(takenPiece);
-				else
-					blackTakenPieces.add(takenPiece);
-			}
-		}
-		*/
-		
 		for(final Piece piece : takenPieces) {
 			if(piece.getPlayerCoulor() == PlayerColour.WHITE) {
 				whiteTakenPieces.add(piece);
@@ -82,24 +69,12 @@ public class TakenPiecesPanel extends JPanel {
 			}
 		}
 		
-		//TODO add this, sort the taken piece panel so the stronger taken piece will have greated value.
-		/*
-		Collections.sort(whiteTakenPieces, new Comparator<Piece>() {
-
-			@Override
-			public int compare(Piece o1, Piece o2) {
-				
-				return ;
-			}
-			
-		});
-		*/
 		
 		for(final Piece takenPiece : whiteTakenPieces) {
 			try {
 			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
 			final ImageIcon imageIcon = new ImageIcon(image);
-			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() , imageIcon.getIconWidth() , Image.SCALE_SMOOTH)));
+			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 10 , imageIcon.getIconWidth() - 10 , Image.SCALE_SMOOTH)));
 			this.southPanel.add(imageLabel);
 		} 
 			catch(final IOException e){
@@ -111,7 +86,7 @@ public class TakenPiecesPanel extends JPanel {
 			try {		
 			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
 			final ImageIcon imageIcon = new ImageIcon(image);
-			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() , imageIcon.getIconWidth() , Image.SCALE_SMOOTH)));
+			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 10 , imageIcon.getIconWidth() - 10 , Image.SCALE_SMOOTH)));
 			this.northPanel.add(imageLabel);
 		} 
 			catch(final IOException e){

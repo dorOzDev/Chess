@@ -25,7 +25,7 @@ public class GameState {
 	*/
 	
 	
-	private GameState(Board board){
+	public GameState(Board board){
 		this.sourceBoard = board;
 		
 	}
@@ -38,7 +38,6 @@ public class GameState {
 	}
 	
 
-	
 	public Board getUpdatedBoard(Board newBoard) {
 		
 		this.sourceBoard = new BoardBuilder(newBoard.getPiecesBlack(), newBoard.getPiecesWhite()).build();

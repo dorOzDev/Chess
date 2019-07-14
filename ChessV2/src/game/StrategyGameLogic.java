@@ -9,6 +9,7 @@ import enaum.PieceType;
 import enaum.PlayerColour;
 import game.Board.BoardBuilder;
 import movement.Move;
+import pieces.King;
 import pieces.Piece;
 import pieces.PieceFactory;
 import pieces.Queen;
@@ -24,8 +25,8 @@ public interface StrategyGameLogic {
 	public boolean isCastleAllowed(Move move);
 	public boolean getInCheckMateStatus();
 	public boolean getInStaleMate();
-	
-
+	public boolean getKingSideCastleCapeable();
+	public boolean getQueenSideCastleCapeable();
 	
 	/*
 	 * Operations for black player. 
@@ -35,8 +36,6 @@ public interface StrategyGameLogic {
 		Board board;
 		
 		BoardBuilder boardBuilder;
-		ArrayList<Piece> blackPlayerPieces;
-		ArrayList<Piece> whitePlayerPieces;
 		List<Move> blackPlayerLegalMoves;
 		List<Move> whitePlayerLegalMoves;
 		PieceFactory pieceFactory;
@@ -46,19 +45,15 @@ public interface StrategyGameLogic {
 		
 		public OperationBlackPlayer(Board board) {
 			this.board = board;
-			blackPlayerPieces = new ArrayList<Piece>();
-			whitePlayerPieces = new ArrayList<Piece>();
 			blackPlayerLegalMoves = new ArrayList<Move>();
 			whitePlayerLegalMoves = new ArrayList<Move>();
 			pieceFactory = new PieceFactory();
 			
-			whitePlayerPieces = board.getPiecesWhite();
-			blackPlayerPieces = board.getPiecesBlack();
 		}
 	
 		private void calcLegalMoves() {
 			blackPlayerLegalMoves.clear();
-			for(Piece piece : blackPlayerPieces) {
+			for(Piece piece : board.getPiecesBlack()) {
 				blackPlayerLegalMoves.addAll(piece.getLegalMovements(board));
 				if(piece.getPieceType() == PieceType.KING) {
 					blackPlayerLegalMoves.addAll(piece.getCastleMovements(board));
@@ -79,8 +74,8 @@ public interface StrategyGameLogic {
 		
 		private boolean simulateAndTestMove(Move move) {
 			boolean isLegalMove;
-			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
-			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
+			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(board.getPiecesWhite());
+			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(board.getPiecesBlack());
 			if(move.isCastleMove()) {
 				return simulateAndTestCastleMove(move);
 			}
@@ -114,6 +109,7 @@ public interface StrategyGameLogic {
 			if(blackKing == null) {
 				return true;
 			}
+		
 			calcLegalOppenentMoves(board);
 			for(Move move : whitePlayerLegalMoves) {
 				if(move.getDestSpot().getX() == blackKing.getX() && move.getDestSpot().getY() == blackKing.getY()) {
@@ -145,7 +141,7 @@ public interface StrategyGameLogic {
 		//Simulate and test castle movements.	
 		private boolean simulateAndTestCastleMove(Move move) {
 			boolean isCastleAllowed;
-			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
+			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(board.getPiecesBlack());
 			Iterator<Piece> itr = blackPlayerPiecesClonedList.iterator();
 			
 			while(itr.hasNext()) {
@@ -158,11 +154,14 @@ public interface StrategyGameLogic {
 					tempPiece.setPiecePos(move.getRookDestSpot());
 				}
 			}		
-			isCastleAllowed = getInCheckStatus(new BoardBuilder(blackPlayerPiecesClonedList, whitePlayerPieces).build());		
+			isCastleAllowed = getInCheckStatus(new BoardBuilder(blackPlayerPiecesClonedList, board.getPiecesWhite()).build());		
 			return isCastleAllowed;
 		}
 		
 		private boolean checkEquality(Piece comparePiece, Piece comparePiece2) {
+			if(comparePiece == null || comparePiece2 == null) {
+				return false;
+			}
 			return comparePiece.getX() == comparePiece2.getX() && comparePiece.getY() == comparePiece2.getY() && comparePiece.getPieceType() == comparePiece2.getPieceType();
 		}
 
@@ -188,6 +187,38 @@ public interface StrategyGameLogic {
 			}
 			return false;
 		}
+
+		@Override
+		public boolean getKingSideCastleCapeable() {
+			if(getInCheckStatus(board)) {
+				return false;
+			}
+			return checkCastleCapeabilityBlack(board.getPiece(0, 4), board.getPiece(0, 7));
+		}
+
+		@Override
+		public boolean getQueenSideCastleCapeable() {
+			if(getInCheckStatus(board)) {
+				return false;
+			}
+			return checkCastleCapeabilityBlack(board.getPiece(0, 4), board.getPiece(0, 0));
+		}
+
+	
+		private boolean checkCastleCapeabilityBlack(Piece potentialKing, Piece potentialRook) {
+			if(potentialKing == null || potentialRook == null) {
+				return false;
+			}
+			if(potentialKing.getPieceType() != PieceType.KING || potentialRook.getPieceType() != PieceType.ROOK) {
+				return false;
+			}
+			if(!potentialKing.isFirstMove() || !potentialRook.isFirstMove()) {
+				return false;
+			}
+			return true;
+		}
+		
+			
 	
 	}
 	
@@ -202,8 +233,6 @@ public interface StrategyGameLogic {
 	public class OperationWhitePlayer implements StrategyGameLogic{
 		
 		Board board;
-		ArrayList<Piece> blackPlayerPieces;
-		ArrayList<Piece> whitePlayerPieces;
 		List<Move> blackPlayerLegalMoves;
 		List<Move> whitePlayerLegalMoves;
 		PieceFactory pieceFactory;
@@ -214,21 +243,17 @@ public interface StrategyGameLogic {
 		
 		public OperationWhitePlayer(Board board) {
 			this.board = board;
-			blackPlayerPieces = new ArrayList<Piece>();
-			whitePlayerPieces = new ArrayList<Piece>();
 			blackPlayerLegalMoves = new ArrayList<Move>();
 			whitePlayerLegalMoves = new ArrayList<Move>();
 			pieceFactory = new PieceFactory();
-			
-			whitePlayerPieces = board.getPiecesWhite();
-			blackPlayerPieces = board.getPiecesBlack();
+
 		}
 		
 		
 		
 		private void calcLegalMoves() {
 			whitePlayerLegalMoves.clear();
-			for(Piece piece : whitePlayerPieces) {
+			for(Piece piece : board.getPiecesWhite()) {
 				whitePlayerLegalMoves.addAll(piece.getLegalMovements(board));
 				if(piece.getPieceType() == PieceType.KING) {
 					whitePlayerLegalMoves.addAll(piece.getCastleMovements(board));
@@ -247,8 +272,8 @@ public interface StrategyGameLogic {
 		
 		private boolean simulateAndTestMove(Move move) {
 			boolean isLegalMove;
-			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
-			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(blackPlayerPieces);
+			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(board.getPiecesWhite());
+			blackPlayerPiecesClonedList = pieceFactory.createImmutableArrayList(board.getPiecesBlack());
 			if(move.isCastleMove()) {
 				return simulateAndTestCastleMove(move);
 			}
@@ -277,6 +302,9 @@ public interface StrategyGameLogic {
 		}
 		
 		private boolean checkEquality(Piece comparePiece, Piece comparePiece2) {
+			if(comparePiece == null || comparePiece2 == null) {
+				return false;
+			}
 			return comparePiece.getX() == comparePiece2.getX() && comparePiece.getY() == comparePiece2.getY() && comparePiece.getPieceType() == comparePiece2.getPieceType();
 		}
 
@@ -318,7 +346,7 @@ public interface StrategyGameLogic {
 		//Simulate and test castle movements.	
 		private boolean simulateAndTestCastleMove(Move move) {
 			boolean isCastleAllowed;
-			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(whitePlayerPieces);
+			whitePlayerPiecesClonedList = pieceFactory.createImmutableArrayList(board.getPiecesWhite());
 			Iterator<Piece> itr = whitePlayerPiecesClonedList.iterator();
 			
 			while(itr.hasNext()) {
@@ -331,7 +359,7 @@ public interface StrategyGameLogic {
 					tempPiece.setPiecePos(move.getRookDestSpot());
 				}
 			}		
-			isCastleAllowed = getInCheckStatus(new BoardBuilder(blackPlayerPieces, whitePlayerPiecesClonedList).build());		
+			isCastleAllowed = getInCheckStatus(new BoardBuilder(board.getPiecesBlack(), whitePlayerPiecesClonedList).build());		
 			return isCastleAllowed;
 		}
 
@@ -359,6 +387,36 @@ public interface StrategyGameLogic {
 				return true;
 			}
 			return false;
+		}
+
+		@Override
+		public boolean getKingSideCastleCapeable() {
+			if(getInCheckStatus(board)) {
+				return false;
+			}
+			return checkCastleCapeabilityWhite(board.getPiece(7, 4), board.getPiece(7, 7));
+		}
+
+		@Override
+		public boolean getQueenSideCastleCapeable() {
+			if(getInCheckStatus(board)) {
+				return false;
+			}
+			return checkCastleCapeabilityWhite(board.getPiece(7, 4), board.getPiece(7, 0));
+		}
+		
+		private boolean checkCastleCapeabilityWhite(Piece potentialKing, Piece potetianlRook) {
+			System.out.println(potetianlRook);
+			if(potentialKing == null || potetianlRook == null) {
+				return false;
+			}
+			if(potentialKing.getPieceType() != PieceType.KING || potetianlRook.getPieceType() != PieceType.ROOK) {
+				return false;
+			}
+			if(!potentialKing.isFirstMove() || !potetianlRook.isFirstMove()) {
+				return false;
+			}
+			return true;
 		}
 
 	}	
@@ -401,7 +459,14 @@ public interface StrategyGameLogic {
 		public boolean getInStaleMateStatus() {
 			return strategy.getInStaleMate();
 		}
-
+		
+		public boolean getKingSideCastleCapeable() {
+			return strategy.getKingSideCastleCapeable();
+		}
+		
+		public boolean getQueenSideCastleCapeable() {
+			return strategy.getKingSideCastleCapeable();
+		}
 		
 	}
 

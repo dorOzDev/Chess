@@ -26,12 +26,13 @@ public  class Board {
 	private static final int BISHOP_SIZE = 2;
 	private static final int KNIGHT_SIZE = 2;
 	private static final int ROOK_SIZE = 2;
-	private static final int OFFSET_CLEAN_ROW_COUNT = 8; 
+	static final int OFFSET_CLEAN_ROW_COUNT = 8; 
 	private final Spot[][] boardSpots;
 	private final ArrayList<Piece> blackPlayerPieces;
 	private final  ArrayList<Piece> whitePlayerPieces;
 	private static ArrayList<Piece> takenPieces = new ArrayList<Piece>();
 	private static Move lastMove = null;
+
 	private ArrayList<Move> legalMovesWhite;
 	private ArrayList<Move> legalMovesBlack;
 	
@@ -39,13 +40,12 @@ public  class Board {
 	private  PlayerWhite playerWhite;
 	private static Player currPlayer;
 	private ContextGameLogic contextGameLogic;
-	//private PieceFactory pieceFactory;
 	
 	
 
 	/*******************
-	 * Creating the board using singleton design pattern. 
-	 *  The board class in responsible for the current state of the board, keeps track of remaining pieces on board, which player's turn is  and so on.
+	 * This is the Board class, it is keeping the current state of the board, e.g pieces positions, active remaining piece etc.
+	 * Building this board using Builder pattern(a nested class you may find at the bottom in here).
 	 *******************/
 	
 	public Board(BoardBuilder boardBuilder) {
@@ -61,7 +61,14 @@ public  class Board {
 	public void updateTakenPieceList(Piece piece) {
 		takenPieces.add(piece);
 		
+	}
+	
+	public boolean getEnPassantTargetAvailability() {
+		if(lastMove == null) {
+			return false;
+		}
 		
+		return lastMove.isPawnJumpMove();
 	}
 	
 	public void setLastMove(Move move) {
@@ -72,7 +79,25 @@ public  class Board {
 		return lastMove;
 	}
 	
-
+	public boolean getKingSideCastleCapeableBlack() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.BLACK, this);
+		return contextGameLogic.getKingSideCastleCapeable();
+	}
+	
+	public boolean getQueenSideCastleCapeableBlack() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.BLACK, this);
+		return contextGameLogic.getQueenSideCastleCapeable();
+	}
+	
+	public boolean getKingSideCastleCapeableWhite() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.WHITE, this);
+		return contextGameLogic.getKingSideCastleCapeable();
+	}
+	
+	public boolean getQueenSideCastleCapeableWhite() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.WHITE, this);
+		return contextGameLogic.getQueenSideCastleCapeable();
+	}
 	
 	public PlayerColour getCurrentPlayerColour() {
 		if(currPlayer.getPlayerColour() == PlayerColour.BLACK) {
@@ -93,32 +118,13 @@ public  class Board {
 		
 	}
 	
-	
-	
-	public void updatePiecePositionOnBoard() {
-		for(int i = 0; i < NUM_ROWS; i++) {
-			for(int j = 0; j < NUM_COLS; j++) {
-				getSpot(i, j).setPieceOnSpot(null);
-			}
-		}
+	public void setStartingPlayer() {
+		this.currPlayer = playerWhite;
 		
-		for(Piece piece : blackPlayerPieces) {
-			getSpot(piece.getX(), piece.getY()).setPieceOnSpot(piece);
-		}
-		
-		for(Piece piece : whitePlayerPieces) {
-			getSpot(piece.getX(), piece.getY()).setPieceOnSpot(piece);
-		}
-	}
-	
-	public void setCurrentPlayer() {
-		// Letting white player play first.
-		if(currPlayer == null) {
-			currPlayer = playerWhite;
-		}		
-		else {	
+	}	
+
+	public void setCurrentPlayer() {	
 			currPlayer = ((currPlayer.getPlayerColour() == PlayerColour.WHITE) ? playerBlack : playerWhite);
-		}
 		
 	}
 	
@@ -159,7 +165,7 @@ public  class Board {
 				
 	}
 	
-	public boolean getInCheckStatus(PlayerColour playerColour) {
+	public boolean isInCheck(PlayerColour playerColour) {
 		contextGameLogic = new ContextGameLogic(playerColour, this);
 		return contextGameLogic.getInCheckStatus();
 	}
@@ -198,6 +204,9 @@ public  class Board {
 	
 	
 	
+	/**
+	 * This is the board builder, sole purpose building board based on requests.
+	 * */
 	public static class BoardBuilder {
 
 
@@ -300,7 +309,11 @@ public  class Board {
 			return new Board(this);
 		}
 	
-	}	
+	}
+
+
+
+
 }
 
 

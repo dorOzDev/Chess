@@ -63,7 +63,7 @@ public class King extends Piece {
 	//1)both rook and king has not made any move yet.
 	//2)No pieces between king and the rook.
 	//3)"One may not castle out of, through, or into check."
-	private boolean isCastleKingSideAllowed(Move move, Board board) {
+	public boolean isCastleKingSideAllowed(Move move, Board board) {
 		//Check for king first move
 		if(!this.isFirstMove()) {
 			return false;
@@ -91,7 +91,7 @@ public class King extends Piece {
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
 			
 			// If king is in chess, castling is not allowed.
-			if(board.getInCheckStatus(PlayerColour.WHITE)) 
+			if(board.isInCheck(PlayerColour.WHITE)) 
 				return false;
 			// Checking if king lands on chess spot by the end of the rook, if true castle is not allowed.
 			if(board.isCastleAllowed(move, PlayerColour.WHITE)) {
@@ -101,7 +101,7 @@ public class King extends Piece {
 					
 		}
 		else if(this.getPlayerCoulor() == PlayerColour.BLACK) {
-			if(board.getInCheckStatus(PlayerColour.BLACK)) {
+			if(board.isInCheck(PlayerColour.BLACK)) {
 				return false;
 			}
 			if(board.isCastleAllowed(move, PlayerColour.BLACK)) {
@@ -119,7 +119,7 @@ public class King extends Piece {
 	//1)both rook and king has not made any move yet.
 	//2)No pieces between king and the rook.
 	//3)"One may not castle out of, through, or into check."
-	private boolean isCastleQueenSideAllowed(Move move, Board board) {
+	public boolean isCastleQueenSideAllowed(Move move, Board board) {
 		//Check for king first move
 		if(!this.isFirstMove()) {
 			return false;
@@ -146,7 +146,7 @@ public class King extends Piece {
 		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
 			
 			// If king is in chess, castling is not allowed.
-			if(board.getInCheckStatus(PlayerColour.WHITE)) 
+			if(board.isInCheck(PlayerColour.WHITE)) 
 				return false;
 			// Checking if king lands on chess spot by the end of the rook, if true castle is not allowed.
 			if(board.isCastleAllowed(move, PlayerColour.WHITE)) {
@@ -156,7 +156,7 @@ public class King extends Piece {
 					
 		}
 		else if(this.getPlayerCoulor() == PlayerColour.BLACK) {
-			if(board.getInCheckStatus(PlayerColour.BLACK)) {
+			if(board.isInCheck(PlayerColour.BLACK)) {
 				return false;
 			}
 			if(board.isCastleAllowed(move, PlayerColour.BLACK)) {

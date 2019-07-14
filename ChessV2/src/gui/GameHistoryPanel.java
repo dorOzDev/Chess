@@ -54,34 +54,32 @@ public class GameHistoryPanel extends JPanel {
 			final Move lastMove = moveLog.getMoves().get(moveLog.size() - 1);
 			final String moveText = lastMove.toString();
 			
-			//**Optional** Add a + sign to the move log when the last move that was made puts the other player in chess.
-			//TODO make the magics work.
 			/*
-			if(lastMove.getPiece().getPieceType() == PlayerColour.WHITE) {
+			if(lastMove.getPiece().getPlayerCoulor() == PlayerColour.WHITE) {
 				this.model.setValueAt(moveText + calcCheckAndCheckMate(board), currRow , 0);
 			}
-			else if(lastMove.getPiece().getPieceType() == PlayerColour.BLACK){
+			else if(lastMove.getPiece().getPlayerCoulor() == PlayerColour.BLACK){
 				this.model.setValueAt(moveText + calcCheckAndCheckMate(board), currRow - 1, 1);
 			}
 			*/
+			
 		}
 		
 		final JScrollBar vertical = scrollPane.getVerticalScrollBar();
 		vertical.setValue(vertical.getMaximum());
 	}
 	
-	//TODO check if magic works.
-	/*
+
 	private String calcCheckAndCheckMate(Board board) {
-		if(board.getCurrPlayer().isInCheckMate()) {
+		if(board.isInCheckMate(board.getCurrentPlayerColour())) {
 			return "#";
 		}
-		if(board.getCurrPlayer().isInCheck()) {
+		if(board.isInCheck(board.getCurrentPlayerColour())) {
 			return "+";
 		}
 		return "";
 	}
-	*/
+	
 	
 	private static class DataModel extends DefaultTableModel {
 		private final List<Row> values;

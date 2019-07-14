@@ -37,6 +37,7 @@ public class Rook extends Piece {
 	public boolean isPawnPromotionMove(int rowDestinaition) {
 		return false;
 	}
-	
+
+
 	
 }

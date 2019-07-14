@@ -32,6 +32,7 @@ public  class Bishop extends Piece {
 	public boolean isPawnPromotionMove(int rowDestinaition) {
 		return false;
 	}
+
 	
 	
 

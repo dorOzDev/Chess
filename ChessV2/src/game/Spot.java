@@ -73,7 +73,8 @@ public class Spot {
 	}
 	@Override
 	public String toString() {
-		return "Spot = [x=" + x + ", y=" + y + "]   Piece = "  + piece;
+		char intToAlgebric =(char) (this.y + 'a'); // Cast row number to letter
+		return intToAlgebric + Integer.toString(Math.abs(this.x - Board.OFFSET_CLEAN_ROW_COUNT)) ;
 	}
 	
 	

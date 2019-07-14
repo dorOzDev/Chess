@@ -18,7 +18,10 @@ import pieces.PieceFactory;
  */
 public interface CommandMove {
 	
-	public Board doMove();
+	public Board doMove(boolean updateTakenList);
+	
+	
+	
 	
 
 	/*
@@ -45,7 +48,7 @@ public interface CommandMove {
 		
 		//@SuppressWarnings("unchecked")
 		@Override
-		public Board doMove() {								
+		public Board doMove(boolean updateTakenList) {								
 			//TODO need to provide the client with option to promote the pawn to any other piece type(Queen is default right now).
 			Iterator <Piece> itr;
 			Piece tempPiece = null;
@@ -65,9 +68,15 @@ public interface CommandMove {
 			}
 			tempPiece.makeFirstMove();
 			if(move.getPiece().isPawnPromotionMove(move.getDestSpot().getX())) {
+				
 				promotedPiece = pieceFactory.createPiece(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, move.getDestSpot(), move.getPiece().isFirstMove());
 				itr.remove();
-				((ArrayList<Piece>) itr).add(promotedPiece);
+				if(tempPiece.getPlayerCoulor() == PlayerColour.WHITE) {
+					playerWhitePieces.add(promotedPiece);
+				}
+				else {
+					playerBlackPieces.add(promotedPiece);
+				}
 			}
 			else {
 				tempPiece.setPiecePos(move.getDestSpot());	
@@ -114,7 +123,7 @@ public interface CommandMove {
 		}
 
 		@Override
-		public Board doMove() {
+		public Board doMove(boolean updateTakenList) {
 			Iterator <Piece>attackingPieceItr;
 			Iterator <Piece>attackedPieceItr;
 			Piece tempAttakcingPiece = null;
@@ -139,7 +148,9 @@ public interface CommandMove {
 				tempAttackedPiece = attackedPieceItr.next();
 				if(checkEquality(tempAttackedPiece, move.getAttackedPiece())) {
 					attackedPieceItr.remove();
-					board.updateTakenPieceList(tempAttackedPiece);
+					if(updateTakenList) {
+						board.updateTakenPieceList(tempAttackedPiece);
+					}
 					break;
 				}
 			}
@@ -197,7 +208,7 @@ public interface CommandMove {
 		}
 		
 		@Override
-		public Board doMove() {
+		public Board doMove(boolean updateTakenList) {
 			Iterator <Piece>itr;
 			Piece tempIterating = null;
 			Piece tempKing = null;
@@ -249,7 +260,7 @@ public interface CommandMove {
 			
 		}
 		
-		public Board makeMove(Move move, Board board) {
+		public Board makeMove(Move move, Board board, boolean updateTakenList) {
 			if(move.isAttackMove()) {
 				commandMove = new ExecuteAttackMove(move, board);
 				
@@ -261,7 +272,7 @@ public interface CommandMove {
 				commandMove = new ExecuteMove(move, board);
 			}
 			
-			return commandMove.doMove();
+			return commandMove.doMove(updateTakenList);
 		}
 		
 		
