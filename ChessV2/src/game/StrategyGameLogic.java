@@ -217,14 +217,10 @@ public interface StrategyGameLogic {
 			}
 			return true;
 		}
-		
-			
-	
+
 	}
 	
-	
-	
-	
+
 	
 	/*
 	 * Operations for white player class.
@@ -406,7 +402,7 @@ public interface StrategyGameLogic {
 		}
 		
 		private boolean checkCastleCapeabilityWhite(Piece potentialKing, Piece potetianlRook) {
-			System.out.println(potetianlRook);
+
 			if(potentialKing == null || potetianlRook == null) {
 				return false;
 			}
