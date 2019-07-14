@@ -77,6 +77,7 @@ public class GuiTable extends Observable{
 	private Terminal terminal;
 	private FenFormat fenFormat;
 	private static GameState gameState;
+	private static boolean playAble; // this primitive indicates if the game is still playable i.e if the game is not over(by checkmate or stalemate)
 	
 	
 	public static String defaultPieceImagePath = "art/pieces/";
@@ -114,6 +115,7 @@ public class GuiTable extends Observable{
 	
 	
 	private GuiTable() {
+		this.playAble = true;
 		this.frame = new JFrame("Chess Game");
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		startNewBoard();
@@ -149,6 +151,7 @@ public class GuiTable extends Observable{
 	}
 	
 	private void restartGame() {
+		this.playAble = true;
 		startNewBoard();
 		this.terminal.init();
 		this.moveLog.clear();
@@ -275,7 +278,7 @@ public class GuiTable extends Observable{
 			@Override
 			public void update(final Observable arg0, final Object arg1) {
 				// TODO Auto-generated method stub
-				if(GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer()) && !(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) && !(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate())) {
+				if(playAble && GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer()) && !(GuiTable.get().getBoard().getCurrPlayer().isInCheckMate()) && !(GuiTable.get().getBoard().getCurrPlayer().isInStaleMate())) {
 					final AIThinkTank thinkTank = new AIThinkTank();
 					thinkTank.execute();	
 				}
@@ -313,11 +316,18 @@ public class GuiTable extends Observable{
 		}
 		
 		private void moveMadeUpdate(final Board board) {
+			isGamePlayAble();
 			setChanged();
 			notifyObservers(board);
 			
 		}
 		
+		private void isGamePlayAble() {
+			this.playAble = !board.isInCheckMate(board.getCurrentPlayerColour()) && !board.isInStaleMate(board.getCurrentPlayerColour());
+			
+			
+		}
+
 		private static class AIThinkTank extends SwingWorker<Move, String>{
 			private AIThinkTank() {
 				
@@ -396,13 +406,10 @@ public class GuiTable extends Observable{
 					tempSpotPanel = itr.next();
 					if(tempSpotPanel.xSpotPos == x && tempSpotPanel.ySpotPos == y) {
 						return tempSpotPanel;
-					}
-					
+					}					
 				}
 				return null;
-			}
-			
-			
+			}		
 		}
 		
 		
@@ -434,9 +441,7 @@ public class GuiTable extends Observable{
 			
 			public boolean removeMove(final Move move) {
 				return this.moves.remove(move);
-			}
-			
-			
+			}		
 		}
 		
 		private  class SpotPanel extends JPanel {
@@ -482,7 +487,7 @@ public class GuiTable extends Observable{
 					public void mouseClicked(final MouseEvent event) {
 						Move move;
 						//Left click to make a move.
-						//if(!GuiTable.get().getGameSetup().isAIPlayer(board.getCurrPlayer())) 
+						if(playAble) {
 						if(SwingUtilities.isLeftMouseButton(event)) {
 							
 							if(sourceSpot == null) {
@@ -504,12 +509,10 @@ public class GuiTable extends Observable{
 									}
 									sourceSpot =  null;
 									destSpot = null;
-									humanMovedPiece = null;		
-								 
+									humanMovedPiece = null;										 
 							}
 						
-						}
-						
+						}						
 						//Right click cancel any click (in case user regrets the click)
 						else if(SwingUtilities.isRightMouseButton(event)) {
 							System.out.println("Right clicked");
@@ -521,27 +524,23 @@ public class GuiTable extends Observable{
 						SwingUtilities.invokeLater(new Runnable() {
 							
 							@Override
-							public void run() {
-								
+							public void run() {								
 								gameHistoryPanel.redo(board, moveLog);
-								takenPiecesPanel.redo(moveLog);
-								
-								if(gameSetup.isAIPlayer(board.getCurrPlayer())) {
-									
-									GuiTable.get().moveMadeUpdate(board);
-									
+								takenPiecesPanel.redo(moveLog);								
+								if(gameSetup.isAIPlayer(board.getCurrPlayer())) {									
+									GuiTable.get().moveMadeUpdate(board);									
 								}
-								boardPanel.drawBoard(board);
-															
+								boardPanel.drawBoard(board);															
 							}
 						});
 						
 						
 					//}
-						}});
+						}}});
 				
 
 				validate();
+				
 			}
 			
 			

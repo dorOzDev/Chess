@@ -40,8 +40,7 @@ public interface StrategyGameLogic {
 		List<Move> whitePlayerLegalMoves;
 		PieceFactory pieceFactory;
 		ArrayList<Piece> whitePlayerPiecesClonedList;
-		ArrayList<Piece> blackPlayerPiecesClonedList;
-		
+		ArrayList<Piece> blackPlayerPiecesClonedList;	
 		
 		public OperationBlackPlayer(Board board) {
 			this.board = board;
@@ -205,7 +204,7 @@ public interface StrategyGameLogic {
 		}
 
 	
-		private boolean checkCastleCapeabilityBlack(Piece potentialKing, Piece potentialRook) {
+		public boolean checkCastleCapeabilityBlack(Piece potentialKing, Piece potentialRook) {
 			if(potentialKing == null || potentialRook == null) {
 				return false;
 			}
@@ -216,11 +215,10 @@ public interface StrategyGameLogic {
 				return false;
 			}
 			return true;
-		}
-
+		}	
 	}
 	
-
+		
 	
 	/*
 	 * Operations for white player class.
@@ -395,14 +393,14 @@ public interface StrategyGameLogic {
 
 		@Override
 		public boolean getQueenSideCastleCapeable() {
+			
 			if(getInCheckStatus(board)) {
 				return false;
 			}
 			return checkCastleCapeabilityWhite(board.getPiece(7, 4), board.getPiece(7, 0));
 		}
 		
-		private boolean checkCastleCapeabilityWhite(Piece potentialKing, Piece potetianlRook) {
-
+		public boolean checkCastleCapeabilityWhite(Piece potentialKing, Piece potetianlRook) {
 			if(potentialKing == null || potetianlRook == null) {
 				return false;
 			}
@@ -461,7 +459,7 @@ public interface StrategyGameLogic {
 		}
 		
 		public boolean getQueenSideCastleCapeable() {
-			return strategy.getKingSideCastleCapeable();
+			return strategy.getQueenSideCastleCapeable();
 		}
 		
 	}

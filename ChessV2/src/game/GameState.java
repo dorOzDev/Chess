@@ -37,7 +37,8 @@ public class GameState {
 		return gameState;
 	}
 	
-
+	
+	
 	public Board getUpdatedBoard(Board newBoard) {
 		
 		this.sourceBoard = new BoardBuilder(newBoard.getPiecesBlack(), newBoard.getPiecesWhite()).build();

@@ -24,6 +24,7 @@ public class FenFormat {
 	
 	public String makeFenofBoard(Board board) {
 		stringBuilder.setLength(0);
+
 		appendPiecePositon(board);
 		appendCurrPlayerTurn(board);
 		appendCastleAvailability(board);
@@ -71,6 +72,7 @@ public class FenFormat {
 	}
 	
 	private void appendCastleAvailability(Board board) {
+		
 		boolean castleAvailabilityWhitePlayer = false;
 		boolean castleAvailabilityBlackPlayer = false;
 		

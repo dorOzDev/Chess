@@ -27,6 +27,7 @@ public class Terminal extends JPanel implements Observer {
 	private final JScrollPane scrollPane;
 	private static EtchedBorder border = new EtchedBorder(EtchedBorder.RAISED);
 	private static Dimension TEXT_AREA_SIZE = new Dimension(100, 100);
+	
 	Terminal(Board board){
 		super(new BorderLayout());
 		this.board = board;
