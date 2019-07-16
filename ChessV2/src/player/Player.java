@@ -20,8 +20,6 @@ public abstract class Player {
 	protected Board board;
 	protected  ArrayList<Piece> remainingPieces;
 	protected List<Move> legalMoves;
-	//Player opponent;
-	//protected final Piece king;
 	protected ArrayList<Move> legalOpponentMoves;
 	protected boolean isInCheck;
 	protected PlayerColour playerColour;
@@ -43,11 +41,8 @@ public abstract class Player {
 	public void setPreferedPieceTypePromotion(PieceType pieceType) {
 		this.preferdPieceTypePormotion = pieceType;
 	}
-	public abstract boolean  isInCheck();
 	
-	public abstract boolean  isInCheckMate();
-	public abstract boolean isInStaleMate();
-	
+
 	public PlayerColour getPlayerColour() {
 		return this.playerColour;
 	}

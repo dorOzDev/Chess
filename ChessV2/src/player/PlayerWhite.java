@@ -18,21 +18,6 @@ public class PlayerWhite extends Player {
 		super(remainingPieces, board, PlayerColour.WHITE);
 		remainingPieces = board.getPiecesWhite();
 	}
-	
-	@Override
-	public boolean isInCheck() {
-		return board.isInCheck(PlayerColour.WHITE);
-	}
-	
-	@Override
-	public boolean isInCheckMate() {
-		return hasKingCaptured() || board.isInCheckMate(PlayerColour.WHITE);
-	}
-	
-	@Override
-	public boolean isInStaleMate() {
-		return board.isInStaleMate(PlayerColour.WHITE);
-	}
 
 	@Override
 	public boolean isWhite() {

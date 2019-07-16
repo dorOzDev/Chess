@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -54,23 +55,24 @@ public class Terminal extends JPanel implements Observer {
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 		textArea.append(initText);
-		
 	}
 	
-	public void checkMate() {
-		String wonText = new String("GAME OVER!\n Current player in check mate, for a new game go to File menu\n");
-		textArea.append(wonText);
+	public void showCheckMateDialog(Board board) {
+		JOptionPane.showMessageDialog(null,"GAME OVER! "+board.getCurrentPlayerColour().toString() + " player is in check mate, for a new game go to File menu","Victory!",1);
 	}
 	
-	public void staleMate() {
-		String staleText = new String("GAME OVER!\n Current player in stale mate, for a new game go to File menu\n");
-		textArea.append(staleText);
+	public void showStaleMateDialog(Board board) {
+		JOptionPane.showMessageDialog(null,"GAME OVER! "+board.getCurrentPlayerColour().toString() + " player is in stale mate, for a new game go to File menu","It's a tie!",1);
 	}
 	
 	public void appendNewMove(Board board) {
 		Move lastMove = board.getLastMove();
-		textArea.append(moveNumber+")"+ lastMove.getPiece().getPieceType().toString()+" moved from " + lastMove.getSourceSpot().toString() + " to " + lastMove.getDestSpot().toString()+"\n");		
+		textArea.append(moveNumber+")"+ lastMove.getPiece().getPlayerCoulor().toString()+" "+lastMove.getPiece().getPieceType().toString()+" moved from " + lastMove.getSourceSpot().toString() + " to " + lastMove.getDestSpot().toString()+"\n");		
 		moveNumber++;
+	}
+	
+	public void showAgainstComputerDialog() {
+		 JOptionPane.showMessageDialog(null,"The greater the difficult set is, the greater time it takes to calculate the legal move","Warnning",1);
 	}
 	
 	public void updateFenFormat(Board board) {
@@ -79,8 +81,22 @@ public class Terminal extends JPanel implements Observer {
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if(arg1 instanceof Board) {
+
 			appendNewMove((Board)arg1);
 			updateFenFormat((Board)arg1);
+			if(((Board) arg1).isInCheckMate(board.getCurrentPlayerColour())){
+				showCheckMateDialog((Board)arg1);
+			}
+			
+			else if(((Board) arg1).isInStaleMate(board.getCurrentPlayerColour())){
+				showStaleMateDialog((Board)arg1);
+			}
+		}
+		
+		else if(arg1 instanceof GameSetup) {
+			if(((GameSetup) arg1).isComputerSelected()) {
+				showAgainstComputerDialog();
+			}
 		}
 		
 	}

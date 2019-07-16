@@ -17,13 +17,6 @@ public class GameState {
 	
 	private static GameState gameState = null;
 	Board sourceBoard;
-	/*	
-	Player currPlayer;
-	ArrayList<Piece> playerBlackPieces;
-	ArrayList<Piece> playerWhitePieces;
-	Spot [][] boardSpots;
-	*/
-	
 	
 	public GameState(Board board){
 		this.sourceBoard = board;

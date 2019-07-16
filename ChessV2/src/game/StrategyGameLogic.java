@@ -22,7 +22,7 @@ import pieces.Queen;
 public interface StrategyGameLogic {
 	public List<Move> getLegalMoves();
 	public boolean getInCheckStatus(Board board);
-	public boolean isCastleAllowed(Move move);
+	public boolean isCastleNotAllowed(Move move);
 	public boolean getInCheckMateStatus();
 	public boolean getInStaleMate();
 	public boolean getKingSideCastleCapeable();
@@ -165,7 +165,7 @@ public interface StrategyGameLogic {
 		}
 
 		@Override
-		public boolean isCastleAllowed(Move move) {
+		public boolean isCastleNotAllowed(Move move) {
 			return simulateAndTestMove(move);
 		}
 
@@ -353,13 +353,13 @@ public interface StrategyGameLogic {
 					tempPiece.setPiecePos(move.getRookDestSpot());
 				}
 			}		
-			isCastleAllowed = getInCheckStatus(new BoardBuilder(board.getPiecesBlack(), whitePlayerPiecesClonedList).build());		
+			isCastleAllowed = getInCheckStatus(new BoardBuilder(board.getPiecesBlack(), whitePlayerPiecesClonedList).build()); 
 			return isCastleAllowed;
 		}
 
 
 		@Override
-		public boolean isCastleAllowed(Move move) {
+		public boolean isCastleNotAllowed(Move move) {
 			return simulateAndTestMove(move);
 		}
 
@@ -442,8 +442,8 @@ public interface StrategyGameLogic {
 			return strategy.getInCheckStatus(this.board);
 		}
 		
-		public boolean isCastleAllowed(Move move) {
-			return strategy.isCastleAllowed(move);
+		public boolean isCastleNotAllowed(Move move) {
+			return strategy.isCastleNotAllowed(move);
 		}
 		
 		public boolean getInCheckMateStatus() {

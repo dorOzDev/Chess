@@ -67,7 +67,6 @@ public  class Board {
 		if(lastMove == null) {
 			return false;
 		}
-		
 		return lastMove.isPawnJumpMove();
 	}
 	
@@ -78,27 +77,7 @@ public  class Board {
 	public Move getLastMove() {
 		return lastMove;
 	}
-	
-	public boolean getKingSideCastleCapeableBlack() {
-		contextGameLogic = new ContextGameLogic(PlayerColour.BLACK, this);
-		return contextGameLogic.getKingSideCastleCapeable();
-	}
-	
-	public boolean getQueenSideCastleCapeableBlack() {
-		contextGameLogic = new ContextGameLogic(PlayerColour.BLACK, this);
-		return contextGameLogic.getQueenSideCastleCapeable();
-	}
-	
-	public boolean getKingSideCastleCapeableWhite() {
-		contextGameLogic = new ContextGameLogic(PlayerColour.WHITE, this);
-		return contextGameLogic.getKingSideCastleCapeable();
-	}
-	
-	public boolean getQueenSideCastleCapeableWhite() {
-		contextGameLogic = new ContextGameLogic(PlayerColour.WHITE, this);
-		return contextGameLogic.getQueenSideCastleCapeable();
-	}
-	
+		
 	public PlayerColour getCurrentPlayerColour() {
 		if(currPlayer.getPlayerColour() == PlayerColour.BLACK) {
 			return PlayerColour.BLACK;
@@ -147,7 +126,7 @@ public  class Board {
 		return this.blackPlayerPieces;
 	}
 	
-	
+	//This method cast numeric coordinates to algebric notion coordinates.
 	public String castToBoardCordinate(Spot destSpot) {
 		
 		char intToAlgebric =(char) (destSpot.getY() + 'a'); // Cast row number to letter
@@ -170,9 +149,9 @@ public  class Board {
 		return contextGameLogic.getInCheckStatus();
 	}
 	
-	public boolean isCastleAllowed(Move move, PlayerColour playerColour) {
+	public boolean isCastleNotAllowed(Move move, PlayerColour playerColour) {
 		contextGameLogic = new ContextGameLogic(playerColour, this);
-		return contextGameLogic.isCastleAllowed(move);
+		return contextGameLogic.isCastleNotAllowed(move);
 	}
 	
 	
@@ -187,9 +166,26 @@ public  class Board {
 		return contextGameLogic.getInStaleMateStatus();
 	}
 	
-
-
+	public boolean getKingSideCastleCapeableBlack() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.BLACK, this);
+		return contextGameLogic.getKingSideCastleCapeable();
+	}
 	
+	public boolean getQueenSideCastleCapeableBlack() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.BLACK, this);
+		return contextGameLogic.getQueenSideCastleCapeable();
+	}
+	
+	public boolean getKingSideCastleCapeableWhite() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.WHITE, this);
+		return contextGameLogic.getKingSideCastleCapeable();
+	}
+	
+	public boolean getQueenSideCastleCapeableWhite() {
+		contextGameLogic = new ContextGameLogic(PlayerColour.WHITE, this);
+		return contextGameLogic.getQueenSideCastleCapeable();
+	}
+		
 	public Player getWhitePlayer() {
 		return this.playerWhite;
 	}
@@ -205,7 +201,9 @@ public  class Board {
 	
 	
 	/**
-	 * This is the board builder, sole purpose building board based on requests.
+	 * This is the board builder, sole purpose building board(Board spots and Player's pieces) based on requests.
+	 * Using builder design pattern.
+	 * 
 	 * */
 	public static class BoardBuilder {
 
@@ -216,24 +214,30 @@ public  class Board {
 		private final Spot boardSpots[][];
 		
 		
-		public BoardBuilder(ArrayList<Piece>blackPlayerPieces, ArrayList<Piece>whitePlayerPieces) {
+		//Creating new standard board
+		public BoardBuilder() {
 			this.blackPlayerPieces = new ArrayList<Piece>();
 			this.whitePlayerPieces = new ArrayList<Piece>();
 			this.boardSpots = new Spot[NUM_ROWS][NUM_COLS];
 			this.pieceFactory = new PieceFactory();
 			createBoardSpots();
+			createBlackPieces();
+			createWhitePieces();
+			updateBoardSpots();	
 			
-			//If starting new game pieces should be created in their original spots
-			if(blackPlayerPieces == null || whitePlayerPieces == null) {
-				createBlackPieces();
-				createWhitePieces();
-			}
-			// Else building a board from existing one
-			else {
-				createPieces(blackPlayerPieces, whitePlayerPieces);
-			}
+		}
+		//Creating board based on pre made white and black pieces locations
+		public BoardBuilder(ArrayList<Piece>blackPlayerPieces, ArrayList<Piece>whitePlayerPieces) {
+			this.blackPlayerPieces = new ArrayList<Piece>();
+			this.whitePlayerPieces = new ArrayList<Piece>();
+			this.boardSpots = new Spot[NUM_ROWS][NUM_COLS];
+			this.pieceFactory = new PieceFactory();
+			createBoardSpots();			
+			createPieces(blackPlayerPieces, whitePlayerPieces);		
 			updateBoardSpots();			
 		}
+		
+		
 		
 		private void createPieces(ArrayList<Piece> blackPlayerPieces, ArrayList<Piece> whitePlayerPieces) {
 			for(Piece piece : blackPlayerPieces) {

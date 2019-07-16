@@ -9,7 +9,9 @@ We will make a fen format of current played board for statistics and enable load
 
 package game;
 
+import enaum.PieceType;
 import enaum.PlayerColour;
+import pieces.Piece;
 
 public class FenFormat {
 	
@@ -38,6 +40,7 @@ public class FenFormat {
 	private void appendPiecePositon(Board board) {
 		int emptySpace;
 		char pieceLetter;
+		Piece tempPiece;
 		for(int i = 0; i < board.NUM_ROWS; i++) {
 			emptySpace = 0;
 			for(int j = 0; j < board.NUM_COLS; j++) {
@@ -45,7 +48,18 @@ public class FenFormat {
 					if(emptySpace != 0) {
 						stringBuilder.append(Character.forDigit(emptySpace, HEX_RADIX));
 					}
-					pieceLetter = board.getSpot(i, j).getPiece().getPlayerCoulor() == PlayerColour.BLACK ? board.getSpot(i, j).getPiece().getPieceType().toString().toLowerCase().charAt(0) : board.getSpot(i, j).getPiece().getPieceType().toString().charAt(0);
+					tempPiece = board.getPiece(i, j);
+					if(tempPiece.getPieceType() == PieceType.KNIGHT) {
+						if(tempPiece.getPlayerCoulor() == PlayerColour.BLACK){
+							pieceLetter = 'n';
+						}
+						else {
+							pieceLetter = 'N';
+						}
+					}
+					else {
+						pieceLetter = tempPiece.getPlayerCoulor() == PlayerColour.BLACK ? tempPiece.getPieceType().toString().toLowerCase().charAt(0) : tempPiece.getPieceType().toString().charAt(0);
+					}
 					stringBuilder.append(pieceLetter);
 					emptySpace = 0;
 				}

@@ -1,5 +1,6 @@
 package ai;
 
+import enaum.PlayerColour;
 import game.Board;
 import pieces.Piece;
 import player.Player;
@@ -17,24 +18,29 @@ public final class StandardBoardEvaluator implements BoardEvaluator {
 	}
 
 	private int scorePlayer(final Board board,final  Player player,final  int depth) {
-		return pieceValue(player) + mobility(player) + check(player) + checkMate(player, depth) + casled(player);
+		return pieceValue(player) + mobility(player) + check(board) + checkMate(board, depth) ; //+casled(player);
 	}
 
-	private static int casled(Player player) {
+	/*
+	private static int casled(Board board) {
 		//TODO add isCasled to player(?) return player.isCasled() ? CASTLE_BONUS : 0;
 		return 0;
 	}
+	*/
+	private static int checkMate(final Board board, final int depth) {
+		return board.isInCheckMate(getOpponentColour(board)) ? CHECK_MATE_BONUS * depthBonus(depth) : 0 ;
+	}
 
-	private static int checkMate(final Player player, final int depth) {
-		return player.getOpponent().isInCheckMate() ? CHECK_MATE_BONUS * depthBonus(depth) : 0 ;
+	private static PlayerColour getOpponentColour(Board board) {
+		return board.getCurrentPlayerColour() == PlayerColour.WHITE ? PlayerColour.BLACK : PlayerColour.WHITE;
 	}
 
 	private static int depthBonus(int depth) {
 		return depth == 0 ? 1 : DEPTH_BONUS * depth;
 	}
 
-	private static int check(Player player) {
-		return player.getOpponent().isInCheck() ? CHECK_BONUS : 0;
+	private static int check(Board board) {
+		return board.isInCheck(getOpponentColour(board)) ? CHECK_BONUS : 0;
 	}
 
 	private static int mobility(final Player player) {

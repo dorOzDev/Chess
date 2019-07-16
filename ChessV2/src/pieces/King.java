@@ -54,7 +54,6 @@ public class King extends Piece {
 		if(isCastleQueenSideAllowed(castleMoveQueenSide, board)) {		
 			castleMovements.add(castleMoveQueenSide);
 		}
-		
 		return castleMovements;
 	}
 	
@@ -68,9 +67,7 @@ public class King extends Piece {
 		if(!this.isFirstMove()) {
 			return false;
 		}
-		
-		
-		
+	
 		// Check if obtained piece is indeed rook of the same colour type.
 		if(move.getRook() == null || move.getRook().getPieceType() != PieceType.ROOK || this.getPlayerCoulor() != move.getRook().getPlayerCoulor()) {
 			return false;
@@ -88,14 +85,13 @@ public class King extends Piece {
 		}
 		
 		
-		if(this.getPlayerCoulor() == PlayerColour.WHITE) {
-			
+		if(this.getPlayerCoulor() == PlayerColour.WHITE) {			
 			// If king is in chess, castling is not allowed.
-			if(board.isInCheck(PlayerColour.WHITE)) 
+			if(board.isInCheck(PlayerColour.WHITE)) {
 				return false;
+			}
 			// Checking if king lands on chess spot by the end of the rook, if true castle is not allowed.
-			if(board.isCastleAllowed(move, PlayerColour.WHITE)) {
-				
+			if(board.isCastleNotAllowed(move, PlayerColour.WHITE)) {
 				return false;
 			}
 					
@@ -104,12 +100,11 @@ public class King extends Piece {
 			if(board.isInCheck(PlayerColour.BLACK)) {
 				return false;
 			}
-			if(board.isCastleAllowed(move, PlayerColour.BLACK)) {
+			if(board.isCastleNotAllowed(move, PlayerColour.BLACK)) {
 				
 				return false;
 			}
 		}
-		
 		return true;
 	}
 	
@@ -149,7 +144,7 @@ public class King extends Piece {
 			if(board.isInCheck(PlayerColour.WHITE)) 
 				return false;
 			// Checking if king lands on chess spot by the end of the rook, if true castle is not allowed.
-			if(board.isCastleAllowed(move, PlayerColour.WHITE)) {
+			if(board.isCastleNotAllowed(move, PlayerColour.WHITE)) {
 				
 				return false;
 			}
@@ -159,7 +154,7 @@ public class King extends Piece {
 			if(board.isInCheck(PlayerColour.BLACK)) {
 				return false;
 			}
-			if(board.isCastleAllowed(move, PlayerColour.BLACK)) {
+			if(board.isCastleNotAllowed(move, PlayerColour.BLACK)) {
 				
 				return false;
 			}

@@ -21,23 +21,6 @@ public class PlayerBlack extends Player {
 	}
 
 	@Override
-	public boolean isInCheck() {	
-		return board.isInCheck(PlayerColour.BLACK);
-		
-	}
-
-	@Override
-	public boolean isInCheckMate() {
-		
-		return hasKingCaptured() || board.isInCheckMate(PlayerColour.BLACK);
-	}
-
-	@Override
-	public boolean isInStaleMate() {
-		return board.isInStaleMate(PlayerColour.BLACK);
-	}
-
-	@Override
 	public boolean isWhite() {
 		return false;
 	}

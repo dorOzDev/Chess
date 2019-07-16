@@ -6,6 +6,10 @@ import game.Board;
 import game.Spot;
 import pieces.Piece;
 
+
+/*
+ * This class is holding information regard each move in the game, it holds source location, destination location move type
+ * */
 public abstract class Move {
 	
 	protected Spot sourceSpot;

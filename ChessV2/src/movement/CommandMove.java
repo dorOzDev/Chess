@@ -13,16 +13,12 @@ import pieces.PieceFactory;
 
 /***********
  * This class execute the selected move by the player
- * This implemented using the Command Design Pattern, that in order to support do/undo move.
- * 
+ * This implemented using the Command Design Pattern.
  */
 public interface CommandMove {
 	
 	public Board doMove(boolean updateTakenList);
-	
-	
-	
-	
+		
 
 	/*
 	 * EXECUTE PROGRESS MOVE
@@ -155,7 +151,7 @@ public interface CommandMove {
 				}
 			}
 					
-			//TODO need to provide the client with option to promote the pawn to any other piece type except for king and pawn.
+
 			tempAttakcingPiece.makeFirstMove();
 			if(move.getPiece().isPawnPromotionMove(move.getDestSpot().getX())) {
 				promotedPiece = pieceFactory.createPiece(move.getPiece().getPlayerCoulor(), PieceType.QUEEN, move.getDestSpot(), move.getPiece().isFirstMove());
@@ -204,7 +200,6 @@ public interface CommandMove {
 			this.pieceFactory = new PieceFactory();
 			this.playerBlackPieces = pieceFactory.createImmutableArrayList(board.getPiecesBlack());
 			this.playerWhitePieces = pieceFactory.createImmutableArrayList(board.getPiecesWhite());		
-
 		}
 		
 		@Override
@@ -243,21 +238,16 @@ public interface CommandMove {
 
 		private boolean checkEquality(Piece piece1, Piece piece2) {
 			return piece1.getX() == piece2.getX() && piece1.getY() == piece2.getY() && piece1.getPieceType() == piece2.getPieceType();
-		}
-		
-		
+		}		
 	}
 	
 	public class MoveExecuter{
 		private CommandMove commandMove = null;
 		PieceType preferedPieceTypePromotion;
 		boolean updateGui;
-		public MoveExecuter(PieceType preferedPieceTypePromotion) {
-		
+		public MoveExecuter(PieceType preferedPieceTypePromotion) {	
 			this.updateGui = updateGui;
-			this.preferedPieceTypePromotion = preferedPieceTypePromotion;
-			
-			
+			this.preferedPieceTypePromotion = preferedPieceTypePromotion;		
 		}
 		
 		public Board makeMove(Move move, Board board, boolean updateTakenList) {

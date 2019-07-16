@@ -28,17 +28,19 @@ public class GameSetup extends JDialog {
 	private static final String HUMAN_TEXT = "Human";
 	private static final String COMPUTER_TEXT = "Computer";
 	
+	final JRadioButton whiteHumanButton;
+	final JRadioButton blackHumanButton;
+	final JRadioButton blackComputerButton;
+	
 	GameSetup(final JFrame frame, final boolean modal){
 		super(frame, modal);
 		final JPanel myJPanel = new JPanel(new GridLayout(0, 1));
-		final JRadioButton whiteHumanButton = new JRadioButton(HUMAN_TEXT);
-		final JRadioButton whiteComputerButton = new JRadioButton(COMPUTER_TEXT);
-		final JRadioButton blackHumanButton = new JRadioButton(HUMAN_TEXT);
-		final JRadioButton blackComputerButton = new JRadioButton(COMPUTER_TEXT);
+		whiteHumanButton = new JRadioButton(HUMAN_TEXT);
+		blackHumanButton = new JRadioButton(HUMAN_TEXT);
+		blackComputerButton = new JRadioButton(COMPUTER_TEXT);
 		whiteHumanButton.setActionCommand(HUMAN_TEXT);
 		final ButtonGroup whiteGroup = new ButtonGroup();
 		whiteGroup.add(whiteHumanButton);
-		whiteGroup.add(whiteComputerButton);
 		whiteHumanButton.setSelected(true);
 		
 		final ButtonGroup blackGroup = new ButtonGroup();
@@ -50,7 +52,6 @@ public class GameSetup extends JDialog {
 		getContentPane().add(myJPanel);
 		myJPanel.add(new JLabel("White"));
 		myJPanel.add(whiteHumanButton);
-		myJPanel.add(whiteComputerButton);
 		myJPanel.add(new JLabel("Black"));
 		myJPanel.add(blackComputerButton);
 		myJPanel.add(blackHumanButton);
@@ -92,7 +93,9 @@ public class GameSetup extends JDialog {
 		
 	}
 	
-	
+	public boolean isComputerSelected() {
+		return blackComputerButton.isSelected();
+	}
 	
     void promptUser() {
         setVisible(true);
