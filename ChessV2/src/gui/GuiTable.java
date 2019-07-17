@@ -3,7 +3,6 @@ package gui;
 import game.Board;
 import game.Board.BoardBuilder;
 import game.FenFormat;
-import game.GameState;
 import game.Spot;
 import movement.AttackMove;
 import movement.CandidateMove;
@@ -75,11 +74,12 @@ public class GuiTable extends Observable{
 	private final GameSetup gameSetup;
 	private Move computerMove;
 	private Terminal terminal;
-	private FenFormat fenFormat;
-	private static GameState gameState;
+
+
 
 	static final String defaultPieceImagePath = "art/pieces/";
 	static final String defaultHighLightMovePath = "art/misc/grey_dot.png";
+	static final String defaultTakenPiecePanel = "art/TakenPiece/";
 
 
 	private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(1050, 1050);
@@ -89,11 +89,7 @@ public class GuiTable extends Observable{
 	
 	private final Color lightSpotColor= Color.decode("#FFFACD");
 	private final Color darkSpotColor = Color.decode("#705124");
-	private final Color lastMadeMoveColor = Color.decode("#70Cf7A");
-	private final Color highLightMove = Color.decode("#A0B2B9");
-	
-	private final String darkSpotTilePath = "art/Tile/Black_Tile.png";
-	private final String lightSpotTilePath = "art/Tile/White_Tile.png";
+
 	
 	private static final GuiTable guiTable = new GuiTable();
 	
@@ -123,9 +119,8 @@ public class GuiTable extends Observable{
 		this.frame.add(gameHistoryPanel, BorderLayout.EAST);	
 		this.frame.add(terminal, BorderLayout.SOUTH);
 		this.moveLog = new MoveLog();
-		//this.gameState = new GameState(board);
 		this.boardPanel = new BoardPanel();
-		addObserver(new TableGameAIWatcher());
+		addObserver(new ExecuterAIMove());
 		addObserver(terminal);
         this.frame.add(boardPanel, BorderLayout.CENTER);
 		center(this.frame);
@@ -247,27 +242,18 @@ public class GuiTable extends Observable{
 			return this.gameSetup;
 		}
 		
-		
+		//Notify observers when playing against computer decision was made
 		private void setupUpdate(final GameSetup gameSetup) {
 			setChanged();
 			notifyObservers(gameSetup);
 		}
 		
-		private  class TableGameAIWatcher implements Observer{
-			
-			
-			@Override
-			public void update(final Observable arg0, final Object arg1) {
-				// TODO Auto-generated method stub
-				if( GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer()) && !(GuiTable.get().getBoard().isInCheckMate(board.getCurrentPlayerColour())) && !(GuiTable.get().getBoard().isInStaleMate(board.getCurrentPlayerColour()))) {
-					final AIThinkTank thinkTank = new AIThinkTank();
-					thinkTank.execute();	
-				}			
-				
-			}
-			
+		//Notify observers when new move was made
+		private void moveMadeUpdate(final Board board) {
+
+			setChanged();
+			notifyObservers(board);		
 		}
-		
 		
 		public void updateComputerMove(Move move) {
 			this.computerMove = move;
@@ -289,17 +275,24 @@ public class GuiTable extends Observable{
 			return this.boardPanel;
 		}
 		
-		private void moveMadeUpdate(final Board board) {
-
-			setChanged();
-			notifyObservers(board);
+		
+		private  class ExecuterAIMove implements Observer{		
+			@Override
+			public void update(final Observable arg0, final Object arg1) {
+				// TODO Auto-generated method stub
+				if( GuiTable.get().getGameSetup().isAIPlayer(GuiTable.get().getBoard().getCurrPlayer()) && !(GuiTable.get().getBoard().isInCheckMate(board.getCurrentPlayerColour())) && !(GuiTable.get().getBoard().isInStaleMate(board.getCurrentPlayerColour()))) {
+					final AIMoveDecider thinkTank = new AIMoveDecider();
+					thinkTank.execute();	
+				}			
+				
+			}
 			
 		}
 		
-	
+		
 
-		private static class AIThinkTank extends SwingWorker<Move, String>{
-			private AIThinkTank() {
+		private static class AIMoveDecider extends SwingWorker<Move, String>{
+			private AIMoveDecider() {
 				
 			}
 
@@ -321,7 +314,6 @@ public class GuiTable extends Observable{
 						board.setCurrentPlayer();
 					}			
 					final Board destionatioBoard = GuiTable.get().getBoard().getCurrPlayer().makeMove(bestMove, GuiTable.get().getBoard(), true);
-					//board = gameState.getUpdatedBoard(destionatioBoard);
 					board = destionatioBoard;
 					GuiTable.get().getMoveLog().addMove(bestMove);
 					GuiTable.get().getGameHistoryPanel().redo(GuiTable.get().getBoard(), GuiTable.get().getMoveLog());

@@ -28,12 +28,6 @@ public class PlayerWhite extends Player {
 	public boolean isBlack() {
 		return false;
 	}
-
-	@Override
-	public void updateCurrentAvailablePieces() {
-		remainingPieces = board.getPiecesWhite();
-		
-	}
 	
 	//This method gets potential move making from the clicked event made by player on the GUI class.
 	//Need to validate if the same clicked move is valid or not.
@@ -80,15 +74,9 @@ public class PlayerWhite extends Player {
 	
 	@Override
 	public List<Piece> getPlayerRemaningPieces() {
-		updateCurrentAvailablePieces();
 		return remainingPieces;
 	}
 
-	@Override
-	public Player getOpponent() {
-		return board.getBlackPlayer();
-	}
-	
 	@Override
 	public boolean hasKingCaptured() {
 		remainingPieces = board.getPiecesWhite();

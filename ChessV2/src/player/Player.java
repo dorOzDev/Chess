@@ -19,8 +19,7 @@ public abstract class Player {
 	
 	protected Board board;
 	protected  ArrayList<Piece> remainingPieces;
-	protected List<Move> legalMoves;
-	protected ArrayList<Move> legalOpponentMoves;
+	protected List<Move> legalMoves;	
 	protected boolean isInCheck;
 	protected PlayerColour playerColour;
 	protected MoveExecuter moveExecuter;
@@ -28,7 +27,6 @@ public abstract class Player {
 	
 	public Player(ArrayList<Piece> remainingPieces, Board board, PlayerColour playerColor){	
 		this.legalMoves = new ArrayList<Move>();
-		this.legalOpponentMoves = new ArrayList<Move>();
 		this.remainingPieces = remainingPieces;
 		this.board = board;
 		this.isInCheck = false;
@@ -69,13 +67,11 @@ public abstract class Player {
 	}
 	
 	public abstract boolean isWhite();
-	public abstract boolean isBlack();
 	
-	public abstract void updateCurrentAvailablePieces();
+	public abstract boolean isBlack();
 	
 	public abstract List<Piece> getPlayerRemaningPieces();
 	
-	public abstract Player getOpponent ();
 	
 	public abstract boolean hasKingCaptured();
 }

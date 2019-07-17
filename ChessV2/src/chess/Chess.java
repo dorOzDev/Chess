@@ -7,12 +7,8 @@ import player.Player;
 
 public class Chess {
 	
-	public static void main(String[] args) {
-
-		
-		GuiTable guiTable = GuiTable.get();
-		
-		
+	public static void main(String[] args) {		
+		GuiTable guiTable = GuiTable.get();		
 	}
 
 }

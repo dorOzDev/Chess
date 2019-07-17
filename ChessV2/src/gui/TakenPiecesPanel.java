@@ -72,7 +72,7 @@ public class TakenPiecesPanel extends JPanel {
 		
 		for(final Piece takenPiece : whiteTakenPieces) {
 			try {
-			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
+			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultTakenPiecePanel + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
 			final ImageIcon imageIcon = new ImageIcon(image);
 			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 10 , imageIcon.getIconWidth() - 10 , Image.SCALE_SMOOTH)));
 			this.southPanel.add(imageLabel);
@@ -84,7 +84,7 @@ public class TakenPiecesPanel extends JPanel {
 		
 		for(final Piece takenPiece : blackTakenPieces) {
 			try {		
-			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultPieceImagePath + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
+			final BufferedImage image = ImageIO.read(new File(GuiTable.defaultTakenPiecePanel + takenPiece.getPlayerCoulor().toString().substring(0, 1) + takenPiece.getPieceType().toString() + ".png"));
 			final ImageIcon imageIcon = new ImageIcon(image);
 			final JLabel imageLabel = new JLabel(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() - 10 , imageIcon.getIconWidth() - 10 , Image.SCALE_SMOOTH)));
 			this.northPanel.add(imageLabel);

@@ -31,12 +31,7 @@ public class PlayerBlack extends Player {
 		return true;
 	}
 
-	@Override
-	public void updateCurrentAvailablePieces() {
-		remainingPieces = board.getPiecesBlack();
-		
-	}
-	
+
 	//This method gets potential move making from the clicked event made by player on the GUI class.
 	//Need to validate if the same clicked move is valid or not.
 	@Override
@@ -80,13 +75,7 @@ public class PlayerBlack extends Player {
 
 	@Override
 	public List<Piece> getPlayerRemaningPieces() {
-		updateCurrentAvailablePieces();
 		return remainingPieces;
-	}
-
-	@Override
-	public Player getOpponent() {
-		return board.getWhitePlayer();
 	}
 
 	@Override

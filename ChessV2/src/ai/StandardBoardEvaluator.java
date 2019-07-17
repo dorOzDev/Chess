@@ -13,7 +13,7 @@ public final class StandardBoardEvaluator implements BoardEvaluator {
 	private static int DEPTH_BONUS = 100;
 
 	@Override
-	public int eveluate(final Board board, final int depth) {
+	public int evaluate(final Board board, final int depth) {
 		return scorePlayer(board, board.getWhitePlayer(), depth) - scorePlayer(board, board.getBlackPlayer(), depth);
 	}
 
